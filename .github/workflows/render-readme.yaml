@@ -25,10 +25,21 @@ jobs:
       - name: Setup pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.9'
+
+      - name: Cache Julia packages
+        uses: julia-actions/cache@v2
+        with:
+          cache-name: julia-cache-artifacts
+          cache-compiled: true
+
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::rmarkdown, ropensci/allcontributors
+          packages: any::rmarkdown, ropensci/allcontributors, local::.
+          needs: website
 
       - name: Update contributors
         if: github.ref == 'refs/heads/main'
@@ -41,6 +52,17 @@ jobs:
               message("Continuing without contributor update...")
             }
           )
+        shell: Rscript {0}
+
+      - name: Install JuliaCall dependencies
+        run: |
+          export R_HOME=$(R RHOME)
+          julia -e 'ENV["R_HOME"] = raw"'"$R_HOME"'"; using Pkg; Pkg.add("RCall"); Pkg.build("RCall")'
+        shell: bash
+
+      - name: Setup Julia dependencies
+        run: |
+          forecastbaselines::setup_ForecastBaselines(verbose = TRUE)
         shell: Rscript {0}
 
       - name: Compile the readme

@@ -1,40 +1,42 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
 # forecastbaselines
 
-> R interface to
-> [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
+> R interface to [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 
-An R package providing access to 10 baseline forecasting models from the
-Julia ForecastBaselines.jl library, with comprehensive uncertainty
-quantification and seamless integration with the
-[scoringutils](https://epiforecasts.io/scoringutils/) evaluation
-framework.
+An R package providing access to 10 baseline forecasting models from the Julia ForecastBaselines.jl library, with comprehensive uncertainty quantification and seamless integration with the [scoringutils](https://epiforecasts.io/scoringutils/) evaluation framework.
 
 ## Features
 
-- **10 Forecasting Models**: From simple baselines (Constant, Marginal)
-  to advanced time series models (ARMA, ETS, STL)
-- **Probabilistic Forecasting**: Multiple methods for prediction
-  intervals (empirical, parametric, model-based)
-- **Comprehensive Scoring**: Compatible with scoringutils for all
-  standard forecast evaluation metrics
-- **Data Transformations**: Log, power, Box-Cox transformations with
-  automatic back-transformation
+- **10 Forecasting Models**: From simple baselines (Constant, Marginal) to advanced time series models (ARMA, ETS, STL)
+- **Probabilistic Forecasting**: Multiple methods for prediction intervals (empirical, parametric, model-based)
+- **Comprehensive Scoring**: Compatible with scoringutils for all standard forecast evaluation metrics
+- **Data Transformations**: Log, power, Box-Cox transformations with automatic back-transformation
 
 ## Installation
 
 ### Prerequisites
 
-1.  **Julia** (\>= 1.9): Download from
-    [julialang.org](https://julialang.org/downloads/)
-2.  **R** (\>= 3.5.0)
-3.  **JuliaCall R package**: `install.packages("JuliaCall")`
+1. **Julia** (>= 1.9): Download from [julialang.org](https://julialang.org/downloads/)
+2. **R** (>= 3.5.0)
+3. **JuliaCall R package**: `install.packages("JuliaCall")`
 
 ### Installing forecastbaselines
 
-``` r
+```r
 # Install from GitHub
 remotes::install_github("epiforecasts/forecastbaselines")
 ```
@@ -43,7 +45,7 @@ remotes::install_github("epiforecasts/forecastbaselines")
 
 After installation, initialize Julia and load ForecastBaselines.jl:
 
-``` r
+```{r setup, eval=FALSE}
 library(forecastbaselines)
 
 # Initialize Julia and install/load ForecastBaselines.jl
@@ -54,7 +56,7 @@ This only needs to be done once per R session.
 
 ## Quick Example
 
-``` r
+```{r example, eval=FALSE}
 library(forecastbaselines)
 library(scoringutils)
 setup_ForecastBaselines()
@@ -90,24 +92,20 @@ print(scores_summary)
 ## Available Models
 
 ### Simple Baseline Models
-
 - **ConstantModel**: Naive forecast using last observed value
 - **MarginalModel**: Forecasts based on empirical marginal distribution
 - **KDEModel**: Kernel density estimation
 
 ### Seasonal/Trend Models
-
 - **LSDModel**: Last Similar Dates method (seasonal patterns)
 - **OLSModel**: Ordinary least squares with polynomial trends
 - **IDSModel**: Increase-Decrease-Stable trend detection
 - **STLModel**: Seasonal-Trend decomposition using Loess
 
 ### Advanced Time Series Models
-
 - **ARMAModel**: Autoregressive Moving Average
 - **INARCHModel**: Integer-valued ARCH for count data
-- **ETSModel**: Error-Trend-Season exponential smoothing (all 30
-  variants)
+- **ETSModel**: Error-Trend-Season exponential smoothing (all 30 variants)
 
 ## Documentation
 
@@ -119,27 +117,28 @@ For detailed guides and examples:
 
 ## Citation
 
-If you use this package in your research, please cite the software and
-the associated preprint:
+If you use this package in your research, please cite the software and the associated preprint:
 
 **Software:**
-
-    @software{forecastbaselinesr,
-      title = {forecastbaselines: R Interface to ForecastBaselines.jl},
-      author = {Stapper, Manuel and Funk, Sebastian},
-      year = {2025},
-      url = {https://github.com/epiforecasts/forecastbaselines}
-    }
+```
+@software{forecastbaselinesr,
+  title = {forecastbaselines: R Interface to ForecastBaselines.jl},
+  author = {Stapper, Manuel and Funk, Sebastian},
+  year = {2025},
+  url = {https://github.com/epiforecasts/forecastbaselines}
+}
+```
 
 **Preprint:**
-
-    @article{stapper2025baseline,
-      title = {Mind the Baseline: The Hidden Impact of Reference Model Selection on Forecast Assessment},
-      author = {Stapper, Manuel and Funk, Sebastian},
-      year = {2025},
-      doi = {10.1101/2025.08.01.25332807},
-      url = {https://doi.org/10.1101/2025.08.01.25332807}
-    }
+```
+@article{stapper2025baseline,
+  title = {Mind the Baseline: The Hidden Impact of Reference Model Selection on Forecast Assessment},
+  author = {Stapper, Manuel and Funk, Sebastian},
+  year = {2025},
+  doi = {10.1101/2025.08.01.25332807},
+  url = {https://doi.org/10.1101/2025.08.01.25332807}
+}
+```
 
 ## License
 
@@ -147,7 +146,6 @@ MIT License - see LICENSE file for details
 
 ## Support
 
-For bugs and feature requests: - R package issues: [GitHub
-Issues](https://github.com/epiforecasts/forecastbaselines/issues) -
-Julia package issues: [ForecastBaselines.jl
-Issues](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
+For bugs and feature requests:
+- R package issues: [GitHub Issues](https://github.com/epiforecasts/forecastbaselines/issues)
+- Julia package issues: [ForecastBaselines.jl Issues](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)

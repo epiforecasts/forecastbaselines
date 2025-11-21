@@ -1,0 +1,13 @@
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Generated files
+README.html
+README.knit.md
+
+# Documentation
+docs/
+inst/doc
