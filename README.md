@@ -146,10 +146,12 @@ MIT License - see LICENSE file for details
 
 ## Support
 
-For bugs and feature requests: - R package issues: [GitHub
-Issues](https://github.com/epiforecasts/forecastbaselines/issues) -
-Julia package issues: [ForecastBaselines.jl
-Issues](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
+For bugs and feature requests:
+
+- R package issues: [GitHub
+  Issues](https://github.com/epiforecasts/forecastbaselines/issues)
+- Julia package issues: [ForecastBaselines.jl
+  Issues](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
 
 ## Contributors
 
