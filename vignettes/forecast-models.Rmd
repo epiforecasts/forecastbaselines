@@ -301,9 +301,9 @@ historical periods.
 ```{r lsd}
 # Monthly data with seasonality
 set.seed(123)
-months <- 1:120
+months <- 1:240
 seasonal_pattern <- 20 + 10 * sin(2 * pi * months / 12)
-data <- seasonal_pattern + rnorm(120, sd = 2)
+data <- seasonal_pattern + rnorm(240, sd = 2)
 
 # Fit LSD model
 model <- LSDModel(window_width = 3, s = 12) # Average last 3 years
@@ -314,10 +314,10 @@ fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:12)
 
 # Plot
 plot(data,
-  type = "l", xlim = c(1, 132),
+  type = "l", xlim = c(1, 252),
   main = "LSD Model: Seasonal Forecast"
 )
-lines(121:132, fc$mean, col = "red", lwd = 2)
+lines(241:252, fc$mean, col = "red", lwd = 2)
 ```
 
 **Parameter Guidance:**
@@ -531,10 +531,10 @@ where $T_t$ is trend, $S_t$ is seasonal, $R_t$ is remainder.
 ```{r stl}
 # Generate trend + seasonality
 set.seed(123)
-time <- 1:120 # 10 years of monthly data
+time <- 1:240 # 20 years of monthly data
 trend <- 0.5 * time
 seasonal <- 10 * sin(2 * pi * time / 12)
-data <- 50 + trend + seasonal + rnorm(120, sd = 2)
+data <- 50 + trend + seasonal + rnorm(240, sd = 2)
 
 # Fit STL model
 model <- STLModel(s = 12)
@@ -545,11 +545,11 @@ fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:12)
 
 # Plot
 plot(data,
-  type = "l", xlim = c(1, 132),
+  type = "l", xlim = c(1, 252),
   main = "STL Model: Trend + Seasonality",
   ylab = "Value"
 )
-lines(121:132, fc$mean, col = "red", lwd = 2)
+lines(241:252, fc$mean, col = "red", lwd = 2)
 ```
 
 **Parameter Guidance:**
@@ -884,10 +884,10 @@ lines(73:84, fc$mean, col = "red", lwd = 2)
 ```{r sales-example}
 # Simulated retail sales: trend + seasonality + promotions
 set.seed(123)
-months <- 1:120
+months <- 1:240
 trend <- 1000 + 20 * months
 seasonal <- 200 * sin(2 * pi * months / 12) # Holiday peaks
-noise <- rnorm(120, sd = 50)
+noise <- rnorm(240, sd = 50)
 data <- trend + seasonal + noise
 
 # Try multiple models
