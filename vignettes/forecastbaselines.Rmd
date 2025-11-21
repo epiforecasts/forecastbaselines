@@ -58,6 +58,7 @@ The first time you use the package, you need to set up the Julia backend:
 
 ```{r setup}
 library(forecastbaselines)
+library(ggplot2)
 
 # One-time setup: installs Julia packages
 setup_ForecastBaselines()
@@ -91,10 +92,10 @@ noise <- rnorm(n, sd = 2)
 data <- trend + seasonal + noise
 
 # Plot the data
-plot(data,
-  type = "l", main = "Simulated Time Series",
-  ylab = "Value", xlab = "Time"
-)
+ggplot(data.frame(time = 1:n, value = data), aes(x = time, y = value)) +
+  geom_line() +
+  labs(title = "Simulated Time Series", x = "Time", y = "Value") +
+  theme_minimal()
 ```
 
 ## Fit a Model
@@ -128,22 +129,17 @@ fc$mean
 
 ```{r plot}
 # Plot data and forecast
-plot(c(data, rep(NA, 12)),
-  type = "l",
-  xlim = c(1, n + 12),
-  main = "Forecast with Constant Model",
-  ylab = "Value", xlab = "Time"
+plot_df <- rbind(
+  data.frame(time = 1:n, value = data, type = "Observed"),
+  data.frame(time = (n + 1):(n + 12), value = fc$mean, type = "Forecast")
 )
 
-# Add forecast
-lines((n + 1):(n + 12), fc$mean, col = "red", lwd = 2)
-
-# Add legend
-legend("topleft",
-  legend = c("Observed", "Forecast"),
-  col = c("black", "red"),
-  lwd = c(1, 2)
-)
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "Forecast with Constant Model", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 # Probabilistic Forecasting
@@ -194,19 +190,18 @@ arma_fc <- forecast(
 )
 
 # Compare forecasts
-plot(c(data, rep(NA, 12)),
-  type = "l",
-  xlim = c(1, n + 12),
-  main = "Constant vs ARMA Forecasts",
-  ylab = "Value", xlab = "Time"
+plot_df <- rbind(
+  data.frame(time = 1:n, value = data, type = "Observed"),
+  data.frame(time = (n + 1):(n + 12), value = fc$mean, type = "Constant"),
+  data.frame(time = (n + 1):(n + 12), value = arma_fc$mean, type = "ARMA")
 )
-lines((n + 1):(n + 12), fc$mean, col = "red", lwd = 2)
-lines((n + 1):(n + 12), arma_fc$mean, col = "blue", lwd = 2)
-legend("topleft",
-  legend = c("Observed", "Constant", "ARMA"),
-  col = c("black", "red", "blue"),
-  lwd = c(1, 2, 2)
-)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Observed" = "black", "Constant" = "red", "ARMA" = "blue")) +
+  labs(title = "Constant vs ARMA Forecasts", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 # Model Evaluation
@@ -342,18 +337,19 @@ lsd_fc <- forecast(lsd_fitted,
 )
 
 # Compare
-plot(c(seasonal_data, rep(NA, 12)),
-  type = "l",
-  main = "Seasonal Forecasting",
-  ylab = "Value", xlab = "Time"
+n_seasonal <- length(seasonal_data)
+plot_df <- rbind(
+  data.frame(time = 1:n_seasonal, value = seasonal_data, type = "Data"),
+  data.frame(time = (n_seasonal + 1):(n_seasonal + 12), value = stl_fc$mean, type = "STL"),
+  data.frame(time = (n_seasonal + 1):(n_seasonal + 12), value = lsd_fc$mean, type = "LSD")
 )
-lines(61:72, stl_fc$mean, col = "red", lwd = 2)
-lines(61:72, lsd_fc$mean, col = "blue", lwd = 2)
-legend("topleft",
-  legend = c("Data", "STL", "LSD"),
-  col = c("black", "red", "blue"),
-  lwd = c(1, 2, 2)
-)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Data" = "black", "STL" = "red", "LSD" = "blue")) +
+  labs(title = "Seasonal Forecasting", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 # Data Transformations

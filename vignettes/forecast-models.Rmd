@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(forecastbaselines)
+library(ggplot2)
 setup_ForecastBaselines()
 ```
 
@@ -115,12 +116,19 @@ fitted <- fit_baseline(data, model)
 fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:10)
 
 # Visualize
-plot(data,
-  type = "l", xlim = c(1, 110),
-  main = "Constant Model: Random Walk Forecast"
+n_data <- length(data)
+plot_df <- rbind(
+  data.frame(time = 1:n_data, value = data, type = "Observed"),
+  data.frame(time = 101:110, value = fc$mean, type = "Forecast")
 )
-lines(101:110, fc$mean, col = "red", lwd = 2)
-abline(h = data[100], lty = 2, col = "red")
+
+ggplot(plot_df, aes(x = time, y = value)) +
+  geom_line(aes(color = type), linewidth = 1) +
+  geom_hline(yintercept = data[100], linetype = "dashed", color = "red", alpha = 0.5) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "Constant Model: Random Walk Forecast", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Strengths:**
@@ -240,15 +248,21 @@ fc_marginal <- forecast(marginal, interval_method = NoInterval(), horizon = 1:10
 fc_kde <- forecast(kde, interval_method = NoInterval(), horizon = 1:100)
 
 # KDE produces smoother samples
-plot(density(fc_marginal$mean),
-  main = "Marginal vs KDE",
-  col = "red", lwd = 2,
-  xlab = "Forecast Value", ylab = "Density"
+# Prepare data for ggplot
+marginal_density <- density(fc_marginal$mean)
+kde_density <- density(fc_kde$mean)
+
+density_df <- rbind(
+  data.frame(x = marginal_density$x, y = marginal_density$y, type = "Marginal"),
+  data.frame(x = kde_density$x, y = kde_density$y, type = "KDE")
 )
-lines(density(fc_kde$mean), col = "blue", lwd = 2)
-legend("topright", c("Marginal", "KDE"),
-  col = c("red", "blue"), lwd = 2
-)
+
+ggplot(density_df, aes(x = x, y = y, color = type)) +
+  geom_line(linewidth = 1.5) +
+  scale_color_manual(values = c("Marginal" = "red", "KDE" = "blue")) +
+  labs(title = "Marginal vs KDE", x = "Forecast Value", y = "Density", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "topright")
 ```
 
 **Strengths:**
@@ -311,11 +325,18 @@ fitted <- fit_baseline(data, model)
 fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:12)
 
 # Plot
-plot(data,
-  type = "l", xlim = c(1, 252),
-  main = "LSD Model: Seasonal Forecast"
+n_data <- length(data)
+plot_df <- rbind(
+  data.frame(time = 1:n_data, value = data, type = "Observed"),
+  data.frame(time = 241:252, value = fc$mean, type = "Forecast")
 )
-lines(241:252, fc$mean, col = "red", lwd = 2)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "LSD Model: Seasonal Forecast", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Parameter Guidance:**
@@ -384,15 +405,20 @@ fc_linear <- forecast(linear, interval_method = NoInterval(), horizon = 1:10)
 fc_quadratic <- forecast(quadratic, interval_method = NoInterval(), horizon = 1:10)
 
 # Plot
-plot(data,
-  type = "l", xlim = c(1, 60),
-  main = "OLS: Linear vs Quadratic Trend"
+n_data <- length(data)
+plot_df <- rbind(
+  data.frame(time = 1:n_data, value = data, type = "Data"),
+  data.frame(time = 51:60, value = fc_linear$mean, type = "Linear"),
+  data.frame(time = 51:60, value = fc_quadratic$mean, type = "Quadratic")
 )
-lines(51:60, fc_linear$mean, col = "blue", lwd = 2)
-lines(51:60, fc_quadratic$mean, col = "red", lwd = 2)
-legend("topleft", c("Data", "Linear", "Quadratic"),
-  col = c("black", "blue", "red"), lwd = c(1, 2, 2)
-)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(aes(linewidth = type)) +
+  scale_linewidth_manual(values = c("Data" = 0.5, "Linear" = 1, "Quadratic" = 1)) +
+  scale_color_manual(values = c("Data" = "black", "Linear" = "blue", "Quadratic" = "red")) +
+  labs(title = "OLS: Linear vs Quadratic Trend", x = "Time", y = "Value", color = NULL, linewidth = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Parameter Guidance:**
@@ -472,12 +498,19 @@ fitted <- fit_baseline(data, model)
 fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:15)
 
 # Plot
-plot(data,
-  type = "l", xlim = c(1, 95),
-  main = "IDS Model: Trend Detection"
+n_data <- length(data)
+plot_df <- rbind(
+  data.frame(time = 1:n_data, value = data, type = "Observed"),
+  data.frame(time = 81:95, value = fc$mean, type = "Forecast")
 )
-lines(81:95, fc$mean, col = "red", lwd = 2)
-abline(v = c(30, 50), lty = 2) # Regime changes
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  geom_vline(xintercept = c(30, 50), linetype = "dashed", alpha = 0.5) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "IDS Model: Trend Detection", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Parameter Guidance:**
@@ -542,12 +575,18 @@ fitted <- fit_baseline(data, model)
 fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:12)
 
 # Plot
-plot(data,
-  type = "l", xlim = c(1, 252),
-  main = "STL Model: Trend + Seasonality",
-  ylab = "Value"
+n_data <- length(data)
+plot_df <- rbind(
+  data.frame(time = 1:n_data, value = data, type = "Observed"),
+  data.frame(time = 241:252, value = fc$mean, type = "Forecast")
 )
-lines(241:252, fc$mean, col = "red", lwd = 2)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "STL Model: Trend + Seasonality", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Parameter Guidance:**
@@ -626,12 +665,18 @@ fc <- forecast(
 )
 
 # Plot
-plot(data[180:200],
-  type = "l", xlim = c(1, 41),
-  main = "ARMA Model: AR(1) Process Forecast",
-  xlab = "Time", ylab = "Value"
+recent_data <- data[180:200]
+plot_df <- rbind(
+  data.frame(time = 1:21, value = recent_data, type = "Observed"),
+  data.frame(time = 22:41, value = fc$mean, type = "Forecast")
 )
-lines(22:41, fc$mean, col = "red", lwd = 2)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "ARMA Model: AR(1) Process Forecast", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Parameter Guidance:**
@@ -816,11 +861,18 @@ fc <- forecast(fitted_specific,
 )
 
 # Plot
-plot(data,
-  type = "l", xlim = c(1, 84),
-  main = "ETS Model: Complex Seasonality"
+n_data <- length(data)
+plot_df <- rbind(
+  data.frame(time = 1:n_data, value = data, type = "Observed"),
+  data.frame(time = 73:84, value = fc$mean, type = "Forecast")
 )
-lines(73:84, fc$mean, col = "red", lwd = 2)
+
+ggplot(plot_df, aes(x = time, y = value, color = type)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
+  labs(title = "ETS Model: Complex Seasonality", x = "Time", y = "Value", color = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
 ```
 
 **Model Selection Guide:**
