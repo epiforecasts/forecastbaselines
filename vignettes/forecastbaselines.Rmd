@@ -331,7 +331,7 @@ stl_fc <- forecast(stl_fitted,
 )
 
 # Last Similar Dates model
-lsd_model <- LSDModel(window = 10, s = 12)
+lsd_model <- LSDModel(window_width = 10, s = 12)
 lsd_fitted <- fit_baseline(seasonal_data, lsd_model)
 lsd_fc <- forecast(lsd_fitted,
   interval_method = NoInterval(),
@@ -464,7 +464,7 @@ MarginalModel() # Sample from marginal distribution
 
 # Seasonal
 STLModel(s = 12) # Monthly seasonality
-LSDModel(window = 10, s = 12) # Last similar dates
+LSDModel(window_width = 10, s = 12) # Last similar dates
 
 # Time Series
 ARMAModel(p = 2, q = 1) # ARMA

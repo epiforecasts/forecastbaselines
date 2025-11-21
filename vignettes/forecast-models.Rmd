@@ -44,7 +44,7 @@ This vignette provides:
 Do you have seasonal patterns?
 ├─ Yes, strong seasonality
 │  ├─ Regular pattern → STLModel(s = period)
-│  ├─ Irregular pattern → LSDModel(window, s = period)
+│  ├─ Irregular pattern → LSDModel(window_width, s = period)
 │  └─ Need decomposition → STLModel(s = period)
 ├─ No, mostly trend
 │  ├─ Polynomial trend → OLSModel(degree)
@@ -57,7 +57,7 @@ Do you have seasonal patterns?
 
 Special cases:
 - Count data (integers) → INARCHModel(p)
-- Multiple components → ETSModel(error, trend, season)
+- Multiple components → ETSModel(error_type, trend_type, season_type)
 - Quick benchmark → ConstantModel()
 ```
 
@@ -306,7 +306,7 @@ seasonal_pattern <- 20 + 10 * sin(2 * pi * months / 12)
 data <- seasonal_pattern + rnorm(60, sd = 2)
 
 # Fit LSD model
-model <- LSDModel(window = 3, s = 12) # Average last 3 years
+model <- LSDModel(window_width = 3, s = 12) # Average last 3 years
 fitted <- fit_baseline(data, model)
 
 # Forecast next year
@@ -808,7 +808,7 @@ model_auto <- ETSModel()
 fitted_auto <- fit_baseline(data, model_auto)
 
 # Specific: Multiplicative error, additive trend, multiplicative season
-model_specific <- ETSModel(error = "M", trend = "A", season = "M", s = 12)
+model_specific <- ETSModel(error_type = "M", trend_type = "A", season_type = "M", s = 12)
 fitted_specific <- fit_baseline(data, model_specific)
 
 # Forecast
@@ -893,9 +893,9 @@ data <- trend + seasonal + noise
 # Try multiple models
 models <- list(
   Naive = ConstantModel(),
-  LSD = LSDModel(window = 3, s = 12),
+  LSD = LSDModel(window_width = 3, s = 12),
   STL = STLModel(s = 12),
-  ETS = ETSModel(error = "A", trend = "A", season = "A", s = 12)
+  ETS = ETSModel(error_type = "A", trend_type = "A", season_type = "A", s = 12)
 )
 
 # Fit all models
@@ -1019,7 +1019,7 @@ MarginalModel()
 KDEModel()
 
 # Seasonal/Trend
-LSDModel(window = 3, s = 12)
+LSDModel(window_width = 3, s = 12)
 OLSModel(degree = 1, differencing = 0)
 IDSModel(window_size = 3)
 STLModel(s = 12)
@@ -1027,5 +1027,5 @@ STLModel(s = 12)
 # Advanced
 ARMAModel(p = 1, q = 1)
 INARCHModel(p = 1, s = NULL)
-ETSModel(error = NULL, trend = NULL, season = NULL, s = NULL)
+ETSModel(error_type = "A", trend_type = "N", season_type = "N", s = NULL)
 ```
