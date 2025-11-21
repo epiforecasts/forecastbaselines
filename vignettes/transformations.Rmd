@@ -23,8 +23,6 @@ When working with time series data, transformations are often needed to:
 - **Ensure non-negativity** (e.g., for count data)
 - **Improve model fit** (e.g., linearize relationships)
 
-While forecastbaselines includes some Julia-based transformation functions, **we strongly recommend using R's built-in transformation functions** for better reliability, flexibility, and performance.
-
 # Why Use R Transformations?
 
 **Advantages:**

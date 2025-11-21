@@ -359,8 +359,7 @@ legend("topleft",
 # Data Transformations
 
 For data with non-constant variance or non-negativity constraints,
-use transformations. **We recommend using R's built-in functions**
-rather than the Julia transformation wrappers.
+use transformations.
 
 ```{r transformations}
 # Example: exponential growth (log transform stabilizes variance)

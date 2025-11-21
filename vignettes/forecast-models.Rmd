@@ -240,16 +240,14 @@ fc_marginal <- forecast(marginal, interval_method = NoInterval(), horizon = 1:10
 fc_kde <- forecast(kde, interval_method = NoInterval(), horizon = 1:100)
 
 # KDE produces smoother samples
-hist(fc_marginal$mean,
-  breaks = 20, main = "Marginal vs KDE",
-  col = rgb(1, 0, 0, 0.5)
+plot(density(fc_marginal$mean),
+  main = "Marginal vs KDE",
+  col = "red", lwd = 2,
+  xlab = "Forecast Value", ylab = "Density"
 )
-hist(fc_kde$mean,
-  breaks = 20, add = TRUE,
-  col = rgb(0, 0, 1, 0.5)
-)
+lines(density(fc_kde$mean), col = "blue", lwd = 2)
 legend("topright", c("Marginal", "KDE"),
-  fill = c(rgb(1, 0, 0, 0.5), rgb(0, 0, 1, 0.5))
+  col = c("red", "blue"), lwd = 2
 )
 ```
 
