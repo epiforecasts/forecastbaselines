@@ -376,7 +376,7 @@ fitted <- fit_baseline(log_data, model)
 # 3. Forecast on transformed scale
 fc <- forecast(fitted,
   interval_method = NoInterval(),
-  horizon = 1:10
+  horizon = 1:12
 )
 
 # 4. Back-transform to original scale
