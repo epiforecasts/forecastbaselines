@@ -320,7 +320,7 @@ For data with strong seasonal patterns, use seasonal models:
 ```{r seasonal}
 # Generate seasonal data (monthly, s=12)
 set.seed(789)
-seasonal_data <- 10 + 5 * sin(2 * pi * (1:60) / 12) + rnorm(60)
+seasonal_data <- 10 + 5 * sin(2 * pi * (1:120) / 12) + rnorm(120)
 
 # STL decomposition model
 stl_model <- STLModel(s = 12)
