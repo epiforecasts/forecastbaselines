@@ -1,8 +1,8 @@
 ---
-title: "Getting Started with ForecastBaselineR"
+title: "Getting Started with forecastbaselines"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started with ForecastBaselineR}
+  %\VignetteIndexEntry{Getting Started with forecastbaselines}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -10,14 +10,13 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE # Set to TRUE when Julia is available
+  comment = "#>"
 )
 ```
 
 # Introduction
 
-**ForecastBaselineR** provides an R interface to the
+**forecastbaselines** provides an R interface to the
 [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 Julia package, giving you access to 10 baseline forecasting models with
 comprehensive uncertainty quantification and evaluation tools.
@@ -45,12 +44,12 @@ You'll need both Julia and R installed:
 
 - Already installed if you're reading this!
 
-## Install ForecastBaselineR
+## Install forecastbaselines
 
 ```{r install, eval=FALSE}
 # Install from GitHub
 # install.packages("remotes")
-remotes::install_github("sbfnk/ForecastBaselineR")
+remotes::install_github("epiforecasts/forecastbaselines")
 ```
 
 ## Setup Julia Backend
@@ -58,7 +57,7 @@ remotes::install_github("sbfnk/ForecastBaselineR")
 The first time you use the package, you need to set up the Julia backend:
 
 ```{r setup}
-library(ForecastBaselineR)
+library(forecastbaselines)
 
 # One-time setup: installs Julia packages
 setup_ForecastBaselines()
@@ -388,7 +387,7 @@ See `vignette("transformations")` for detailed guidance on transformations.
 
 # Utility Functions
 
-ForecastBaselineR provides helpful utilities for working with forecast objects:
+forecastbaselines provides helpful utilities for working with forecast objects:
 
 ```{r utilities}
 # Check what components are available
@@ -420,8 +419,8 @@ Now that you've learned the basics, explore:
 2. **`vignette("transformations")`** - Comprehensive guide to data
    transformations with examples
 
-3. **Package documentation** - Run `?ForecastBaselineR` or
-   `help(package = "ForecastBaselineR")`
+3. **Package documentation** - Run `?forecastbaselines` or
+   `help(package = "forecastbaselines")`
 
 4. **Examples** - Check the `examples/` directory in the package
    for complete workflows
@@ -484,7 +483,7 @@ ETSModel() # Exponential smoothing
 ?CRPS
 
 # Package overview
-?ForecastBaselineR
+?forecastbaselines
 ```
 
 # Troubleshooting
@@ -515,4 +514,4 @@ length(data) # Enough observations?
 # e.g., ARMA needs p + q < length(data)
 ```
 
-For more help, see the [GitHub Issues](https://github.com/sbfnk/ForecastBaselineR/issues).
+For more help, see the [GitHub Issues](https://github.com/epiforecasts/forecastbaselines/issues).

@@ -10,19 +10,18 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE # Set to TRUE when Julia is available
+  comment = "#>"
 )
 ```
 
 ```{r setup}
-library(ForecastBaselineR)
+library(forecastbaselines)
 setup_ForecastBaselines()
 ```
 
 # Overview
 
-ForecastBaselineR provides 10 baseline forecasting models across three
+forecastbaselines provides 10 baseline forecasting models across three
 categories:
 
 1. **Simple Baselines** - Naive methods for benchmarking
