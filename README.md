@@ -55,10 +55,6 @@ This only needs to be done once per R session.
 ## Quick Example
 
 ``` r
-library(forecastbaselines)
-library(scoringutils)
-setup_ForecastBaselines()
-
 # Your time series data
 data <- c(1.2, 2.3, 3.1, 2.8, 3.5, 4.2, 3.9, 4.5, 4.1, 4.8)
 
@@ -66,7 +62,7 @@ data <- c(1.2, 2.3, 3.1, 2.8, 3.5, 4.2, 3.9, 4.5, 4.1, 4.8)
 model <- ARMAModel(p = 1, q = 1)
 fitted <- fit_baseline(data, model)
 
-# 2. Generate probabilistic forecasts
+# 2. Generate forecasts with prediction intervals
 fc <- forecast(
   fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
@@ -79,12 +75,15 @@ fc <- forecast(
 truth <- c(5.0, 5.2, 5.4, 5.1, 5.3)
 fc_with_truth <- add_truth(fc, truth)
 
-# 4. Score the probabilistic forecast
-fc_quantile <- as_forecast_quantile(fc_with_truth)
-scores <- score(fc_quantile)
+# 4. Score the forecast
+fc_point <- as_forecast_point(fc_with_truth)
+scores <- score(fc_point)
 scores_summary <- summarise_scores(scores, by = "model")
 
-print(scores_summary)
+scores_summary[, c("model", "ae_point", "se_point")]
+#>        model  ae_point   se_point
+#>       <char>     <num>      <num>
+#> 1: ARMA(1,1) 0.2368795 0.07611188
 ```
 
 ## Available Models
