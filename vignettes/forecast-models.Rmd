@@ -48,7 +48,7 @@ Do you have seasonal patterns?
 │  └─ Need decomposition → STLModel(s = period)
 ├─ No, mostly trend
 │  ├─ Polynomial trend → OLSModel(degree)
-│  ├─ Step changes → IDSModel(p)
+│  ├─ Step changes → IDSModel(window_size)
 │  └─ Complex trend → ARMAModel(p, q)
 └─ No clear pattern
    ├─ Need simple baseline → ConstantModel()
@@ -452,7 +452,8 @@ windows and extrapolates.
 
 **Parameters:**
 
-- `p`: Number of windows to analyze
+- `window_size`: Number of windows to analyze (default: 3)
+- `threshold`: Threshold for detecting changes (default: 0.0)
 
 **Example:**
 
@@ -466,7 +467,7 @@ data <- c(
 )
 
 # Fit IDS model
-model <- IDSModel(p = 3) # Analyze last 3 windows
+model <- IDSModel(window_size = 3) # Analyze last 3 windows
 fitted <- fit_baseline(data, model)
 
 # Forecast
@@ -1020,7 +1021,7 @@ KDEModel()
 # Seasonal/Trend
 LSDModel(window = 3, s = 12)
 OLSModel(degree = 1, differencing = 0)
-IDSModel(p = 3)
+IDSModel(window_size = 3)
 STLModel(s = 12)
 
 # Advanced
