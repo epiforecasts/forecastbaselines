@@ -218,7 +218,10 @@ To evaluate forecast accuracy, you need to provide the true values.
 ```{r scoring}
 # Generate some "future" observations
 set.seed(456)
-truth <- trend[n + 1:12] + seasonal[n + 1:12] + rnorm(12, sd = 2)
+future_time <- (n + 1):(n + 12)
+future_trend <- 0.5 * future_time
+future_seasonal <- 5 * sin(2 * pi * future_time / 12)
+truth <- future_trend + future_seasonal + rnorm(12, sd = 2)
 
 # Add truth to forecast
 fc_with_truth <- forecast(
