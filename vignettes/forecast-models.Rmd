@@ -1006,7 +1006,7 @@ Fastest → Slowest:
 
 ## Further Reading
 
-- See `vignette("getting-started")` for basic workflow
+- See `vignette("forecastbaselines")` for basic workflow
 - See `vignette("transformations")` for data preprocessing
 - Check individual function help: `?ARMAModel`, `?forecast`, etc.
 

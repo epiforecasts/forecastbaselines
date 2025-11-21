@@ -112,7 +112,7 @@ scores_summary[, c("model", "ae_point", "se_point")]
 
 For detailed guides and examples:
 
-- `vignette("getting-started")` - Complete introduction with examples
+- `vignette("forecastbaselines")` - Complete introduction with examples
 - `vignette("forecast-models")` - Detailed guide to all 10 models
 - `vignette("transformations")` - Working with data transformations
 
