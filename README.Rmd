@@ -13,7 +13,14 @@ knitr::opts_chunk$set(
 )
 
 # Setup for the example
-devtools::load_all()
+# Try devtools::load_all() first (for local development)
+# Fall back to library() (for CI/installed package)
+if (requireNamespace("devtools", quietly = TRUE) &&
+    dir.exists("R")) {
+  devtools::load_all(quiet = TRUE)
+} else {
+  library(forecastbaselines)
+}
 library(scoringutils)
 suppressMessages(setup_ForecastBaselines())
 ```
