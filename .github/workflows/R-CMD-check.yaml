@@ -97,7 +97,7 @@ jobs:
 
       - name: Setup Julia dependencies
         run: |
-          ForecastBaselineR::setup_ForecastBaselines(verbose = TRUE)
+          forecastbaselines::setup_ForecastBaselines(verbose = TRUE)
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
