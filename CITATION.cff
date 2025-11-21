@@ -1,0 +1,42 @@
+# --------------------------------------------
+# CITATION file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# --------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "forecastbaselines" in publications use:'
+type: software
+license: MIT
+title: 'forecastbaselines: R Interface to ForecastBaselines.jl'
+version: 0.1.0
+abstract: Provides an R interface to the ForecastBaselines.jl Julia package, enabling
+  access to 10 baseline forecasting models including ARMA, ETS, STL, and others. Supports
+  probabilistic forecasting with multiple interval methods and seamless integration
+  with the scoringutils evaluation framework.
+authors:
+- family-names: Stapper
+  given-names: Manuel
+- family-names: Funk
+  given-names: Sebastian
+  email: sebastian.funk@lshtm.ac.uk
+  orcid: https://orcid.org/0000-0002-2842-3406
+repository-code: https://github.com/epiforecasts/forecastbaselines
+url: https://github.com/epiforecasts/forecastbaselines
+contact:
+- family-names: Funk
+  given-names: Sebastian
+  email: sebastian.funk@lshtm.ac.uk
+  orcid: https://orcid.org/0000-0002-2842-3406
+references:
+- type: software
+  title: 'R: A Language and Environment for Statistical Computing'
+  notes: Depends
+  url: https://www.R-project.org/
+  authors:
+  - name: R Core Team
+  institution:
+    name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2025'
+  version: '>= 3.5.0'
+
