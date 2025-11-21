@@ -151,3 +151,20 @@ For bugs and feature requests: - R package issues: [GitHub
 Issues](https://github.com/epiforecasts/forecastbaselines/issues) -
 Julia package issues: [ForecastBaselines.jl
 Issues](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
+
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+All contributions to this project are gratefully acknowledged using the
+[`allcontributors` package](https://github.com/ropensci/allcontributors)
+following the [allcontributors](https://allcontributors.org)
+specification. Contributions of any kind are welcome!
+
+<a href="https://github.com/epiforecasts/forecastbaselines/commits?author=sbfnk">sbfnk</a>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
