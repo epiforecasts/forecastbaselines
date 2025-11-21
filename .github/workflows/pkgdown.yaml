@@ -28,7 +28,7 @@ jobs:
 
       - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.9'
+          version: '1.11'
 
       - name: Cache Julia packages
         uses: julia-actions/cache@v2
@@ -47,10 +47,21 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          activate-environment: ""
+
+      - name: Link conda for Julia
+        run: |
+          mkdir -p "$HOME/.julia/conda/3"
+          ln -sf "$CONDA" "$HOME/.julia/conda/3/x86_64"
+        shell: bash
+
       - name: Install JuliaCall dependencies
         run: |
           export R_HOME=$(R RHOME)
-          julia -e 'ENV["R_HOME"] = raw"'"$R_HOME"'"; using Pkg; Pkg.add("RCall"); Pkg.build("RCall")'
+          julia -e 'ENV["R_HOME"] = raw"'"$R_HOME"'"; using Pkg; Pkg.add("Suppressor"); Pkg.add("RCall"); Pkg.build("RCall")'
         shell: bash
 
       - name: Preload Julia's libunwind (Linux workaround)
