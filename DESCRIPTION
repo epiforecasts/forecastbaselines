@@ -1,0 +1,27 @@
+Package: forecastbaselines
+Type: Package
+Title: R Interface to ForecastBaselines.jl
+Version: 0.1.0
+Authors@R: c(
+    person("Manuel", "Stapper", role = c("aut")),
+    person("Sebastian", "Funk", email = "sebastian.funk@lshtm.ac.uk",
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2842-3406"))
+    )
+Description: Provides an R interface to the ForecastBaselines.jl Julia package,
+    enabling access to 10 baseline forecasting models including ARMA, ETS, STL,
+    and others. Supports probabilistic forecasting with multiple interval methods
+    and seamless integration with the scoringutils evaluation framework.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.5.0)
+Imports:
+    JuliaCall (>= 0.17.0),
+    scoringutils (>= 1.0.0)
+SystemRequirements: Julia (>= 1.9)
+RoxygenNote: 7.3.3
+URL: https://github.com/epiforecasts/forecastbaselines
+BugReports: https://github.com/epiforecasts/forecastbaselines/issues
+Suggests:
+    testthat (>= 3.0.0)

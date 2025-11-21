@@ -1,0 +1,518 @@
+---
+title: "Getting Started with ForecastBaselineR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with ForecastBaselineR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE # Set to TRUE when Julia is available
+)
+```
+
+# Introduction
+
+**ForecastBaselineR** provides an R interface to the
+[ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
+Julia package, giving you access to 10 baseline forecasting models with
+comprehensive uncertainty quantification and evaluation tools.
+
+This vignette will walk you through:
+
+1. Installation and setup
+2. Your first forecast
+3. Probabilistic forecasting with prediction intervals
+4. Model evaluation and scoring
+5. Next steps
+
+# Installation
+
+## Prerequisites
+
+You'll need both Julia and R installed:
+
+**Julia (>= 1.9)**
+
+- Download from [julialang.org](https://julialang.org/downloads/)
+- Verify installation: `julia --version`
+
+**R (>= 3.5.0)**
+
+- Already installed if you're reading this!
+
+## Install ForecastBaselineR
+
+```{r install, eval=FALSE}
+# Install from GitHub
+# install.packages("remotes")
+remotes::install_github("sbfnk/ForecastBaselineR")
+```
+
+## Setup Julia Backend
+
+The first time you use the package, you need to set up the Julia backend:
+
+```{r setup}
+library(ForecastBaselineR)
+
+# One-time setup: installs Julia packages
+setup_ForecastBaselines()
+```
+
+This will:
+
+- Initialize Julia from R
+- Install the ForecastBaselines.jl package
+- Install all dependencies
+- Load helper functions
+
+**Note:** This only needs to be done once. Subsequent R sessions will
+automatically connect to Julia.
+
+# Your First Forecast
+
+Let's create a simple forecast using the Constant (naive) model, which
+uses the last observed value as the forecast.
+
+## Generate Some Data
+
+```{r data}
+# Simulate a time series with trend and noise
+set.seed(123)
+n <- 50
+time <- 1:n
+trend <- 0.5 * time
+seasonal <- 5 * sin(2 * pi * time / 12)
+noise <- rnorm(n, sd = 2)
+data <- trend + seasonal + noise
+
+# Plot the data
+plot(data,
+  type = "l", main = "Simulated Time Series",
+  ylab = "Value", xlab = "Time"
+)
+```
+
+## Fit a Model
+
+```{r fit}
+# Create a Constant (naive) model
+model <- ConstantModel()
+
+# Fit the model to the data
+fitted <- fit_baseline(data, model)
+```
+
+## Generate Forecasts
+
+```{r forecast}
+# Forecast 12 steps ahead
+horizon <- 1:12
+fc <- forecast(fitted,
+  interval_method = NoInterval(),
+  horizon = horizon
+)
+
+# View the forecast
+print(fc)
+
+# Access forecast values
+fc$mean
+```
+
+## Visualize Results
+
+```{r plot}
+# Plot data and forecast
+plot(c(data, rep(NA, 12)),
+  type = "l",
+  xlim = c(1, n + 12),
+  main = "Forecast with Constant Model",
+  ylab = "Value", xlab = "Time"
+)
+
+# Add forecast
+lines((n + 1):(n + 12), fc$mean, col = "red", lwd = 2)
+
+# Add legend
+legend("topleft",
+  legend = c("Observed", "Forecast"),
+  col = c("black", "red"),
+  lwd = c(1, 2)
+)
+```
+
+# Probabilistic Forecasting
+
+Most real-world forecasts need uncertainty quantification. Let's add
+prediction intervals.
+
+## Empirical Intervals
+
+The empirical method generates prediction intervals by bootstrapping
+from residuals:
+
+```{r intervals}
+# Forecast with 95% prediction intervals
+fc_with_intervals <- forecast(
+  fitted,
+  interval_method = EmpiricalInterval(
+    n_trajectories = 1000,
+    seed = 42
+  ),
+  horizon = 1:12,
+  levels = c(0.50, 0.80, 0.95)
+)
+
+# View the result
+print(fc_with_intervals)
+```
+
+**Note:** The current version returns intervals in the Julia object.
+Future versions will provide full R support for interval extraction
+and visualization.
+
+## Try a More Advanced Model
+
+Let's use an ARMA model for better forecasting:
+
+```{r arma}
+# Create ARMA(2,1) model
+arma_model <- ARMAModel(p = 2, q = 1)
+
+# Fit and forecast
+arma_fitted <- fit_baseline(data, arma_model)
+arma_fc <- forecast(
+  arma_fitted,
+  interval_method = EmpiricalInterval(n_trajectories = 1000),
+  horizon = 1:12,
+  levels = 0.95
+)
+
+# Compare forecasts
+plot(c(data, rep(NA, 12)),
+  type = "l",
+  xlim = c(1, n + 12),
+  main = "Constant vs ARMA Forecasts",
+  ylab = "Value", xlab = "Time"
+)
+lines((n + 1):(n + 12), fc$mean, col = "red", lwd = 2)
+lines((n + 1):(n + 12), arma_fc$mean, col = "blue", lwd = 2)
+legend("topleft",
+  legend = c("Observed", "Constant", "ARMA"),
+  col = c("black", "red", "blue"),
+  lwd = c(1, 2, 2)
+)
+```
+
+# Model Evaluation
+
+To evaluate forecast accuracy, you need to provide the true values.
+
+## Point Forecast Accuracy
+
+```{r scoring}
+# Generate some "future" observations
+set.seed(456)
+truth <- trend[n + 1:12] + seasonal[n + 1:12] + rnorm(12, sd = 2)
+
+# Add truth to forecast
+fc_with_truth <- forecast(
+  fitted,
+  interval_method = NoInterval(),
+  horizon = 1:12,
+  truth = truth,
+  model_name = "Constant"
+)
+
+# Calculate scoring metrics using scoringutils
+fc_point <- scoringutils::as_forecast_point(fc_with_truth)
+scores <- scoringutils::score(fc_point)
+scores_summary <- scoringutils::summarise_scores(scores, by = "model")
+print(scores_summary)
+
+# Access specific metrics
+cat("Mean Absolute Error:", scores_summary$ae_point, "\n")
+cat("Root Mean Squared Error:", sqrt(scores_summary$se_point), "\n")
+cat("Absolute Percentage Error:", scores_summary$ape, "\n")
+```
+
+## Available Scoring Rules
+
+**Note:** This package is compatible with the [scoringutils](https://epiforecasts.io/scoringutils/) package, providing standardized and comprehensive forecast evaluation through S3 methods.
+
+Convert forecasts using `scoringutils::as_forecast_point()` or `scoringutils::as_forecast_quantile()`, then score:
+
+```r
+# Convert forecast to scoringutils format
+fc_point <- scoringutils::as_forecast_point(forecast)
+
+# Score the forecast
+scores <- scoringutils::score(fc_point)
+
+# Get summarised scores
+scores_summary <- scoringutils::summarise_scores(scores, by = "model")
+
+# Access metrics from summary
+mae <- scores_summary$ae_point          # Mean Absolute Error
+mse <- scores_summary$se_point          # Mean Squared Error
+rmse <- sqrt(scores_summary$se_point)   # Root Mean Squared Error
+ape <- scores_summary$ape               # Absolute Percentage Error
+
+# For quantile forecasts
+wis <- scores_summary$wis               # Weighted Interval Score
+bias <- scores_summary$bias             # Forecast bias
+coverage_50 <- scores_summary$interval_coverage_50  # 50% interval coverage
+coverage_90 <- scores_summary$interval_coverage_90  # 90% interval coverage
+```
+
+See the [scoringutils documentation](https://epiforecasts.io/scoringutils/) for all available metrics and functions.
+
+## Compare Multiple Models
+
+```{r comparison}
+# Create multiple models
+models <- list(
+  Constant = ConstantModel(),
+  ARMA = ARMAModel(p = 1, q = 1),
+  Marginal = MarginalModel()
+)
+
+# Fit and score each model
+results <- lapply(names(models), function(name) {
+  fitted <- fit_baseline(data, models[[name]])
+  fc <- forecast(fitted,
+    interval_method = NoInterval(),
+    horizon = 1:12,
+    truth = truth,
+    model_name = name
+  )
+
+  fc_point <- scoringutils::as_forecast_point(fc)
+  fc_scores <- scoringutils::score(fc_point)
+  fc_summary <- scoringutils::summarise_scores(fc_scores, by = "model")
+
+  data.frame(
+    Model = name,
+    MAE = fc_summary$ae_point,
+    RMSE = sqrt(fc_summary$se_point),
+    APE = fc_summary$ape
+  )
+})
+
+# Combine and display
+comparison <- do.call(rbind, results)
+print(comparison)
+
+# Find best model by MAE
+best_model <- comparison$Model[which.min(comparison$MAE)]
+cat("\nBest model by MAE:", best_model, "\n")
+```
+
+# Working with Seasonal Data
+
+For data with strong seasonal patterns, use seasonal models:
+
+```{r seasonal}
+# Generate seasonal data (monthly, s=12)
+set.seed(789)
+seasonal_data <- 10 + 5 * sin(2 * pi * (1:60) / 12) + rnorm(60)
+
+# STL decomposition model
+stl_model <- STLModel(s = 12)
+stl_fitted <- fit_baseline(seasonal_data, stl_model)
+stl_fc <- forecast(stl_fitted,
+  interval_method = NoInterval(),
+  horizon = 1:12
+)
+
+# Last Similar Dates model
+lsd_model <- LSDModel(window = 10, s = 12)
+lsd_fitted <- fit_baseline(seasonal_data, lsd_model)
+lsd_fc <- forecast(lsd_fitted,
+  interval_method = NoInterval(),
+  horizon = 1:12
+)
+
+# Compare
+plot(c(seasonal_data, rep(NA, 12)),
+  type = "l",
+  main = "Seasonal Forecasting",
+  ylab = "Value", xlab = "Time"
+)
+lines(61:72, stl_fc$mean, col = "red", lwd = 2)
+lines(61:72, lsd_fc$mean, col = "blue", lwd = 2)
+legend("topleft",
+  legend = c("Data", "STL", "LSD"),
+  col = c("black", "red", "blue"),
+  lwd = c(1, 2, 2)
+)
+```
+
+# Data Transformations
+
+For data with non-constant variance or non-negativity constraints,
+use transformations. **We recommend using R's built-in functions**
+rather than the Julia transformation wrappers.
+
+```{r transformations}
+# Example: exponential growth (log transform stabilizes variance)
+data_exp <- exp(rnorm(50, mean = 2, sd = 0.3))
+
+# 1. Transform data
+log_data <- log(data_exp)
+
+# 2. Fit model on transformed scale
+model <- ConstantModel()
+fitted <- fit_baseline(log_data, model)
+
+# 3. Forecast on transformed scale
+fc <- forecast(fitted,
+  interval_method = NoInterval(),
+  horizon = 1:10
+)
+
+# 4. Back-transform to original scale
+fc$mean <- exp(fc$mean)
+
+# Now fc$mean is in the original scale
+print(fc$mean)
+```
+
+See `vignette("transformations")` for detailed guidance on transformations.
+
+# Utility Functions
+
+ForecastBaselineR provides helpful utilities for working with forecast objects:
+
+```{r utilities}
+# Check what components are available
+has_mean(fc) # TRUE
+has_median(fc) # FALSE (not requested)
+has_truth(fc) # FALSE (not provided)
+
+# Add components
+median_vals <- fc$mean # For demo, use mean as median
+fc_with_median <- add_median(fc, median_vals)
+has_median(fc_with_median) # TRUE
+
+# Add truth values for scoring
+fc_with_truth <- add_truth(fc, truth)
+has_truth(fc_with_truth) # TRUE
+
+# Filter/subset forecasts
+fc_short <- truncate_horizon(fc, max_h = 5)
+fc_selected <- filter_horizons(fc, horizons = c(1, 3, 6, 12))
+```
+
+# Next Steps
+
+Now that you've learned the basics, explore:
+
+1. **`vignette("forecast-models")`** - Detailed guide to all 10 models,
+   when to use each, and their parameters
+
+2. **`vignette("transformations")`** - Comprehensive guide to data
+   transformations with examples
+
+3. **Package documentation** - Run `?ForecastBaselineR` or
+   `help(package = "ForecastBaselineR")`
+
+4. **Examples** - Check the `examples/` directory in the package
+   for complete workflows
+
+# Quick Reference
+
+## Basic Workflow
+
+```{r reference, eval=FALSE}
+# 1. Setup (once)
+setup_ForecastBaselines()
+
+# 2. Create model
+model <- ARMAModel(p = 2, q = 1)
+
+# 3. Fit to data
+fitted <- fit_baseline(data, model)
+
+# 4. Generate forecasts
+fc <- forecast(fitted,
+  interval_method = EmpiricalInterval(n_trajectories = 1000),
+  horizon = 1:12,
+  levels = 0.95,
+  truth = truth_values,
+  model_name = "ARMA(2,1)"
+)
+
+# 5. Score forecasts
+fc_point <- scoringutils::as_forecast_point(fc)
+scores <- scoringutils::score(fc_point)
+scores_summary <- scoringutils::summarise_scores(scores, by = "model")
+mae <- scores_summary$ae_point
+```
+
+## Common Models
+
+```{r models-ref, eval=FALSE}
+# Simple
+ConstantModel() # Naive forecast
+MarginalModel() # Sample from marginal distribution
+
+# Seasonal
+STLModel(s = 12) # Monthly seasonality
+LSDModel(window = 10, s = 12) # Last similar dates
+
+# Time Series
+ARMAModel(p = 2, q = 1) # ARMA
+ETSModel() # Exponential smoothing
+```
+
+## Getting Help
+
+```{r help, eval=FALSE}
+# Model help
+?ARMAModel
+?forecast
+
+# Scoring rules
+?MAE
+?CRPS
+
+# Package overview
+?ForecastBaselineR
+```
+
+# Troubleshooting
+
+**Julia not found:**
+```{r trouble1, eval=FALSE}
+# Specify Julia path manually
+Sys.setenv(JULIA_HOME = "/path/to/julia/bin")
+setup_ForecastBaselines()
+```
+
+**Package not loading:**
+```{r trouble2, eval=FALSE}
+# Check if Julia is set up
+is_setup() # Should return TRUE
+
+# Re-run setup if needed
+setup_ForecastBaselines()
+```
+
+**Getting errors during forecasting:**
+```{r trouble3, eval=FALSE}
+# Check your data
+summary(data) # No NAs or infinite values?
+length(data) # Enough observations?
+
+# Check model parameters
+# e.g., ARMA needs p + q < length(data)
+```
+
+For more help, see the [GitHub Issues](https://github.com/sbfnk/ForecastBaselineR/issues).
