@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(forecastbaselines)
+library(scoringutils)
 library(ggplot2)
 setup_ForecastBaselines()
 ```
@@ -177,17 +178,31 @@ data <- rnorm(100, mean = 50, sd = 10)
 model <- MarginalModel()
 fitted <- fit_baseline(data, model)
 
-# Forecast with intervals
+# Forecast with prediction intervals
 fc <- forecast(
   fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:10,
-  levels = 0.95
+  levels = c(0.5, 0.95),
+  model_name = "Marginal"
 )
 
 # The forecast mean approximates the historical mean
 cat("Historical mean:", mean(data), "\n")
 cat("Forecast mean:", mean(fc$mean), "\n")
+
+# Visualize with prediction intervals
+truth <- 20 + cumsum(rnorm(10, 0, 2))  # Simulated future values
+fc_truth <- add_truth(fc, truth)
+fc_quantile <- scoringutils::as_forecast_quantile(fc_truth)
+
+scoringutils::plot_predictions(
+  fc_quantile,
+  x = "horizon",
+  range = c(0, 50, 95)
+) +
+  labs(title = "Marginal Model with Prediction Intervals") +
+  theme_minimal()
 ```
 
 Strengths:
@@ -656,27 +671,34 @@ for (i in 2:n) {
 model <- ARMAModel(p = 2, q = 1)
 fitted <- fit_baseline(data, model)
 
-# Forecast with parametric intervals
+# Forecast with prediction intervals
 fc <- forecast(
   fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:20,
-  levels = 0.95
+  levels = c(0.5, 0.95),
+  model_name = "ARMA(2,1)"
 )
 
-# Plot
-recent_data <- data[180:200]
-plot_df <- rbind(
-  data.frame(time = 1:21, value = recent_data, type = "Observed"),
-  data.frame(time = 22:41, value = fc$mean, type = "Forecast")
-)
+# Add simulated truth and visualize with intervals
+set.seed(456)
+truth <- numeric(20)
+truth[1] <- 0.7 * data[200] + rnorm(1)
+for (i in 2:20) {
+  truth[i] <- 0.7 * truth[i - 1] + rnorm(1)
+}
 
-ggplot(plot_df, aes(x = time, y = value, color = type)) +
-  geom_line(linewidth = 1) +
-  scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "ARMA Model: AR(1) Process Forecast", x = "Time", y = "Value", color = NULL) +
-  theme_minimal() +
-  theme(legend.position = "top")
+fc_truth <- add_truth(fc, truth)
+fc_quantile <- scoringutils::as_forecast_quantile(fc_truth)
+
+scoringutils::plot_predictions(
+  fc_quantile,
+  x = "horizon",
+  range = c(0, 50, 95)
+) +
+  labs(title = "ARMA(2,1) Forecast with Prediction Intervals",
+       x = "Forecast Horizon", y = "Value") +
+  theme_minimal()
 ```
 
 Parameter Guidance:

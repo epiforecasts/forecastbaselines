@@ -58,6 +58,7 @@ The first time you use the package, you need to set up the Julia backend:
 
 ```{r setup}
 library(forecastbaselines)
+library(scoringutils)
 library(ggplot2)
 
 # One-time setup: installs Julia packages
@@ -153,7 +154,7 @@ The empirical method generates prediction intervals by bootstrapping
 from residuals:
 
 ```{r intervals}
-# Forecast with 95% prediction intervals
+# Forecast with prediction intervals
 fc_with_intervals <- forecast(
   fitted,
   interval_method = EmpiricalInterval(
@@ -161,16 +162,26 @@ fc_with_intervals <- forecast(
     seed = 42
   ),
   horizon = 1:12,
-  levels = c(0.50, 0.80, 0.95)
+  levels = c(0.50, 0.95),
+  model_name = "Constant"
 )
 
-# View the result
-print(fc_with_intervals)
-```
+# Add truth for visualization
+truth_vals <- c(105, 110, 108, 112, 115, 118, 120, 122, 125, 128, 130, 132)
+fc_intervals_truth <- add_truth(fc_with_intervals, truth_vals)
 
-Note: The current version returns intervals in the Julia object.
-Future versions will provide full R support for interval extraction
-and visualization.
+# Convert to scoringutils format and visualize
+fc_quantile <- scoringutils::as_forecast_quantile(fc_intervals_truth)
+
+scoringutils::plot_predictions(
+  fc_quantile,
+  x = "horizon",
+  range = c(0, 50, 95)  # Show median and 50%, 95% prediction intervals
+) +
+  labs(title = "Constant Model Forecast with Prediction Intervals",
+       x = "Forecast Horizon", y = "Value") +
+  theme_minimal()
+```
 
 ## Try a More Advanced Model
 
@@ -180,28 +191,31 @@ Let's use an ARMA model for better forecasting:
 # Create ARMA(2,1) model
 arma_model <- ARMAModel(p = 2, q = 1)
 
-# Fit and forecast
+# Fit and forecast with prediction intervals
 arma_fitted <- fit_baseline(data, arma_model)
 arma_fc <- forecast(
   arma_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = 0.95
+  levels = c(0.5, 0.95),
+  model_name = "ARMA(2,1)"
 )
 
-# Compare forecasts
-plot_df <- rbind(
-  data.frame(time = 1:n, value = data, type = "Observed"),
-  data.frame(time = (n + 1):(n + 12), value = fc$mean, type = "Constant"),
-  data.frame(time = (n + 1):(n + 12), value = arma_fc$mean, type = "ARMA")
-)
+# Add truth and visualize with prediction intervals
+truth <- c(105, 110, 108, 112, 115, 118, 120, 122, 125, 128, 130, 132)
+arma_with_truth <- add_truth(arma_fc, truth)
 
-ggplot(plot_df, aes(x = time, y = value, color = type)) +
-  geom_line(linewidth = 1) +
-  scale_color_manual(values = c("Observed" = "black", "Constant" = "red", "ARMA" = "blue")) +
-  labs(title = "Constant vs ARMA Forecasts", x = "Time", y = "Value", color = NULL) +
-  theme_minimal() +
-  theme(legend.position = "top")
+# Convert to scoringutils format and plot with intervals
+arma_quantile <- scoringutils::as_forecast_quantile(arma_with_truth)
+
+scoringutils::plot_predictions(
+  arma_quantile,
+  x = "horizon",
+  range = c(0, 50, 95)  # Show median and 50%, 95% intervals
+) +
+  labs(title = "ARMA(2,1) Forecast with Prediction Intervals",
+       x = "Forecast Horizon", y = "Value") +
+  theme_minimal()
 ```
 
 # Model Evaluation
