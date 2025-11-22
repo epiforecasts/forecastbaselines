@@ -47,9 +47,9 @@ function forecast_to_r_dict(fc)
 
     # Extract quantiles from intervals if present
     if fc.intervals !== nothing && !isempty(fc.intervals)
-        # intervals is a Dict{Float64, Matrix{Float64}}
-        # keys are levels (e.g., 0.95), values are matrices with lower/upper bounds
-        # We need to convert this to quantile format
+        # intervals is a Dict{Float64, ForecastInterval}
+        # keys are levels (e.g., 0.95), values are ForecastInterval objects
+        # ForecastInterval has .lower, .upper, .levels fields (all Vector{Float64})
 
         levels = sort(collect(keys(fc.intervals)))
         n_horizons = length(fc.horizon)
@@ -59,8 +59,8 @@ function forecast_to_r_dict(fc)
         quantiles_list = Vector{Float64}[]
 
         for level in levels
-            interval_matrix = fc.intervals[level]
-            # interval_matrix has shape (n_horizons, 2) with columns [lower, upper]
+            interval_obj = fc.intervals[level]
+            # interval_obj is a ForecastInterval with .lower and .upper vectors
             # lower quantile = (1 - level) / 2
             # upper quantile = 1 - (1 - level) / 2
             lower_q = (1.0 - level) / 2.0
@@ -68,8 +68,8 @@ function forecast_to_r_dict(fc)
 
             push!(quantile_levels, lower_q)
             push!(quantile_levels, upper_q)
-            push!(quantiles_list, vec(interval_matrix[:, 1]))  # lower bounds
-            push!(quantiles_list, vec(interval_matrix[:, 2]))  # upper bounds
+            push!(quantiles_list, Vector{Float64}(interval_obj.lower))  # lower bounds
+            push!(quantiles_list, Vector{Float64}(interval_obj.upper))  # upper bounds
         end
 
         # Add median if present
