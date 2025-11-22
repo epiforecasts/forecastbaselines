@@ -18,23 +18,23 @@ knitr::opts_chunk$set(
 
 When working with time series data, transformations are often needed to:
 
-- **Stabilize variance** (e.g., log transform for multiplicative seasonality)
-- **Handle skewness** (e.g., Box-Cox transformations)
-- **Ensure non-negativity** (e.g., for count data)
-- **Improve model fit** (e.g., linearize relationships)
+- Stabilize variance (e.g., log transform for multiplicative seasonality)
+- Handle skewness (e.g., Box-Cox transformations)
+- Ensure non-negativity (e.g., for count data)
+- Improve model fit (e.g., linearize relationships)
 
 # Why Use R Transformations?
 
-**Advantages:**
+Advantages:
 
-- ✅ **Simpler** - Just use `log()`, `sqrt()`, `^`, etc.
-- ✅ **More reliable** - No dependency on Julia package bugs
-- ✅ **More flexible** - Use any R function or custom transformations
-- ✅ **More familiar** - R users already know these functions
-- ✅ **Composable** - Easy to chain multiple transformations
-- ✅ **Full control** - Complete transparency in what's happening
+- ✅ Simpler - Just use `log()`, `sqrt()`, `^`, etc.
+- ✅ More reliable - No dependency on Julia package bugs
+- ✅ More flexible - Use any R function or custom transformations
+- ✅ More familiar - R users already know these functions
+- ✅ Composable - Easy to chain multiple transformations
+- ✅ Full control - Complete transparency in what's happening
 
-**Known Issues with Julia transformations:**
+Known Issues with Julia transformations:
 
 - `SquareRootTransform()` has a bug in ForecastBaselines.jl
 - `transform_model()` is not implemented in ForecastBaselines.jl
@@ -44,10 +44,10 @@ When working with time series data, transformations are often needed to:
 
 The general workflow for using transformations:
 
-1. **Transform** your data using R functions
-2. **Fit** the model on transformed data
-3. **Forecast** on the transformed scale
-4. **Back-transform** forecasts to original scale
+1. Transform your data using R functions
+2. Fit the model on transformed data
+3. Forecast on the transformed scale
+4. Back-transform forecasts to original scale
 
 ```{r setup}
 library(forecastbaselines)
@@ -272,24 +272,24 @@ print(fc$mean)
 
 | Transformation | Forward | Inverse | Use Case | Notes |
 |---------------|---------|---------|----------|-------|
-| **Log** | `log(x)` | `exp(y)` | Multiplicative effects | x > 0 required |
-| **Log + 1** | `log1p(x)` | `expm1(y)` | Data with zeros | x ≥ 0 |
-| **Square root** | `sqrt(x)` | `y^2` | Count data | x ≥ 0 |
-| **Power** | `x^λ` | `y^(1/λ)` | General variance stabilization | x > 0 |
-| **Box-Cox** | `(x^λ - 1)/λ` | `(y*λ + 1)^(1/λ)` | Complex cases | x > 0, λ ≠ 0 |
-| **Arcsinh** | `asinh(x)` | `sinh(y)` | Data with negatives | All x |
+| Log | `log(x)` | `exp(y)` | Multiplicative effects | x > 0 required |
+| Log + 1 | `log1p(x)` | `expm1(y)` | Data with zeros | x ≥ 0 |
+| Square root | `sqrt(x)` | `y^2` | Count data | x ≥ 0 |
+| Power | `x^λ` | `y^(1/λ)` | General variance stabilization | x > 0 |
+| Box-Cox | `(x^λ - 1)/λ` | `(y*λ + 1)^(1/λ)` | Complex cases | x > 0, λ ≠ 0 |
+| Arcsinh | `asinh(x)` | `sinh(y)` | Data with negatives | All x |
 
 # Best Practices
 
-1. **Check your data** - Ensure transformations are appropriate (e.g., log requires positive data)
+1. Check your data - Ensure transformations are appropriate (e.g., log requires positive data)
 
-2. **Visualize** - Plot transformed data to verify it looks reasonable
+2. Visualize - Plot transformed data to verify it looks reasonable
 
-3. **Consider bias** - Back-transforming introduces bias (forecasts of log(x) ≠ log(forecasts of x))
+3. Consider bias - Back-transforming introduces bias (forecasts of log(x) ≠ log(forecasts of x))
 
-4. **Document** - Make transformations explicit in your code and comments
+4. Document - Make transformations explicit in your code and comments
 
-5. **Use functions** - Wrap transformation logic in functions for reusability:
+5. Use functions - Wrap transformation logic in functions for reusability:
 
 ```{r best-practice-functions}
 forecast_with_log <- function(data, model, horizon) {
@@ -319,11 +319,11 @@ fc <- forecast_with_log(data, ConstantModel(), 1:4)
 
 # Summary
 
-- **Use R's built-in transformation functions** for reliability and flexibility
-- **Follow the 4-step workflow**: transform → fit → forecast → back-transform
-- **Be aware of bias** when back-transforming forecasts
-- **Document your transformations** clearly in your code
-- **Avoid the Julia transformation functions** due to bugs and limitations
+- Use R's built-in transformation functions for reliability and flexibility
+- Follow the 4-step workflow: transform → fit → forecast → back-transform
+- Be aware of bias when back-transforming forecasts
+- Document your transformations clearly in your code
+- Avoid the Julia transformation functions due to bugs and limitations
 
 For more information on time series transformations, see:
 

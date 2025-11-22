@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-**forecastbaselines** provides an R interface to the
+forecastbaselines provides an R interface to the
 [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 Julia package, giving you access to 10 baseline forecasting models with
 comprehensive uncertainty quantification and evaluation tools.
@@ -35,12 +35,12 @@ This vignette will walk you through:
 
 You'll need both Julia and R installed:
 
-**Julia (>= 1.9)**
+Julia (>= 1.9)
 
 - Download from [julialang.org](https://julialang.org/downloads/)
 - Verify installation: `julia --version`
 
-**R (>= 3.5.0)**
+R (>= 3.5.0)
 
 - Already installed if you're reading this!
 
@@ -71,7 +71,7 @@ This will:
 - Install all dependencies
 - Load helper functions
 
-**Note:** This only needs to be done once. Subsequent R sessions will
+Note: This only needs to be done once. Subsequent R sessions will
 automatically connect to Julia.
 
 # Your First Forecast
@@ -168,7 +168,7 @@ fc_with_intervals <- forecast(
 print(fc_with_intervals)
 ```
 
-**Note:** The current version returns intervals in the Julia object.
+Note: The current version returns intervals in the Julia object.
 Future versions will provide full R support for interval extraction
 and visualization.
 
@@ -241,7 +241,7 @@ cat("Absolute Percentage Error:", scores_summary$ape, "\n")
 
 ## Available Scoring Rules
 
-**Note:** This package is compatible with the [scoringutils](https://epiforecasts.io/scoringutils/) package, providing standardized and comprehensive forecast evaluation through S3 methods.
+Note: This package is compatible with the [scoringutils](https://epiforecasts.io/scoringutils/) package, providing standardized and comprehensive forecast evaluation through S3 methods.
 
 Convert forecasts using `scoringutils::as_forecast_point()` or `scoringutils::as_forecast_quantile()`, then score:
 
@@ -411,16 +411,16 @@ fc_selected <- filter_horizons(fc, horizons = c(1, 3, 6, 12))
 
 Now that you've learned the basics, explore:
 
-1. **`vignette("forecast-models")`** - Detailed guide to all 10 models,
+1. `vignette("forecast-models")` - Detailed guide to all 10 models,
    when to use each, and their parameters
 
-2. **`vignette("transformations")`** - Comprehensive guide to data
+2. `vignette("transformations")` - Comprehensive guide to data
    transformations with examples
 
-3. **Package documentation** - Run `?forecastbaselines` or
+3. Package documentation - Run `?forecastbaselines` or
    `help(package = "forecastbaselines")`
 
-4. **Examples** - Check the `examples/` directory in the package
+4. Examples - Check the `examples/` directory in the package
    for complete workflows
 
 # Quick Reference
@@ -486,14 +486,14 @@ ETSModel() # Exponential smoothing
 
 # Troubleshooting
 
-**Julia not found:**
+Julia not found:
 ```{r trouble1, eval=FALSE}
 # Specify Julia path manually
 Sys.setenv(JULIA_HOME = "/path/to/julia/bin")
 setup_ForecastBaselines()
 ```
 
-**Package not loading:**
+Package not loading:
 ```{r trouble2, eval=FALSE}
 # Check if Julia is set up
 is_setup() # Should return TRUE
@@ -502,7 +502,7 @@ is_setup() # Should return TRUE
 setup_ForecastBaselines()
 ```
 
-**Getting errors during forecasting:**
+Getting errors during forecasting:
 ```{r trouble3, eval=FALSE}
 # Check your data
 summary(data) # No NAs or infinite values?

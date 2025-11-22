@@ -25,9 +25,9 @@ setup_ForecastBaselines()
 forecastbaselines provides 10 baseline forecasting models across three
 categories:
 
-1. **Simple Baselines** - Naive methods for benchmarking
-2. **Seasonal/Trend Models** - For patterned data
-3. **Advanced Time Series Models** - Statistical models
+1. Simple Baselines - Naive methods for benchmarking
+2. Seasonal/Trend Models - For patterned data
+3. Advanced Time Series Models - Statistical models
 
 This vignette provides:
 
@@ -84,24 +84,24 @@ benchmarks for more complex methods.
 
 ## 1.1 Constant Model (Naive Forecast)
 
-**Description:**
+Description:
 The simplest possible forecast - uses the last observed value for all
 future predictions.
 
-**Mathematical Form:**
+Mathematical Form:
 $$\hat{y}_{t+h} = y_t \quad \forall h > 0$$
 
-**When to Use:**
+When to Use:
 
 - ✅ Quick baseline for model comparison
 - ✅ Random walk data (financial prices, etc.)
 - ✅ When you need fast, simple forecasts
 - ❌ Data with trends or seasonality
 
-**Parameters:**
+Parameters:
 None - completely parameter-free.
 
-**Example:**
+Example:
 
 ```{r constant}
 # Generate random walk data
@@ -131,14 +131,14 @@ ggplot(plot_df, aes(x = time, y = value)) +
   theme(legend.position = "top")
 ```
 
-**Strengths:**
+Strengths:
 
 - Extremely fast
 - No parameters to tune
 - Optimal for random walks
 - Easy to explain
 
-**Limitations:**
+Limitations:
 
 - Ignores all patterns
 - Flat forecast function
@@ -148,14 +148,14 @@ ggplot(plot_df, aes(x = time, y = value)) +
 
 ## 1.2 Marginal Model
 
-**Description:**
+Description:
 Forecasts by randomly sampling from the empirical distribution of the
 observed data.
 
-**Mathematical Form:**
+Mathematical Form:
 $$\hat{y}_{t+h} \sim \text{Empirical}(y_1, \ldots, y_t)$$
 
-**When to Use:**
+When to Use:
 
 - ✅ Stationary data without autocorrelation
 - ✅ Need probabilistic forecasts
@@ -163,10 +163,10 @@ $$\hat{y}_{t+h} \sim \text{Empirical}(y_1, \ldots, y_t)$$
 - ❌ Trending or seasonal patterns
 - ❌ Strong autocorrelation
 
-**Parameters:**
+Parameters:
 None
 
-**Example:**
+Example:
 
 ```{r marginal}
 # Generate stationary data
@@ -190,19 +190,19 @@ cat("Historical mean:", mean(data), "\n")
 cat("Forecast mean:", mean(fc$mean), "\n")
 ```
 
-**Strengths:**
+Strengths:
 
 - Captures full distribution
 - Natural uncertainty quantification
 - No distributional assumptions
 
-**Limitations:**
+Limitations:
 
 - Ignores temporal dependence
 - Requires sufficient data (30+)
 - Constant forecast on average
 
-**Use Case:**
+Use Case:
 Benchmark for comparing autocorrelation benefits. If ARMA doesn't
 beat Marginal, your data may not have useful autocorrelation.
 
@@ -210,16 +210,16 @@ beat Marginal, your data may not have useful autocorrelation.
 
 ## 1.3 KDE Model (Kernel Density Estimation)
 
-**Description:**
+Description:
 Similar to Marginal but uses kernel density estimation for smoother
 probability distributions.
 
-**Mathematical Form:**
+Mathematical Form:
 $$\hat{f}(y) = \frac{1}{n h} \sum_{i=1}^n K\left(\frac{y - y_i}{h}\right)$$
 
 where $K$ is a kernel function and $h$ is bandwidth.
 
-**When to Use:**
+When to Use:
 
 - ✅ Need smooth probability estimates
 - ✅ Continuous data
@@ -227,10 +227,10 @@ where $K$ is a kernel function and $h$ is bandwidth.
 - ❌ Small sample sizes (< 50)
 - ❌ Discrete/count data
 
-**Parameters:**
+Parameters:
 None (bandwidth selected automatically)
 
-**Example:**
+Example:
 
 ```{r kde}
 # Generate bimodal data
@@ -265,13 +265,13 @@ ggplot(density_df, aes(x = x, y = y, color = type)) +
   theme(legend.position = "topright")
 ```
 
-**Strengths:**
+Strengths:
 
 - Smooth probability estimates
 - Handles multi-modal data
 - Good for continuous distributions
 
-**Limitations:**
+Limitations:
 
 - Needs more data than Marginal (50+)
 - Computationally more expensive
@@ -285,17 +285,17 @@ For data with identifiable patterns in time.
 
 ## 2.1 LSD Model (Last Similar Dates)
 
-**Description:**
+Description:
 Seasonal model that forecasts by averaging values from similar
 historical periods.
 
-**How It Works:**
+How It Works:
 
 1. For horizon $h$, look back to periods $t - s + h$, $t - 2s + h$, etc.
 2. Average the `window` most recent similar periods
 3. Handles irregular seasonality well
 
-**When to Use:**
+When to Use:
 
 - ✅ Strong seasonal patterns
 - ✅ Seasonality more important than trend
@@ -303,12 +303,12 @@ historical periods.
 - ❌ Purely trending data
 - ❌ Less than 2 full seasonal cycles
 
-**Parameters:**
+Parameters:
 
 - `window`: Number of similar periods to average (default: 1)
 - `s`: Seasonal period (e.g., 12 for monthly, 7 for daily)
 
-**Example:**
+Example:
 
 ```{r lsd}
 # Monthly data with seasonality
@@ -339,27 +339,27 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   theme(legend.position = "top")
 ```
 
-**Parameter Guidance:**
+Parameter Guidance:
 
-- **`s` (seasonal period)**:
+- `s` (seasonal period):
   - 7 for daily data with weekly patterns
   - 12 for monthly data with yearly patterns
   - 24 for hourly data with daily patterns
   - 52 for weekly data with yearly patterns
 
-- **`window` (averaging window)**:
+- `window` (averaging window):
   - 1: Use only last similar period (more responsive)
   - 3-5: Smooth average (more stable)
   - Large: Very smooth but less adaptive
 
-**Strengths:**
+Strengths:
 
 - Simple and interpretable
 - Handles irregular seasonality
 - Fast computation
 - Works with little data
 
-**Limitations:**
+Limitations:
 
 - No trend modeling
 - Needs at least 2 seasonal cycles
@@ -369,14 +369,14 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
 
 ## 2.2 OLS Model (Polynomial Trend)
 
-**Description:**
+Description:
 Fits polynomial trends using ordinary least squares, then forecasts
 by extrapolating the trend.
 
-**Mathematical Form:**
+Mathematical Form:
 $$y_t = \beta_0 + \beta_1 t + \beta_2 t^2 + \ldots + \beta_p t^p + \epsilon_t$$
 
-**When to Use:**
+When to Use:
 
 - ✅ Clear polynomial trends
 - ✅ Smooth, continuous trends
@@ -384,12 +384,12 @@ $$y_t = \beta_0 + \beta_1 t + \beta_2 t^2 + \ldots + \beta_p t^p + \epsilon_t$$
 - ❌ Seasonal patterns
 - ❌ Long-term forecasts (unstable extrapolation)
 
-**Parameters:**
+Parameters:
 
 - `degree`: Polynomial degree (1 = linear, 2 = quadratic, etc.)
 - `differencing`: Order of differencing (default: 0)
 
-**Example:**
+Example:
 
 ```{r ols}
 # Generate quadratic trend
@@ -421,32 +421,32 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   theme(legend.position = "top")
 ```
 
-**Parameter Guidance:**
+Parameter Guidance:
 
-- **`degree`**:
+- `degree`:
   - 1: Linear trend (most common)
   - 2: Quadratic (turning point)
   - 3: Cubic (S-shaped curves)
   - 4+: Rarely recommended (overfitting risk)
 
-- **`differencing`**:
+- `differencing`:
   - 0: Model in levels
   - 1: Model in first differences
   - Requires `degree >= differencing + 1`
 
-**Strengths:**
+Strengths:
 
 - Simple interpretation
 - Fast computation
 - Well-understood statistics
 
-**Limitations:**
+Limitations:
 
 - Polynomial extrapolation can be unstable
 - No seasonality handling
 - Overfitting risk with high degrees
 
-**Tips:**
+Tips:
 
 - Use degree = 1 (linear) unless there's clear curvature
 - Validate extrapolations carefully
@@ -456,17 +456,17 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
 
 ## 2.3 IDS Model (Increase-Decrease-Stable)
 
-**Description:**
+Description:
 Detects trend direction (increasing, decreasing, stable) over recent
 windows and extrapolates.
 
-**How It Works:**
+How It Works:
 
 1. Divide recent history into `p` windows
 2. Classify each window's trend
 3. Forecast based on detected pattern
 
-**When to Use:**
+When to Use:
 
 - ✅ Step changes in trend
 - ✅ Regime-switching behavior
@@ -474,12 +474,12 @@ windows and extrapolates.
 - ❌ Smooth continuous trends (use OLS)
 - ❌ Seasonal patterns
 
-**Parameters:**
+Parameters:
 
 - `window_size`: Number of windows to analyze (default: 3)
 - `threshold`: Threshold for detecting changes (default: 0.0)
 
-**Example:**
+Example:
 
 ```{r ids}
 # Generate data with trend change
@@ -513,20 +513,20 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   theme(legend.position = "top")
 ```
 
-**Parameter Guidance:**
+Parameter Guidance:
 
-- **`p` (number of windows)**:
+- `p` (number of windows):
   - 2-3: More reactive to recent changes
   - 4-6: More stable, less reactive
   - Too large: Misses recent trends
 
-**Strengths:**
+Strengths:
 
 - Detects trend changes
 - Adapts to regimes
 - Interpretable classifications
 
-**Limitations:**
+Limitations:
 
 - Discrete trend categories
 - Needs sufficient data
@@ -536,16 +536,16 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
 
 ## 2.4 STL Model (Seasonal-Trend Decomposition)
 
-**Description:**
+Description:
 Decomposes series into seasonal, trend, and remainder components using
 LOESS, then forecasts each separately.
 
-**Mathematical Form:**
+Mathematical Form:
 $$y_t = T_t + S_t + R_t$$
 
 where $T_t$ is trend, $S_t$ is seasonal, $R_t$ is remainder.
 
-**When to Use:**
+When to Use:
 
 - ✅ Both trend AND seasonality
 - ✅ Need decomposition for interpretation
@@ -553,11 +553,11 @@ where $T_t$ is trend, $S_t$ is seasonal, $R_t$ is remainder.
 - ❌ Irregular seasonality
 - ❌ Less than 2 seasonal cycles
 
-**Parameters:**
+Parameters:
 
 - `s`: Seasonal period
 
-**Example:**
+Example:
 
 ```{r stl}
 # Generate trend + seasonality
@@ -589,24 +589,24 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   theme(legend.position = "top")
 ```
 
-**Parameter Guidance:**
+Parameter Guidance:
 
-- **`s` (seasonal period)**: Same as LSD model guidance
+- `s` (seasonal period): Same as LSD model guidance
 
-**Strengths:**
+Strengths:
 
 - Handles trend + seasonality together
 - Robust to outliers
 - Provides interpretable decomposition
 - Can extract components for analysis
 
-**Limitations:**
+Limitations:
 
 - Fixed seasonal period
 - Needs at least 2 cycles
 - More complex than LSD
 
-**Use Case:**
+Use Case:
 Preferred over LSD when trend is important, or when you need to
 analyze seasonal and trend components separately.
 
@@ -618,16 +618,16 @@ Statistical models with parametric probability distributions.
 
 ## 3.1 ARMA Model (Autoregressive Moving Average)
 
-**Description:**
+Description:
 Classic time series model combining autoregressive (AR) and moving
 average (MA) components.
 
-**Mathematical Form:**
+Mathematical Form:
 $$y_t = c + \phi_1 y_{t-1} + \ldots + \phi_p y_{t-p} + \theta_1 \epsilon_{t-1} + \ldots + \theta_q \epsilon_{t-q} + \epsilon_t$$
 
 where $\epsilon_t \sim N(0, \sigma^2)$.
 
-**When to Use:**
+When to Use:
 
 - ✅ Stationary time series
 - ✅ Need parametric uncertainty
@@ -635,12 +635,12 @@ where $\epsilon_t \sim N(0, \sigma^2)$.
 - ❌ Strong trends (use differencing or detrend first)
 - ❌ Seasonal patterns (use SARIMA or seasonal models)
 
-**Parameters:**
+Parameters:
 
 - `p`: Autoregressive order
 - `q`: Moving average order
 
-**Example:**
+Example:
 
 ```{r arma}
 # Generate AR(1) process
@@ -679,46 +679,46 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   theme(legend.position = "top")
 ```
 
-**Parameter Guidance:**
+Parameter Guidance:
 
-**How to choose `p` and `q`:**
+How to choose `p` and `q`:
 
-1. **Plot ACF/PACF** (in R):
+1. Plot ACF/PACF (in R):
 ```{r acf, eval=FALSE}
 acf(data) # Autocorrelation
 pacf(data) # Partial autocorrelation
 ```
 
-2. **ACF/PACF patterns**:
+2. ACF/PACF patterns:
    - ACF cuts off at lag q → MA(q)
    - PACF cuts off at lag p → AR(p)
    - Both decay slowly → ARMA(p,q)
 
-3. **Common starting points**:
+3. Common starting points:
    - ARMA(1,0) = AR(1): Simple persistence
    - ARMA(0,1) = MA(1): Single shock memory
    - ARMA(1,1): Most parsimonious mixed model
    - ARMA(2,2): More flexibility
 
-4. **General guidance**:
+4. General guidance:
    - Start small (p=1, q=1)
    - Rarely need p or q > 3
    - More parameters ≠ better forecasts
 
-**Strengths:**
+Strengths:
 
 - Well-established theory
 - Parametric uncertainty
 - Efficient for stationary data
 - Many diagnostic tools
 
-**Limitations:**
+Limitations:
 
 - Requires stationarity
 - Parameter selection can be tricky
 - Needs sufficient data (50+)
 
-**Tips:**
+Tips:
 
 - Detrend before fitting if trending
 - Use AIC/BIC for model selection
@@ -728,15 +728,15 @@ pacf(data) # Partial autocorrelation
 
 ## 3.2 INARCH Model (Integer ARCH)
 
-**Description:**
+Description:
 Designed for count data (non-negative integers), models conditional
 mean and variance with ARCH-type dynamics.
 
-**Mathematical Form:**
+Mathematical Form:
 $$E[y_t | \mathcal{F}_{t-1}] = \beta + \alpha_1 y_{t-1} + \ldots + \alpha_p y_{t-p}$$
 $$y_t | \mathcal{F}_{t-1} \sim \text{Poisson}(\lambda_t)$$
 
-**When to Use:**
+When to Use:
 
 - ✅ Count data (0, 1, 2, 3, ...)
 - ✅ Non-negative integers
@@ -745,12 +745,12 @@ $$y_t | \mathcal{F}_{t-1} \sim \text{Poisson}(\lambda_t)$$
 - ❌ Continuous data
 - ❌ Negative values
 
-**Parameters:**
+Parameters:
 
 - `p`: Order of lags
 - `s`: Seasonal period (optional)
 
-**Example:**
+Example:
 
 ```{r inarch}
 # Generate count data
@@ -775,31 +775,31 @@ fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:10)
 print(fc$mean)
 ```
 
-**Parameter Guidance:**
+Parameter Guidance:
 
-- **`p` (lag order)**:
+- `p` (lag order):
   - 1: Most common, captures direct persistence
   - 2-3: If ACF shows higher-order dependence
   - Rarely need p > 3
 
-- **`s` (seasonality)**:
+- `s` (seasonality):
   - Omit if no seasonality
   - Set to period if seasonal counts
 
-**Strengths:**
+Strengths:
 
 - Designed for count data
 - Respects non-negativity
 - Handles overdispersion
 - Seasonal version available
 
-**Limitations:**
+Limitations:
 
 - Only for integer counts
 - Requires more data than ARMA
 - Limited to Poisson/NegBin distributions
 
-**Use Cases:**
+Use Cases:
 
 - Disease counts
 - Customer arrivals
@@ -810,17 +810,17 @@ print(fc$mean)
 
 ## 3.3 ETS Model (Error-Trend-Season)
 
-**Description:**
+Description:
 Exponential smoothing state space models covering 30 different
 combinations of error, trend, and seasonal components.
 
-**Components:**
+Components:
 
-- **Error**: Additive (A) or Multiplicative (M)
-- **Trend**: None (N), Additive (A), Multiplicative (M), Damped (Ad, Md)
-- **Season**: None (N), Additive (A), Multiplicative (M)
+- Error: Additive (A) or Multiplicative (M)
+- Trend: None (N), Additive (A), Multiplicative (M), Damped (Ad, Md)
+- Season: None (N), Additive (A), Multiplicative (M)
 
-**When to Use:**
+When to Use:
 
 - ✅ Complex seasonal patterns
 - ✅ Need automatic model selection
@@ -829,14 +829,14 @@ combinations of error, trend, and seasonal components.
 - ❌ Very short series (< 2 cycles)
 - ❌ Need interpretable parameters
 
-**Parameters:**
+Parameters:
 
 - `error`: "A" (additive) or "M" (multiplicative) or NULL (auto)
 - `trend`: "N", "A", "M", "Ad", "Md", or NULL (auto)
 - `season`: "N", "A", "M", or NULL (auto)
 - `s`: Seasonal period (if seasonal)
 
-**Example:**
+Example:
 
 ```{r ets}
 # Generate multiplicative seasonal data
@@ -875,14 +875,14 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   theme(legend.position = "top")
 ```
 
-**Model Selection Guide:**
+Model Selection Guide:
 
-**Error type:**
+Error type:
 
 - Additive (A): Errors independent of level
 - Multiplicative (M): Errors proportional to level
 
-**Trend type:**
+Trend type:
 
 - None (N): No trend
 - Additive (A): Linear trend
@@ -890,13 +890,13 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
 - Additive Damped (Ad): Trend decays to flat
 - Multiplicative Damped (Md): Trend decays exponentially
 
-**Season type:**
+Season type:
 
 - None (N): No seasonality
 - Additive (A): Constant seasonal fluctuation
 - Multiplicative (M): Seasonal % of level
 
-**Common Models:**
+Common Models:
 
 - `ETS(A,N,N)`: Simple exponential smoothing
 - `ETS(A,A,N)`: Holt's linear trend
@@ -904,21 +904,21 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
 - `ETS(A,A,M)`: Multiplicative seasonality
 - `ETS(M,M,M)`: Fully multiplicative
 
-**Strengths:**
+Strengths:
 
 - Extremely flexible (30 models)
 - Automatic selection available
 - Well-tested in practice
 - Handles many data types
 
-**Limitations:**
+Limitations:
 
 - Many parameters to choose
 - Computationally intensive
 - Less interpretable than ARMA
 - Can overfit
 
-**Tips:**
+Tips:
 
 - Start with automatic selection (NULL parameters)
 - Use additive for stable variance
@@ -1035,7 +1035,7 @@ Fastest → Slowest:
 
 ## Quick Start
 
-**Don't know where to begin?**
+Don't know where to begin?
 
 1. Start with `ConstantModel()` - it's fast and shows what "no model" looks like
 2. If you have seasonality, try `STLModel(s = period)`
@@ -1044,15 +1044,15 @@ Fastest → Slowest:
 
 ## Best Practices
 
-1. **Always use a simple baseline** - ConstantModel or Marginal
-2. **Match model to data characteristics**:
+1. Always use a simple baseline - ConstantModel or Marginal
+2. Match model to data characteristics:
    - Counts → INARCH
    - Seasonal → STL or LSD
    - Stationary → ARMA
    - Complex → ETS
-3. **Validate on holdout data** - use `truth` parameter
-4. **Check residuals** - should look like white noise
-5. **Start simple, add complexity only if needed**
+3. Validate on holdout data - use `truth` parameter
+4. Check residuals - should look like white noise
+5. Start simple, add complexity only if needed
 
 ## Further Reading
 
