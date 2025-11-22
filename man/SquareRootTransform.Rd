@@ -10,7 +10,8 @@ SquareRootTransform()
 A SquareRootTransform object
 }
 \description{
-Creates a square root transformation. Useful for count data and variance stabilization.
+Creates a square root transformation. Useful for count data and variance
+stabilization.
 }
 \examples{
 \dontrun{

@@ -16,17 +16,18 @@ ModelTrajectoryInterval(
 
 \item{seed}{Random seed for reproducibility (default: NULL)}
 
-\item{positivity_correction}{Method to ensure positive forecasts: "none", "post_clip",
-"truncate", or "zero_floor" (default: "none")}
+\item{positivity_correction}{Method to ensure positive forecasts: "none",
+"post_clip", "truncate", or "zero_floor" (default: "none")}
 
-\item{return_trajectories}{Whether to return forecast trajectories (default: FALSE)}
+\item{return_trajectories}{Whether to return forecast trajectories
+(default: FALSE)}
 }
 \value{
 A ModelTrajectoryInterval object
 }
 \description{
-Creates prediction intervals by simulating trajectories from the fitted model.
-This method uses the model's own simulation mechanism.
+Creates prediction intervals by simulating trajectories from the fitted
+model. This method uses the model's own simulation mechanism.
 }
 \examples{
 \dontrun{

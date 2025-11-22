@@ -7,15 +7,15 @@
 ParametricInterval(positivity_correction = "none")
 }
 \arguments{
-\item{positivity_correction}{Method to ensure positive forecasts: "none" or "post_clip"
-(default: "none")}
+\item{positivity_correction}{Method to ensure positive forecasts: "none"
+or "post_clip" (default: "none")}
 }
 \value{
 A ParametricInterval object
 }
 \description{
-Creates prediction intervals using parametric assumptions based on the model's
-distribution (e.g., assuming normality for ARMA models).
+Creates prediction intervals using parametric assumptions based on the
+model's distribution (e.g., assuming normality for ARMA models).
 }
 \examples{
 \dontrun{

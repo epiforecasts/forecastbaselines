@@ -206,6 +206,38 @@ arma_quantile <- scoringutils::as_forecast_quantile(arma_with_truth)
 print(head(arma_quantile, 15))
 ```
 
+## Visualizing with hubVis
+
+The package integrates with hubVis for interactive forecast visualization:
+
+```{r hubvis, eval = FALSE}
+# Convert to hubverse format
+hubverse_data <- as_hubverse(
+  arma_with_truth,
+  origin_date = as.Date("2024-01-01"),
+  horizon_unit = "week"
+)
+
+# Visualize with hubVis (if installed)
+if (requireNamespace("hubVis", quietly = TRUE) &&
+  requireNamespace("hubUtils", quietly = TRUE)) {
+  # Convert to model_out_tbl format
+  model_out <- hubUtils::as_model_out_tbl(hubverse_data$model_output)
+
+  # Create interactive plot with 50%, 80%, and 95% intervals
+  hubVis::plot_step_ahead_model_output(
+    model_out,
+    hubverse_data$target_data,
+    use_plotly = TRUE # Set FALSE for static ggplot
+  )
+}
+```
+
+This creates an interactive Plotly visualization showing:
+- Prediction intervals at 50%, 80%, and 95% confidence levels
+- Observed values overlaid on the forecasts
+- Color-coded by model
+
 # Model Evaluation
 
 To evaluate forecast accuracy, you need to provide the true values.

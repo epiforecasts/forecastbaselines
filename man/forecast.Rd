@@ -17,7 +17,8 @@ forecast(
 \arguments{
 \item{fitted}{A fitted model object from fit_baseline()}
 
-\item{interval_method}{Interval method object (NoInterval, EmpiricalInterval, etc.)}
+\item{interval_method}{Interval method object (NoInterval,
+EmpiricalInterval, etc.)}
 
 \item{horizon}{Integer or vector of integers specifying forecast horizons}
 
@@ -33,8 +34,8 @@ forecast(
 A Forecast object (list) containing forecasts and metadata
 }
 \description{
-Generates a complete forecast including point forecasts, prediction intervals,
-and optionally trajectories.
+Generates a complete forecast including point forecasts, prediction
+intervals, and optionally trajectories.
 }
 \examples{
 \dontrun{

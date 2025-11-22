@@ -12,9 +12,11 @@ setup_ForecastBaselines(
 )
 }
 \arguments{
-\item{JULIA_HOME}{Path to Julia installation (optional, will auto-detect if not provided)}
+\item{JULIA_HOME}{Path to Julia installation (optional, will auto-detect
+if not provided)}
 
-\item{install_package}{Whether to install ForecastBaselines.jl if not already installed}
+\item{install_package}{Whether to install ForecastBaselines.jl if not
+already installed}
 
 \item{rebuild}{Whether to rebuild the Julia system image}
 

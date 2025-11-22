@@ -18,8 +18,8 @@ A transformed model object
 Wraps a model with a data transformation.
 }
 \details{
-**Not Implemented:** This function does not work because ForecastBaselines.jl
-does not implement `transform()` for model types.
+**Not Implemented:** This function does not work because
+ForecastBaselines.jl does not implement `transform()` for model types.
 
 **Recommended approach:** Transform your data manually in R before fitting:
 

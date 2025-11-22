@@ -7,14 +7,15 @@
 MarginalModel(p = NULL)
 }
 \arguments{
-\item{p}{Number of most recent observations to use (default: all observations)}
+\item{p}{Number of most recent observations to use (default: all
+observations)}
 }
 \value{
 A MarginalModel object
 }
 \description{
-Creates a forecast based on the empirical marginal distribution using the mean
-of the p most recent observations.
+Creates a forecast based on the empirical marginal distribution using the
+mean of the p most recent observations.
 }
 \examples{
 \dontrun{

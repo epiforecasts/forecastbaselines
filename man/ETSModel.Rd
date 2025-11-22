@@ -13,12 +13,14 @@ ETSModel(
 )
 }
 \arguments{
-\item{error_type}{Error type: "A" (additive), "M" (multiplicative), or "N" (none)}
+\item{error_type}{Error type: "A" (additive), "M" (multiplicative), or
+"N" (none)}
 
-\item{trend_type}{Trend type: "A" (additive), "M" (multiplicative), "Ad" (damped additive),
-"Md" (damped multiplicative), or "N" (none)}
+\item{trend_type}{Trend type: "A" (additive), "M" (multiplicative), "Ad"
+(damped additive), "Md" (damped multiplicative), or "N" (none)}
 
-\item{season_type}{Season type: "A" (additive), "M" (multiplicative), or "N" (none)}
+\item{season_type}{Season type: "A" (additive), "M" (multiplicative), or
+"N" (none)}
 
 \item{s}{Seasonal period (required if season_type is not "N")}
 
@@ -39,9 +41,13 @@ model <- ETSModel(error_type = "A", trend_type = "N", season_type = "N")
 model <- ETSModel(error_type = "A", trend_type = "A", season_type = "N")
 
 # Holt-Winters additive (A,A,A)
-model <- ETSModel(error_type = "A", trend_type = "A", season_type = "A", s = 12)
+model <- ETSModel(
+  error_type = "A", trend_type = "A", season_type = "A", s = 12
+)
 
 # Holt-Winters multiplicative (M,M,M)
-model <- ETSModel(error_type = "M", trend_type = "M", season_type = "M", s = 12)
+model <- ETSModel(
+  error_type = "M", trend_type = "M", season_type = "M", s = 12
+)
 }
 }

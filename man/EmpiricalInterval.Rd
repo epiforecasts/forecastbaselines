@@ -16,29 +16,34 @@ EmpiricalInterval(
 )
 }
 \arguments{
-\item{n_trajectories}{Number of bootstrap samples to generate (default: 1000)}
+\item{n_trajectories}{Number of bootstrap samples to generate
+(default: 1000)}
 
 \item{min_observation}{Minimum number of observations required (default: 1)}
 
-\item{bootstrap_distribution}{Optional distribution to sample from (default: NULL)}
+\item{bootstrap_distribution}{Optional distribution to sample from
+(default: NULL)}
 
 \item{seed}{Random seed for reproducibility (default: NULL)}
 
-\item{positivity_correction}{Method to ensure positive forecasts: "none", "post_clip",
-"truncate", or "zero_floor" (default: "none")}
+\item{positivity_correction}{Method to ensure positive forecasts: "none",
+"post_clip", "truncate", or "zero_floor" (default: "none")}
 
-\item{symmetry_correction}{Whether to apply symmetry correction (default: FALSE)}
+\item{symmetry_correction}{Whether to apply symmetry correction
+(default: FALSE)}
 
 \item{stepwise}{Whether to use stepwise intervals (default: FALSE)}
 
-\item{return_trajectories}{Whether to return forecast trajectories (default: FALSE)}
+\item{return_trajectories}{Whether to return forecast trajectories
+(default: FALSE)}
 }
 \value{
 An EmpiricalInterval object
 }
 \description{
-Creates prediction intervals by bootstrapping from historical forecast errors.
-This is a non-parametric method that doesn't assume any particular distribution.
+Creates prediction intervals by bootstrapping from historical forecast
+errors. This is a non-parametric method that doesn't assume any particular
+distribution.
 }
 \examples{
 \dontrun{

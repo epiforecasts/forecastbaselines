@@ -11,7 +11,8 @@ fit_baseline(x, model, temporal_info = NULL)
 
 \item{model}{A model object created by one of the model constructors}
 
-\item{temporal_info}{Optional TemporalInfo object with start date and resolution}
+\item{temporal_info}{Optional TemporalInfo object with start date and
+resolution}
 }
 \value{
 A fitted model object that can be used for forecasting

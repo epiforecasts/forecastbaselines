@@ -10,8 +10,8 @@ ConstantModel()
 A ConstantModel object
 }
 \description{
-Creates a naive forecast model that uses the last observed value as the forecast
-for all future horizons.
+Creates a naive forecast model that uses the last observed value as the
+forecast for all future horizons.
 }
 \examples{
 \dontrun{
