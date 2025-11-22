@@ -14,23 +14,23 @@ framework.
 
 ## Features
 
-- **10 Forecasting Models**: From simple baselines (Constant, Marginal)
-  to advanced time series models (ARMA, ETS, STL)
-- **Probabilistic Forecasting**: Multiple methods for prediction
-  intervals (empirical, parametric, model-based)
-- **Comprehensive Scoring**: Compatible with scoringutils for all
-  standard forecast evaluation metrics
-- **Data Transformations**: Log, power, Box-Cox transformations with
+- 10 Forecasting Models: From simple baselines (Constant, Marginal) to
+  advanced time series models (ARMA, ETS, STL)
+- Probabilistic Forecasting: Multiple methods for prediction intervals
+  (empirical, parametric, model-based)
+- Comprehensive Scoring: Compatible with scoringutils for all standard
+  forecast evaluation metrics
+- Data Transformations: Log, power, Box-Cox transformations with
   automatic back-transformation
 
 ## Installation
 
 ### Prerequisites
 
-1.  **Julia** (\>= 1.9): Download from
+1.  Julia (\>= 1.9): Download from
     [julialang.org](https://julialang.org/downloads/)
-2.  **R** (\>= 3.5.0)
-3.  **JuliaCall R package**: `install.packages("JuliaCall")`
+2.  R (\>= 3.5.0)
+3.  JuliaCall R package: `install.packages("JuliaCall")`
 
 ### Installing forecastbaselines
 
@@ -55,6 +55,8 @@ This only needs to be done once per R session.
 ## Quick Example
 
 ``` r
+library(scoringutils) # for scoring
+
 # Your time series data
 data <- c(1.2, 2.3, 3.1, 2.8, 3.5, 4.2, 3.9, 4.5, 4.1, 4.8)
 
@@ -90,23 +92,22 @@ scores_summary[, c("model", "ae_point", "se_point")]
 
 ### Simple Baseline Models
 
-- **ConstantModel**: Naive forecast using last observed value
-- **MarginalModel**: Forecasts based on empirical marginal distribution
-- **KDEModel**: Kernel density estimation
+- *ConstantModel*: Naive forecast using last observed value
+- *MarginalModel*: Forecasts based on empirical marginal distribution
+- *KDEModel*: Kernel density estimation
 
 ### Seasonal/Trend Models
 
-- **LSDModel**: Last Similar Dates method (seasonal patterns)
-- **OLSModel**: Ordinary least squares with polynomial trends
-- **IDSModel**: Increase-Decrease-Stable trend detection
-- **STLModel**: Seasonal-Trend decomposition using Loess
+- *LSDModel*: Last Similar Dates method (seasonal patterns)
+- *OLSModel*: Ordinary least squares with polynomial trends
+- *IDSModel*: Increase-Decrease-Stable trend detection
+- *STLModel*: Seasonal-Trend decomposition using Loess
 
 ### Advanced Time Series Models
 
-- **ARMAModel**: Autoregressive Moving Average
-- **INARCHModel**: Integer-valued ARCH for count data
-- **ETSModel**: Error-Trend-Season exponential smoothing (all 30
-  variants)
+- *ARMAModel*: Autoregressive Moving Average
+- *INARCHModel*: Integer-valued ARCH for count data
+- *ETSModel*: Error-Trend-Season exponential smoothing (all 30 variants)
 
 ## Documentation
 
@@ -116,12 +117,25 @@ For detailed guides and examples:
 - `vignette("forecast-models")` - Detailed guide to all 10 models
 - `vignette("transformations")` - Working with data transformations
 
+## Related Packages
+
+For comprehensive time series forecasting in R, consider:
+
+- [fable](https://fable.tidyverts.org/) - A complete forecasting
+  framework in the [tidyverts](https://tidyverts.org/) ecosystem
+- [forecast](https://pkg.robjhyndman.com/forecast/) - The classic R
+  forecasting package with auto.arima, ets, and many other methods
+- [prophet](https://facebook.github.io/prophet/) - Facebook’s
+  forecasting package for time series with strong seasonal patterns
+- [modeltime](https://business-science.github.io/modeltime/) - A
+  tidymodels framework for time series forecasting
+
 ## Citation
 
 If you use this package in your research, please cite the software and
 the associated preprint:
 
-**Software:**
+Software:
 
     @software{forecastbaselinesr,
       title = {forecastbaselines: R Interface to ForecastBaselines.jl},
@@ -130,7 +144,7 @@ the associated preprint:
       url = {https://github.com/epiforecasts/forecastbaselines}
     }
 
-**Preprint:**
+Preprint:
 
     @article{stapper2025baseline,
       title = {Mind the Baseline: The Hidden Impact of Reference Model Selection on Forecast Assessment},
