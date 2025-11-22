@@ -45,9 +45,53 @@ function forecast_to_r_dict(fc)
     result["truth"] = to_r_compatible(fc.truth)
     result["model_name"] = String(fc.model_name)
 
-    # Skip complex types (intervals, trajectories) for now
-    # These would need recursive conversion if needed
-    result["intervals"] = nothing
+    # Extract quantiles from intervals if present
+    if fc.intervals !== nothing && !isempty(fc.intervals)
+        # intervals is a Dict{Float64, Matrix{Float64}}
+        # keys are levels (e.g., 0.95), values are matrices with lower/upper bounds
+        # We need to convert this to quantile format
+
+        levels = sort(collect(keys(fc.intervals)))
+        n_horizons = length(fc.horizon)
+
+        # Build quantile levels and quantile matrix
+        quantile_levels = Float64[]
+        quantiles_list = Vector{Float64}[]
+
+        for level in levels
+            interval_matrix = fc.intervals[level]
+            # interval_matrix has shape (n_horizons, 2) with columns [lower, upper]
+            # lower quantile = (1 - level) / 2
+            # upper quantile = 1 - (1 - level) / 2
+            lower_q = (1.0 - level) / 2.0
+            upper_q = 1.0 - lower_q
+
+            push!(quantile_levels, lower_q)
+            push!(quantile_levels, upper_q)
+            push!(quantiles_list, vec(interval_matrix[:, 1]))  # lower bounds
+            push!(quantiles_list, vec(interval_matrix[:, 2]))  # upper bounds
+        end
+
+        # Add median if present
+        if fc.median !== nothing
+            push!(quantile_levels, 0.5)
+            push!(quantiles_list, to_r_compatible(fc.median))
+        end
+
+        # Sort by quantile level and arrange as matrix
+        perm = sortperm(quantile_levels)
+        quantile_levels = quantile_levels[perm]
+        quantiles_list = quantiles_list[perm]
+
+        # Convert to matrix: rows = horizons, cols = quantile levels
+        result["quantiles"] = hcat(quantiles_list...)  # Shape: (n_horizons, n_quantile_levels)
+        result["quantile_levels"] = quantile_levels
+    else
+        result["quantiles"] = nothing
+        result["quantile_levels"] = nothing
+    end
+
+    # Skip trajectories for now
     result["trajectories"] = nothing
 
     return result
