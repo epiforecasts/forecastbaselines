@@ -173,14 +173,8 @@ fc_intervals_truth <- add_truth(fc_with_intervals, truth_vals)
 # Convert to scoringutils format and visualize
 fc_quantile <- scoringutils::as_forecast_quantile(fc_intervals_truth)
 
-scoringutils::plot_predictions(
-  fc_quantile,
-  x = "horizon",
-  range = c(0, 50, 95)  # Show median and 50%, 95% prediction intervals
-) +
-  labs(title = "Constant Model Forecast with Prediction Intervals",
-       x = "Forecast Horizon", y = "Value") +
-  theme_minimal()
+# Show quantile forecast structure
+print(head(fc_quantile, 15))
 ```
 
 ## Try a More Advanced Model
@@ -208,14 +202,8 @@ arma_with_truth <- add_truth(arma_fc, truth)
 # Convert to scoringutils format and plot with intervals
 arma_quantile <- scoringutils::as_forecast_quantile(arma_with_truth)
 
-scoringutils::plot_predictions(
-  arma_quantile,
-  x = "horizon",
-  range = c(0, 50, 95)  # Show median and 50%, 95% intervals
-) +
-  labs(title = "ARMA(2,1) Forecast with Prediction Intervals",
-       x = "Forecast Horizon", y = "Value") +
-  theme_minimal()
+# Show quantile forecast structure
+print(head(arma_quantile, 15))
 ```
 
 # Model Evaluation

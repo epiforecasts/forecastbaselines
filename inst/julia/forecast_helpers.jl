@@ -47,45 +47,61 @@ function forecast_to_r_dict(fc)
 
     # Extract quantiles from intervals if present
     if fc.intervals !== nothing && !isempty(fc.intervals)
-        # intervals is a Dict{Float64, ForecastInterval}
-        # keys are levels (e.g., 0.95), values are ForecastInterval objects
-        # ForecastInterval has .lower, .upper, .levels fields (all Vector{Float64})
+        # intervals is a Vector{ForecastInterval}, one per horizon
+        # Each ForecastInterval has .lower, .upper, .levels (all Vector{Float64})
+        # .lower[i] and .upper[i] correspond to .levels[i]
 
-        levels = sort(collect(keys(fc.intervals)))
-        n_horizons = length(fc.horizon)
+        n_horizons = length(fc.intervals)
 
-        # Build quantile levels and quantile matrix
+        # Get the levels from the first interval (should be same for all)
+        levels = fc.intervals[1].levels
+        n_levels = length(levels)
+
+        # Build quantile levels from confidence levels
         quantile_levels = Float64[]
-        quantiles_list = Vector{Float64}[]
-
         for level in levels
-            interval_obj = fc.intervals[level]
-            # interval_obj is a ForecastInterval with .lower and .upper vectors
-            # lower quantile = (1 - level) / 2
-            # upper quantile = 1 - (1 - level) / 2
+            # Convert confidence level to quantile levels
+            # e.g., 0.95 confidence → 0.025 and 0.975 quantiles
             lower_q = (1.0 - level) / 2.0
             upper_q = 1.0 - lower_q
-
             push!(quantile_levels, lower_q)
             push!(quantile_levels, upper_q)
-            push!(quantiles_list, Vector{Float64}(interval_obj.lower))  # lower bounds
-            push!(quantiles_list, Vector{Float64}(interval_obj.upper))  # upper bounds
         end
 
-        # Add median if present
-        if fc.median !== nothing
+        # Add median quantile if present
+        has_median = fc.median !== nothing
+        if has_median
             push!(quantile_levels, 0.5)
-            push!(quantiles_list, to_r_compatible(fc.median))
         end
 
-        # Sort by quantile level and arrange as matrix
-        perm = sortperm(quantile_levels)
-        quantile_levels = quantile_levels[perm]
-        quantiles_list = quantiles_list[perm]
+        # Build quantile matrix: rows = horizons, cols = quantile levels
+        n_quantiles = length(quantile_levels)
+        quantiles_matrix = zeros(n_horizons, n_quantiles)
 
-        # Convert to matrix: rows = horizons, cols = quantile levels
-        result["quantiles"] = hcat(quantiles_list...)  # Shape: (n_horizons, n_quantile_levels)
-        result["quantile_levels"] = quantile_levels
+        for h in 1:n_horizons
+            interval = fc.intervals[h]
+            col_idx = 1
+            # Fill lower and upper bounds for each level
+            for i in 1:n_levels
+                quantiles_matrix[h, col_idx] = interval.lower[i]
+                quantiles_matrix[h, col_idx + 1] = interval.upper[i]
+                col_idx += 2
+            end
+            # Fill median if present
+            if has_median
+                median_val = if isa(fc.median, AbstractArray)
+                    fc.median[h]
+                else
+                    fc.median  # Scalar median
+                end
+                quantiles_matrix[h, col_idx] = Float64(median_val)
+            end
+        end
+
+        # Sort columns by quantile level
+        perm = sortperm(quantile_levels)
+        result["quantiles"] = quantiles_matrix[:, perm]
+        result["quantile_levels"] = quantile_levels[perm]
     else
         result["quantiles"] = nothing
         result["quantile_levels"] = nothing

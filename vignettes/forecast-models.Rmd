@@ -191,18 +191,14 @@ fc <- forecast(
 cat("Historical mean:", mean(data), "\n")
 cat("Forecast mean:", mean(fc$mean), "\n")
 
-# Visualize with prediction intervals
-truth <- 20 + cumsum(rnorm(10, 0, 2))  # Simulated future values
+# Quantile forecasts are now available for scoring
+set.seed(124)
+truth <- 50 + rnorm(10, 0, 10)  # Simulated future values
 fc_truth <- add_truth(fc, truth)
-fc_quantile <- scoringutils::as_forecast_quantile(fc_truth)
 
-scoringutils::plot_predictions(
-  fc_quantile,
-  x = "horizon",
-  range = c(0, 50, 95)
-) +
-  labs(title = "Marginal Model with Prediction Intervals") +
-  theme_minimal()
+# Convert to quantile format and show structure
+fc_quantile <- scoringutils::as_forecast_quantile(fc_truth)
+print(head(fc_quantile, 15))  # Show first few quantiles
 ```
 
 Strengths:
@@ -691,14 +687,8 @@ for (i in 2:20) {
 fc_truth <- add_truth(fc, truth)
 fc_quantile <- scoringutils::as_forecast_quantile(fc_truth)
 
-scoringutils::plot_predictions(
-  fc_quantile,
-  x = "horizon",
-  range = c(0, 50, 95)
-) +
-  labs(title = "ARMA(2,1) Forecast with Prediction Intervals",
-       x = "Forecast Horizon", y = "Value") +
-  theme_minimal()
+# Show quantile forecast structure
+print(head(fc_quantile, 15))
 ```
 
 Parameter Guidance:
