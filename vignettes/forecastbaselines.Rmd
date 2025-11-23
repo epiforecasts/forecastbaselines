@@ -184,7 +184,7 @@ if (requireNamespace("hubVis", quietly = TRUE) &&
   hubVis::plot_step_ahead_model_output(
     model_out,
     constant_hubverse$target_data,
-    use_plotly = TRUE # Interactive plot
+    interactive = TRUE # Interactive plot
   )
 }
 ```
@@ -225,7 +225,7 @@ if (requireNamespace("hubVis", quietly = TRUE) &&
   hubVis::plot_step_ahead_model_output(
     model_out,
     arma_hubverse$target_data,
-    use_plotly = TRUE # Interactive plot with 50%, 80%, 95% intervals
+    interactive = TRUE # Interactive plot with 50%, 80%, 95% intervals
   )
 }
 ```
@@ -233,7 +233,7 @@ if (requireNamespace("hubVis", quietly = TRUE) &&
 The hubVis visualizations show:
 - Prediction intervals at 50%, 80%, and 95% confidence levels
 - Observed truth values overlaid on the forecasts
-- Interactive Plotly plots (set `use_plotly = FALSE` for static ggplot)
+- Interactive Plotly plots (set `interactive = FALSE` for static ggplot)
 
 # Model Evaluation
 
@@ -397,7 +397,7 @@ if (requireNamespace("hubVis", quietly = TRUE) &&
   hubVis::plot_step_ahead_model_output(
     model_out,
     seasonal_hubverse$target_data,
-    use_plotly = TRUE
+    interactive = TRUE
   )
 }
 ```
