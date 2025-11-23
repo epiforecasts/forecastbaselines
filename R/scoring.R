@@ -25,6 +25,10 @@ NULL
 #'     \item{target_data}{Data frame with columns: date, observation}
 #'   }
 #'
+#' @details
+#' The hubVis and hubUtils packages are not on CRAN and must be installed from GitHub:
+#' \code{remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))}
+#'
 #' @export
 #'
 #' @examples
@@ -38,8 +42,12 @@ NULL
 #'   horizon_unit = "week"
 #' )
 #'
-#' # Visualize with hubVis
-#' if (requireNamespace("hubVis", quietly = TRUE)) {
+#' # Install hubVis/hubUtils from GitHub for visualization
+#' # remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))
+#'
+#' # Visualize with hubVis (if installed)
+#' if (requireNamespace("hubVis", quietly = TRUE) &&
+#'   requireNamespace("hubUtils", quietly = TRUE)) {
 #'   hubVis::plot_step_ahead_model_output(
 #'     hubUtils::as_model_out_tbl(hubverse_data$model_output),
 #'     hubverse_data$target_data
