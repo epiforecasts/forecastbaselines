@@ -45,6 +45,7 @@ jobs:
         with:
           extra-packages: any::covr, local::.
           needs: coverage
+          cache-version: 2
 
       - uses: conda-incubator/setup-miniconda@v3
         with:

@@ -34,6 +34,7 @@ jobs:
           packages: |
             any::cffr
             any::V8
+          cache-version: 2
 
       - name: Update CITATION.cff
         run: |

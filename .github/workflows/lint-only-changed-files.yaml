@@ -26,6 +26,7 @@ jobs:
             any::lintr
             any::purrr
           needs: lint
+          cache-version: 2
 
       - name: Add lintr options
         run: |

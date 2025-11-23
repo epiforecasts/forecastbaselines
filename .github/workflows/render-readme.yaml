@@ -49,6 +49,7 @@ jobs:
         with:
           packages: any::rmarkdown, ropensci/allcontributors, local::.
           needs: website
+          cache-version: 2
 
       - name: Update contributors
         if: github.ref == 'refs/heads/main'
