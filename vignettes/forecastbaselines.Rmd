@@ -170,11 +170,23 @@ fc_with_intervals <- forecast(
 truth_vals <- c(105, 110, 108, 112, 115, 118, 120, 122, 125, 128, 130, 132)
 fc_intervals_truth <- add_truth(fc_with_intervals, truth_vals)
 
-# Convert to scoringutils format and visualize
-fc_quantile <- scoringutils::as_forecast_quantile(fc_intervals_truth)
+# Convert to hubverse format for visualization
+constant_hubverse <- as_hubverse(
+  fc_intervals_truth,
+  origin_date = as.Date("2024-01-01"),
+  horizon_unit = "week"
+)
 
-# Show quantile forecast structure
-print(head(fc_quantile, 15))
+# Visualize with hubVis (if installed)
+if (requireNamespace("hubVis", quietly = TRUE) &&
+  requireNamespace("hubUtils", quietly = TRUE)) {
+  model_out <- hubUtils::as_model_out_tbl(constant_hubverse$model_output)
+  hubVis::plot_step_ahead_model_output(
+    model_out,
+    constant_hubverse$target_data,
+    use_plotly = TRUE # Interactive plot
+  )
+}
 ```
 
 ## Try a More Advanced Model
@@ -195,24 +207,12 @@ arma_fc <- forecast(
   model_name = "ARMA(2,1)"
 )
 
-# Add truth and visualize with prediction intervals
+# Add truth for visualization
 truth <- c(105, 110, 108, 112, 115, 118, 120, 122, 125, 128, 130, 132)
 arma_with_truth <- add_truth(arma_fc, truth)
 
-# Convert to scoringutils format and plot with intervals
-arma_quantile <- scoringutils::as_forecast_quantile(arma_with_truth)
-
-# Show quantile forecast structure
-print(head(arma_quantile, 15))
-```
-
-## Visualizing with hubVis
-
-The package integrates with hubVis for interactive forecast visualization:
-
-```{r hubvis, eval = FALSE}
-# Convert to hubverse format
-hubverse_data <- as_hubverse(
+# Convert to hubverse format for visualization
+arma_hubverse <- as_hubverse(
   arma_with_truth,
   origin_date = as.Date("2024-01-01"),
   horizon_unit = "week"
@@ -221,22 +221,19 @@ hubverse_data <- as_hubverse(
 # Visualize with hubVis (if installed)
 if (requireNamespace("hubVis", quietly = TRUE) &&
   requireNamespace("hubUtils", quietly = TRUE)) {
-  # Convert to model_out_tbl format
-  model_out <- hubUtils::as_model_out_tbl(hubverse_data$model_output)
-
-  # Create interactive plot with 50%, 80%, and 95% intervals
+  model_out <- hubUtils::as_model_out_tbl(arma_hubverse$model_output)
   hubVis::plot_step_ahead_model_output(
     model_out,
-    hubverse_data$target_data,
-    use_plotly = TRUE # Set FALSE for static ggplot
+    arma_hubverse$target_data,
+    use_plotly = TRUE # Interactive plot with 50%, 80%, 95% intervals
   )
 }
 ```
 
-This creates an interactive Plotly visualization showing:
+The hubVis visualizations show:
 - Prediction intervals at 50%, 80%, and 95% confidence levels
-- Observed values overlaid on the forecasts
-- Color-coded by model
+- Observed truth values overlaid on the forecasts
+- Interactive Plotly plots (set `use_plotly = FALSE` for static ggplot)
 
 # Model Evaluation
 
@@ -357,33 +354,52 @@ seasonal_data <- 10 + 5 * sin(2 * pi * (1:240) / 12) + rnorm(240)
 # STL decomposition model
 stl_model <- STLModel(s = 12)
 stl_fitted <- fit_baseline(seasonal_data, stl_model)
+
+# Generate future observations for truth
+set.seed(790)
+future_seasonal <- 10 + 5 * sin(2 * pi * (241:252) / 12) + rnorm(12)
+
 stl_fc <- forecast(stl_fitted,
-  interval_method = NoInterval(),
-  horizon = 1:12
+  interval_method = EmpiricalInterval(n_trajectories = 1000),
+  horizon = 1:12,
+  levels = c(0.5, 0.95),
+  truth = future_seasonal,
+  model_name = "STL"
 )
 
 # Last Similar Dates model
 lsd_model <- LSDModel(window_width = 10, s = 12)
 lsd_fitted <- fit_baseline(seasonal_data, lsd_model)
 lsd_fc <- forecast(lsd_fitted,
-  interval_method = NoInterval(),
-  horizon = 1:12
+  interval_method = EmpiricalInterval(n_trajectories = 1000),
+  horizon = 1:12,
+  levels = c(0.5, 0.95),
+  truth = future_seasonal,
+  model_name = "LSD"
 )
 
-# Compare
-n_seasonal <- length(seasonal_data)
-plot_df <- rbind(
-  data.frame(time = 1:n_seasonal, value = seasonal_data, type = "Data"),
-  data.frame(time = (n_seasonal + 1):(n_seasonal + 12), value = stl_fc$mean, type = "STL"),
-  data.frame(time = (n_seasonal + 1):(n_seasonal + 12), value = lsd_fc$mean, type = "LSD")
+# Combine forecasts for hubVis visualization
+stl_quantile <- scoringutils::as_forecast_quantile(stl_fc)
+lsd_quantile <- scoringutils::as_forecast_quantile(lsd_fc)
+combined_quantile <- rbind(stl_quantile, lsd_quantile)
+
+# Convert to hubverse format
+seasonal_hubverse <- as_hubverse(
+  combined_quantile,
+  origin_date = as.Date("2024-01-01"),
+  horizon_unit = "month"
 )
 
-ggplot(plot_df, aes(x = time, y = value, color = type)) +
-  geom_line(linewidth = 1) +
-  scale_color_manual(values = c("Data" = "black", "STL" = "red", "LSD" = "blue")) +
-  labs(title = "Seasonal Forecasting", x = "Time", y = "Value", color = NULL) +
-  theme_minimal() +
-  theme(legend.position = "top")
+# Visualize both models with hubVis (if installed)
+if (requireNamespace("hubVis", quietly = TRUE) &&
+  requireNamespace("hubUtils", quietly = TRUE)) {
+  model_out <- hubUtils::as_model_out_tbl(seasonal_hubverse$model_output)
+  hubVis::plot_step_ahead_model_output(
+    model_out,
+    seasonal_hubverse$target_data,
+    use_plotly = TRUE
+  )
+}
 ```
 
 # Data Transformations
