@@ -83,17 +83,28 @@ uses the last observed value as the forecast.
 ## Generate Some Data
 
 ```{r data}
-# Simulate a time series with trend and noise
+# Simulate a time series with trend and seasonality
 set.seed(123)
-n <- 50
-time <- 1:n
+n_total <- 62  # Total observations
+n_train <- 50  # Training set size
+time <- 1:n_total
 trend <- 0.5 * time
 seasonal <- 5 * sin(2 * pi * time / 12)
-noise <- rnorm(n, sd = 2)
-data <- trend + seasonal + noise
+noise <- rnorm(n_total, sd = 2)
+full_data <- trend + seasonal + noise
 
-# Plot the data
-ggplot(data.frame(time = 1:n, value = data), aes(x = time, y = value)) +
+# Split into training and test sets
+data <- full_data[1:n_train]
+truth <- full_data[(n_train + 1):n_total]
+
+# Plot the full series
+plot_df <- data.frame(
+  time = 1:n_total,
+  value = full_data,
+  set = c(rep("Training", n_train), rep("Test", n_total - n_train))
+)
+
+ggplot(plot_df, aes(x = time, y = value, color = set)) +
   geom_line() +
   labs(title = "Simulated Time Series", x = "Time", y = "Value") +
   theme_minimal()
@@ -131,8 +142,8 @@ fc$mean
 ```{r plot}
 # Plot data and forecast
 plot_df <- rbind(
-  data.frame(time = 1:n, value = data, type = "Observed"),
-  data.frame(time = (n + 1):(n + 12), value = fc$mean, type = "Forecast")
+  data.frame(time = 1:n_train, value = data, type = "Observed"),
+  data.frame(time = (n_train + 1):(n_train + 12), value = fc$mean, type = "Forecast")
 )
 
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
@@ -163,30 +174,24 @@ fc_with_intervals <- forecast(
   ),
   horizon = 1:12,
   levels = c(0.50, 0.80, 0.95),
+  include_median = FALSE,
   model_name = "Constant"
 )
 
-# Add truth for visualization
-truth_vals <- c(105, 110, 108, 112, 115, 118, 120, 122, 125, 128, 130, 132)
-fc_intervals_truth <- add_truth(fc_with_intervals, truth_vals)
-
 # Convert to hubverse format for visualization
 constant_hubverse <- as_hubverse(
-  fc_intervals_truth,
-  origin_date = as.Date("2024-01-01"),
-  horizon_unit = "week"
+  fc_with_intervals,
+  start_date = as.Date("2024-01-01"),
+  horizon_unit = "week",
+  observed_data = full_data
 )
 
-# Visualize with hubVis (if installed)
-if (requireNamespace("hubVis", quietly = TRUE) &&
-  requireNamespace("hubUtils", quietly = TRUE)) {
-  model_out <- hubUtils::as_model_out_tbl(constant_hubverse$model_output)
-  hubVis::plot_step_ahead_model_output(
-    model_out,
-    constant_hubverse$target_data,
-    interactive = TRUE # Interactive plot
-  )
-}
+# Visualize with hubVis
+library(hubVis)
+hubVis::plot_step_ahead_model_output(
+  constant_hubverse$model_output,
+  constant_hubverse$target_data
+)
 ```
 
 ## Try a More Advanced Model
@@ -204,36 +209,28 @@ arma_fc <- forecast(
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
   levels = c(0.50, 0.80, 0.95),
+  include_median = FALSE,
   model_name = "ARMA(2,1)"
 )
 
-# Add truth for visualization
-truth <- c(105, 110, 108, 112, 115, 118, 120, 122, 125, 128, 130, 132)
-arma_with_truth <- add_truth(arma_fc, truth)
-
 # Convert to hubverse format for visualization
 arma_hubverse <- as_hubverse(
-  arma_with_truth,
-  origin_date = as.Date("2024-01-01"),
-  horizon_unit = "week"
+  arma_fc,
+  start_date = as.Date("2024-01-01"),
+  horizon_unit = "week",
+  observed_data = full_data
 )
 
-# Visualize with hubVis (if installed)
-if (requireNamespace("hubVis", quietly = TRUE) &&
-  requireNamespace("hubUtils", quietly = TRUE)) {
-  model_out <- hubUtils::as_model_out_tbl(arma_hubverse$model_output)
-  hubVis::plot_step_ahead_model_output(
-    model_out,
-    arma_hubverse$target_data,
-    interactive = TRUE # Interactive plot with 50%, 80%, 95% intervals
-  )
-}
+# Visualize with hubVis
+hubVis::plot_step_ahead_model_output(
+  arma_hubverse$model_output,
+  arma_hubverse$target_data
+)
 ```
 
 The hubVis visualizations show:
 - Prediction intervals at 50%, 80%, and 95% confidence levels
 - Observed truth values overlaid on the forecasts
-- Interactive Plotly plots (set `interactive = FALSE` for static ggplot)
 
 # Model Evaluation
 
@@ -242,14 +239,7 @@ To evaluate forecast accuracy, you need to provide the true values.
 ## Point Forecast Accuracy
 
 ```{r scoring}
-# Generate some "future" observations
-set.seed(456)
-future_time <- (n + 1):(n + 12)
-future_trend <- 0.5 * future_time
-future_seasonal <- 5 * sin(2 * pi * future_time / 12)
-truth <- future_trend + future_seasonal + rnorm(12, sd = 2)
-
-# Add truth to forecast
+# Add truth to forecast (using the truth values generated earlier)
 fc_with_truth <- forecast(
   fitted,
   interval_method = NoInterval(),
@@ -349,20 +339,19 @@ For data with strong seasonal patterns, use seasonal models:
 ```{r seasonal}
 # Generate seasonal data (monthly, s=12)
 set.seed(789)
-seasonal_data <- 10 + 5 * sin(2 * pi * (1:240) / 12) + rnorm(240)
+full_seasonal <- 10 + 5 * sin(2 * pi * (1:252) / 12) + rnorm(252)
+seasonal_data <- full_seasonal[1:240]
+future_seasonal <- full_seasonal[241:252]
 
 # STL decomposition model
 stl_model <- STLModel(s = 12)
 stl_fitted <- fit_baseline(seasonal_data, stl_model)
 
-# Generate future observations for truth
-set.seed(790)
-future_seasonal <- 10 + 5 * sin(2 * pi * (241:252) / 12) + rnorm(12)
-
 stl_fc <- forecast(stl_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
   levels = c(0.50, 0.80, 0.95),
+  include_median = FALSE,
   truth = future_seasonal,
   model_name = "STL"
 )
@@ -374,6 +363,7 @@ lsd_fc <- forecast(lsd_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
   levels = c(0.50, 0.80, 0.95),
+  include_median = FALSE,
   truth = future_seasonal,
   model_name = "LSD"
 )
@@ -386,20 +376,16 @@ combined_quantile <- rbind(stl_quantile, lsd_quantile)
 # Convert to hubverse format
 seasonal_hubverse <- as_hubverse(
   combined_quantile,
-  origin_date = as.Date("2024-01-01"),
-  horizon_unit = "month"
+  start_date = as.Date("2024-01-01"),
+  horizon_unit = "month",
+  observed_data = full_seasonal
 )
 
-# Visualize both models with hubVis (if installed)
-if (requireNamespace("hubVis", quietly = TRUE) &&
-  requireNamespace("hubUtils", quietly = TRUE)) {
-  model_out <- hubUtils::as_model_out_tbl(seasonal_hubverse$model_output)
-  hubVis::plot_step_ahead_model_output(
-    model_out,
-    seasonal_hubverse$target_data,
-    interactive = TRUE
-  )
-}
+# Visualize both models with hubVis
+hubVis::plot_step_ahead_model_output(
+  seasonal_hubverse$model_output,
+  seasonal_hubverse$target_data
+)
 ```
 
 # Data Transformations

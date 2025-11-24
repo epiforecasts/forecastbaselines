@@ -26,5 +26,6 @@ BugReports: https://github.com/epiforecasts/forecastbaselines/issues
 Suggests:
     testthat (>= 3.0.0),
     ggplot2,
+    hubVis,
     knitr,
     rmarkdown
