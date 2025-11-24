@@ -322,6 +322,9 @@ all_quantiles <- do.call(rbind, lapply(forecasts, function(fc) {
   scoringutils::as_forecast_quantile(add_truth(fc, truth))
 }))
 
+# Re-validate as forecast object after rbind
+all_quantiles <- scoringutils::as_forecast_quantile(all_quantiles)
+
 # Score all models
 scores <- scoringutils::score(all_quantiles)
 score_summary <- scoringutils::summarise_scores(scores, by = "model")
