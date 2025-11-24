@@ -29,3 +29,5 @@ Suggests:
     hubVis,
     knitr,
     rmarkdown
+Remotes:
+    hubverse-org/hubVis
