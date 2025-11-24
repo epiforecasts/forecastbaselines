@@ -82,7 +82,7 @@ uses the last observed value as the forecast.
 
 ## Generate Some Data
 
-```{r data}
+```{r data, fig.width=7, fig.height=4}
 # Simulate a time series with trend and seasonality
 set.seed(123)
 n_total <- 62  # Total observations
@@ -139,7 +139,7 @@ fc$mean
 
 ## Visualize Results
 
-```{r plot}
+```{r plot, fig.width=7, fig.height=4}
 # Plot data and forecast
 plot_df <- rbind(
   data.frame(time = 1:n_train, value = data, type = "Observed"),
@@ -353,10 +353,15 @@ seasonal_hubverse <- as_hubverse(
   observed_data = full_seasonal
 )
 
+# Filter to show only last 5 years + forecast for cleaner visualization
+cutoff_date <- as.Date("2020-01-01")
+filtered_target <- seasonal_hubverse$target_data[seasonal_hubverse$target_data$date >= cutoff_date, ]
+filtered_output <- seasonal_hubverse$model_output[seasonal_hubverse$model_output$target_date >= cutoff_date, ]
+
 # Visualize both models with hubVis
 hubVis::plot_step_ahead_model_output(
-  seasonal_hubverse$model_output,
-  seasonal_hubverse$target_data,
+  filtered_output,
+  filtered_target,
   interactive = TRUE
 )
 ```
