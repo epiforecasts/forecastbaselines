@@ -162,7 +162,7 @@ fc_with_intervals <- forecast(
     seed = 42
   ),
   horizon = 1:12,
-  levels = c(0.50, 0.95),
+  levels = c(0.50, 0.80, 0.95),
   model_name = "Constant"
 )
 
@@ -203,7 +203,7 @@ arma_fc <- forecast(
   arma_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = c(0.5, 0.95),
+  levels = c(0.50, 0.80, 0.95),
   model_name = "ARMA(2,1)"
 )
 
@@ -362,7 +362,7 @@ future_seasonal <- 10 + 5 * sin(2 * pi * (241:252) / 12) + rnorm(12)
 stl_fc <- forecast(stl_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = c(0.5, 0.95),
+  levels = c(0.50, 0.80, 0.95),
   truth = future_seasonal,
   model_name = "STL"
 )
@@ -373,7 +373,7 @@ lsd_fitted <- fit_baseline(seasonal_data, lsd_model)
 lsd_fc <- forecast(lsd_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = c(0.5, 0.95),
+  levels = c(0.50, 0.80, 0.95),
   truth = future_seasonal,
   model_name = "LSD"
 )
