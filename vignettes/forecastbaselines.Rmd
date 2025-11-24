@@ -236,62 +236,9 @@ The hubVis visualizations show:
 
 # Model Evaluation
 
-To evaluate forecast accuracy, you need to provide the true values.
+This package integrates seamlessly with [scoringutils](https://epiforecasts.io/scoringutils/) for forecast evaluation using proper scoring rules.
 
-## Point Forecast Accuracy
-
-```{r scoring}
-# Add truth to forecast (using the truth values generated earlier)
-fc_with_truth <- forecast(
-  fitted,
-  interval_method = NoInterval(),
-  horizon = 1:12,
-  truth = truth,
-  model_name = "Constant"
-)
-
-# Calculate scoring metrics using scoringutils
-fc_point <- scoringutils::as_forecast_point(fc_with_truth)
-scores <- scoringutils::score(fc_point)
-scores_summary <- scoringutils::summarise_scores(scores, by = "model")
-print(scores_summary)
-
-# Access specific metrics
-cat("Mean Absolute Error:", scores_summary$ae_point, "\n")
-cat("Root Mean Squared Error:", sqrt(scores_summary$se_point), "\n")
-cat("Absolute Percentage Error:", scores_summary$ape, "\n")
-```
-
-## Available Scoring Rules
-
-Note: This package is compatible with the [scoringutils](https://epiforecasts.io/scoringutils/) package, providing standardized and comprehensive forecast evaluation through S3 methods.
-
-Convert forecasts using `scoringutils::as_forecast_point()` or `scoringutils::as_forecast_quantile()`, then score:
-
-```r
-# Convert forecast to scoringutils format
-fc_point <- scoringutils::as_forecast_point(forecast)
-
-# Score the forecast
-scores <- scoringutils::score(fc_point)
-
-# Get summarised scores
-scores_summary <- scoringutils::summarise_scores(scores, by = "model")
-
-# Access metrics from summary
-mae <- scores_summary$ae_point          # Mean Absolute Error
-mse <- scores_summary$se_point          # Mean Squared Error
-rmse <- sqrt(scores_summary$se_point)   # Root Mean Squared Error
-ape <- scores_summary$ape               # Absolute Percentage Error
-
-# For quantile forecasts
-wis <- scores_summary$wis               # Weighted Interval Score
-bias <- scores_summary$bias             # Forecast bias
-coverage_50 <- scores_summary$interval_coverage_50  # 50% interval coverage
-coverage_90 <- scores_summary$interval_coverage_90  # 90% interval coverage
-```
-
-See the [scoringutils documentation](https://epiforecasts.io/scoringutils/) for all available metrics and functions.
+For probabilistic forecasts with prediction intervals, use **WIS (Weighted Interval Score)** and **interval coverage**:
 
 ## Compare Multiple Models
 
@@ -360,11 +307,13 @@ hubVis::plot_step_ahead_model_output(
 For data with strong seasonal patterns, use seasonal models:
 
 ```{r seasonal}
-# Generate seasonal data (monthly, s=12)
+# Generate seasonal data: 15 years training (Jan 2010-Dec 2024) + 1 year test (2025)
 set.seed(789)
-full_seasonal <- 10 + 5 * sin(2 * pi * (1:252) / 12) + rnorm(252)
-seasonal_data <- full_seasonal[1:240]
-future_seasonal <- full_seasonal[241:252]
+n_total_months <- 192  # 16 years total
+n_train_months <- 180  # 15 years for training
+full_seasonal <- 10 + 5 * sin(2 * pi * (1:n_total_months) / 12) + rnorm(n_total_months, sd = 0.5)
+seasonal_data <- full_seasonal[1:n_train_months]
+future_seasonal <- full_seasonal[(n_train_months + 1):n_total_months]
 
 # STL decomposition model
 stl_model <- STLModel(s = 12)
@@ -396,10 +345,10 @@ stl_quantile <- scoringutils::as_forecast_quantile(stl_fc)
 lsd_quantile <- scoringutils::as_forecast_quantile(lsd_fc)
 combined_quantile <- rbind(stl_quantile, lsd_quantile)
 
-# Convert to hubverse format
+# Convert to hubverse format (data from Jan 2010 to Dec 2025)
 seasonal_hubverse <- as_hubverse(
   combined_quantile,
-  start_date = as.Date("2024-01-01"),
+  start_date = as.Date("2010-01-01"),
   horizon_unit = "month",
   observed_data = full_seasonal
 )
