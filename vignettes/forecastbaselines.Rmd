@@ -190,7 +190,8 @@ constant_hubverse <- as_hubverse(
 library(hubVis)
 hubVis::plot_step_ahead_model_output(
   constant_hubverse$model_output,
-  constant_hubverse$target_data
+  constant_hubverse$target_data,
+  interactive = TRUE
 )
 ```
 
@@ -224,7 +225,8 @@ arma_hubverse <- as_hubverse(
 # Visualize with hubVis
 hubVis::plot_step_ahead_model_output(
   arma_hubverse$model_output,
-  arma_hubverse$target_data
+  arma_hubverse$target_data,
+  interactive = TRUE
 )
 ```
 
@@ -293,6 +295,8 @@ See the [scoringutils documentation](https://epiforecasts.io/scoringutils/) for 
 
 ## Compare Multiple Models
 
+For probabilistic forecasts, use proper scoring rules like WIS (Weighted Interval Score):
+
 ```{r comparison}
 # Create multiple models
 models <- list(
@@ -301,35 +305,51 @@ models <- list(
   Marginal = MarginalModel()
 )
 
-# Fit and score each model
-results <- lapply(names(models), function(name) {
+# Fit each model with prediction intervals
+forecasts <- lapply(names(models), function(name) {
   fitted <- fit_baseline(data, models[[name]])
-  fc <- forecast(fitted,
-    interval_method = NoInterval(),
+  forecast(fitted,
+    interval_method = EmpiricalInterval(n_trajectories = 1000),
     horizon = 1:12,
-    truth = truth,
+    levels = c(0.50, 0.80, 0.95),
+    include_median = FALSE,
     model_name = name
-  )
-
-  fc_point <- scoringutils::as_forecast_point(fc)
-  fc_scores <- scoringutils::score(fc_point)
-  fc_summary <- scoringutils::summarise_scores(fc_scores, by = "model")
-
-  data.frame(
-    Model = name,
-    MAE = fc_summary$ae_point,
-    RMSE = sqrt(fc_summary$se_point),
-    APE = fc_summary$ape
   )
 })
 
-# Combine and display
-comparison <- do.call(rbind, results)
+# Combine all forecasts for comparison
+all_quantiles <- do.call(rbind, lapply(forecasts, function(fc) {
+  scoringutils::as_forecast_quantile(add_truth(fc, truth))
+}))
+
+# Score all models
+scores <- scoringutils::score(all_quantiles)
+score_summary <- scoringutils::summarise_scores(scores, by = "model")
+
+# Display key metrics
+comparison <- data.frame(
+  Model = score_summary$model,
+  WIS = round(score_summary$wis, 2),
+  Coverage_50 = paste0(round(score_summary$interval_coverage_50 * 100, 1), "%"),
+  Coverage_95 = paste0(round(score_summary$interval_coverage_95 * 100, 1), "%")
+)
 print(comparison)
 
-# Find best model by MAE
-best_model <- comparison$Model[which.min(comparison$MAE)]
-cat("\nBest model by MAE:", best_model, "\n")
+cat("\nBest model by WIS:", comparison$Model[which.min(score_summary$wis)], "\n")
+
+# Visualize model comparison with hubVis
+comparison_hubverse <- as_hubverse(
+  all_quantiles,
+  start_date = as.Date("2024-01-01"),
+  horizon_unit = "week",
+  observed_data = full_data
+)
+
+hubVis::plot_step_ahead_model_output(
+  comparison_hubverse$model_output,
+  comparison_hubverse$target_data,
+  interactive = TRUE
+)
 ```
 
 # Working with Seasonal Data
@@ -384,7 +404,8 @@ seasonal_hubverse <- as_hubverse(
 # Visualize both models with hubVis
 hubVis::plot_step_ahead_model_output(
   seasonal_hubverse$model_output,
-  seasonal_hubverse$target_data
+  seasonal_hubverse$target_data,
+  interactive = TRUE
 )
 ```
 
