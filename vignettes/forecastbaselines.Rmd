@@ -16,24 +16,24 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-forecastbaselines provides an R interface to the
+{forecastbaselines} provides an R interface to the
 [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 Julia package, giving you access to 10 baseline forecasting models with
 uncertainty quantification and evaluation tools.
 
 Some of the models included here are already available through other packages such as [fable](https://fable.tidyverts.org/), which provides a rich ecosystem of models such as ARIMA, ETS, and many others with tidyverse integration.
 
-forecastbaselines complements fable by focusing on:
+{forecastbaselines} focuses on:
 
-- **Baseline models for evaluation**: Includes simple benchmarks (Constant,
+- Baseline models for evaluation: Includes simple benchmarks (Constant,
   Marginal) and specialised models (LSD, IDS, INARCH) designed for comparing
   against more complex forecasting methods
-- **Seamless scoringutils integration**: Native support for the
+- Seamless scoringutils integration: Native support for the
   [scoringutils](https://epiforecasts.io/scoringutils/) evaluation framework
   and hubverse ecosystem
-- **Multiple uncertainty quantification methods**: Bootstrap-based, analytical,
+- Multiple uncertainty quantification methods: Bootstrap-based, analytical,
   and conformal prediction intervals
-- **Unique models**: Last Similar Dates (LSD) for seasonal patterns, Kernel
+- Unique models: Last Similar Dates (LSD) for seasonal patterns, Kernel
   Density Estimation (KDE), and models for count data (INARCH)
 
 This vignette will walk you through:
@@ -415,7 +415,7 @@ See `vignette("transformations")` for detailed guidance on transformations.
 
 # Utility Functions
 
-forecastbaselines provides helpful utilities for working with forecast objects:
+{forecastbaselines} provides helpful utilities for working with forecast objects:
 
 ```{r utilities}
 # Check what components are available
@@ -444,8 +444,8 @@ Now that you've learned the basics, explore:
 1. `vignette("forecast-models")` - Detailed guide to all 10 models,
    when to use each, and their parameters
 
-2. `vignette("transformations")` - Comprehensive guide to data
-   transformations with examples
+2. `vignette("transformations")` - Guide to data transformations with
+   examples
 
 3. Package documentation - Run `?forecastbaselines` or
    `help(package = "forecastbaselines")`
