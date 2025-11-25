@@ -1,4 +1,4 @@
-# Tests for Model Constructors
+# Tests for Model Functions
 
 # ConstantModel Tests ---------------------------------------------------
 

@@ -1,4 +1,4 @@
-# Model Constructors for ForecastBaselines.jl
+# Model Functions for ForecastBaselines.jl
 
 #' Constant Model
 #'

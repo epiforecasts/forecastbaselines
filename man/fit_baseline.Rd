@@ -9,7 +9,8 @@ fit_baseline(x, model, temporal_info = NULL)
 \arguments{
 \item{x}{Numeric vector of time series data}
 
-\item{model}{A model object created by one of the model constructors}
+\item{model}{A model created using ConstantModel(), ARMAModel(), ETSModel(),
+or other model functions (see ?ConstantModel for available models)}
 
 \item{temporal_info}{Optional TemporalInfo object with start date and
 resolution}

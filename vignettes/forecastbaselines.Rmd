@@ -19,7 +19,22 @@ knitr::opts_chunk$set(
 forecastbaselines provides an R interface to the
 [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 Julia package, giving you access to 10 baseline forecasting models with
-comprehensive uncertainty quantification and evaluation tools.
+uncertainty quantification and evaluation tools.
+
+Some of the models included here are already available through other packages such as [fable](https://fable.tidyverts.org/), which provides a rich ecosystem of models such as ARIMA, ETS, and many others with tidyverse integration.
+
+forecastbaselines complements fable by focusing on:
+
+- **Baseline models for evaluation**: Includes simple benchmarks (Constant,
+  Marginal) and specialised models (LSD, IDS, INARCH) designed for comparing
+  against more complex forecasting methods
+- **Seamless scoringutils integration**: Native support for the
+  [scoringutils](https://epiforecasts.io/scoringutils/) evaluation framework
+  and hubverse ecosystem
+- **Multiple uncertainty quantification methods**: Bootstrap-based, analytical,
+  and conformal prediction intervals
+- **Unique models**: Last Similar Dates (LSD) for seasonal patterns, Kernel
+  Density Estimation (KDE), and models for count data (INARCH)
 
 This vignette will walk you through:
 
@@ -231,6 +246,7 @@ hubVis::plot_step_ahead_model_output(
 ```
 
 The hubVis visualizations show:
+
 - Prediction intervals at 50%, 80%, and 95% confidence levels
 - Observed truth values overlaid on the forecasts
 

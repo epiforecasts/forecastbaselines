@@ -4,24 +4,32 @@
 \alias{as_hubverse}
 \title{Convert ForecastBaselines Forecast to hubverse format}
 \usage{
-as_hubverse(data, origin_date = NULL, horizon_unit = c("day", "week", "month"))
+as_hubverse(
+  data,
+  start_date = NULL,
+  horizon_unit = c("day", "week", "month"),
+  observed_data = NULL
+)
 }
 \arguments{
 \item{data}{A ForecastBaselines_Forecast object with quantiles, or a
 scoringutils forecast_quantile object}
 
-\item{origin_date}{Optional origin date for converting horizons to target_dates.
+\item{start_date}{Optional start date for the time series.
 If NULL (default), uses horizon numbers as target_date values.
 Can be a Date object or character string in "YYYY-MM-DD" format.}
 
 \item{horizon_unit}{Character string specifying the time unit for horizons.
-One of "day" (default), "week", or "month". Used when origin_date is provided.}
+One of "day" (default), "week", or "month". Used when start_date is provided.}
+
+\item{observed_data}{Optional numeric vector of all observed values (training + test).
+If provided, will be used to populate target_data with complete historical context.}
 }
 \value{
 A list with two elements:
   \describe{
-    \item{model_output}{Data frame with columns: target_date, value, model_id,
-      output_type, output_type_id}
+    \item{model_output}{Data frame (model_out_tbl) with columns: target_date, value,
+      model_id, output_type, output_type_id}
     \item{target_data}{Data frame with columns: date, observation}
   }
 }
@@ -30,21 +38,27 @@ Converts a ForecastBaselines_Forecast object to the hubverse format used by
 hubVis for visualization. Returns a list with model_output and target_data
 data frames.
 }
+\details{
+The hubVis and hubUtils packages are not on CRAN and must be installed from GitHub:
+\code{remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))}
+}
 \examples{
 \dontrun{
-# Basic conversion (horizons as dates)
-hubverse_data <- as_hubverse(forecast)
-
-# With origin date for proper dates
+# With observed data for complete visualization context
 hubverse_data <- as_hubverse(forecast,
-  origin_date = "2024-01-01",
-  horizon_unit = "week"
+  start_date = "2024-01-01",
+  horizon_unit = "week",
+  observed_data = full_data
 )
 
-# Visualize with hubVis
+# Install hubVis/hubUtils from GitHub for visualization
+# remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))
+
+# Visualize with hubVis (if installed)
+# Note: as_hubverse() automatically converts model_output to model_out_tbl
 if (requireNamespace("hubVis", quietly = TRUE)) {
   hubVis::plot_step_ahead_model_output(
-    hubUtils::as_model_out_tbl(hubverse_data$model_output),
+    hubverse_data$model_output,
     hubverse_data$target_data
   )
 }

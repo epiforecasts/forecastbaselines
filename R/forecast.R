@@ -5,7 +5,8 @@
 #' Fits a baseline forecasting model to observed data.
 #'
 #' @param x Numeric vector of time series data
-#' @param model A model object created by one of the model constructors
+#' @param model A model created using ConstantModel(), ARMAModel(), ETSModel(),
+#'   or other model functions (see ?ConstantModel for available models)
 #' @param temporal_info Optional TemporalInfo object with start date and
 #'   resolution
 #'
