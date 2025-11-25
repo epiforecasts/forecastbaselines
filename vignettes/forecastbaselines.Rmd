@@ -33,8 +33,8 @@ Some of the models included here are already available through other packages su
   and hubverse ecosystem
 - Multiple uncertainty quantification methods: Bootstrap-based, analytical,
   and conformal prediction intervals
-- Unique models: Last Similar Dates (LSD) for seasonal patterns, Kernel
-  Density Estimation (KDE), and models for count data (INARCH)
+- Available models: Constant, Marginal, KDE, LSD, OLS, IDS, STL, ARMA, ETS,
+  and INARCH
 
 This vignette will walk you through:
 
