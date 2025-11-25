@@ -16,14 +16,14 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-{forecastbaselines} provides an R interface to the
+`{forecastbaselines}` provides an R interface to the
 [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 Julia package, giving you access to 10 baseline forecasting models with
 uncertainty quantification and evaluation tools.
 
 Some of the models included here are already available through other packages such as [fable](https://fable.tidyverts.org/), which provides a rich ecosystem of models such as ARIMA, ETS, and many others with tidyverse integration.
 
-{forecastbaselines} focuses on:
+`{forecastbaselines}` focuses on:
 
 - Baseline models for evaluation: Includes simple benchmarks (Constant,
   Marginal) and specialised models (LSD, IDS, INARCH) designed for comparing
@@ -415,7 +415,7 @@ See `vignette("transformations")` for detailed guidance on transformations.
 
 # Utility Functions
 
-{forecastbaselines} provides helpful utilities for working with forecast objects:
+`{forecastbaselines}` provides helpful utilities for working with forecast objects:
 
 ```{r utilities}
 # Check what components are available
