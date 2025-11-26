@@ -10,36 +10,17 @@ An R package providing access to 10 baseline forecasting models from the
 Julia ForecastBaselines.jl library, with uncertainty quantification and
 seamless integration with the
 [scoringutils](https://epiforecasts.io/scoringutils/) evaluation
-framework.
-
-## Why `{forecastbaselines}`?
-
-Some of the models included here are already available through other
-packages such as [fable](https://fable.tidyverts.org/), which provides a
-rich ecosystem of models such as ARIMA, ETS, and many others with
-tidyverse integration.
-
-`{forecastbaselines}` focuses on:
-
-- Baseline models for evaluation: Includes simple benchmarks (Constant,
-  Marginal) and specialised models (LSD, IDS, INARCH) designed for
-  comparing against more complex forecasting methods
-- Seamless scoringutils integration: Native support for the
-  [scoringutils](https://epiforecasts.io/scoringutils/) evaluation
-  framework and hubverse ecosystem
-- Multiple uncertainty quantification methods: Bootstrap-based,
-  analytical, and conformal prediction intervals
+framework and hubverse ecosystem.
 
 ## Features
 
-- 10 Forecasting Models: From simple baselines (Constant, Marginal) to
-  advanced time series models (ARMA, ETS, STL)
-- Probabilistic Forecasting: Multiple methods for prediction intervals
-  (empirical, parametric, model-based)
-- Scoring: Compatible with scoringutils for all standard forecast
-  evaluation metrics
-- Data Transformations: Log, power, Box-Cox transformations with
-  automatic back-transformation
+- Baseline and benchmark models for forecast evaluation
+- Multiple uncertainty quantification methods (bootstrap, analytical,
+  conformal)
+- Seamless integration with
+  [scoringutils](https://epiforecasts.io/scoringutils/) for proper
+  scoring rules
+- Data transformations with automatic back-transformation
 
 ## Installation
 
@@ -137,16 +118,22 @@ For detailed guides and examples:
 
 ## Related Packages
 
-For comprehensive time series forecasting in R, consider:
+Some of the models in `{forecastbaselines}` are also available through
+other R packages. For time series forecasting in R, consider:
 
 - [fable](https://fable.tidyverts.org/) - A complete forecasting
-  framework in the [tidyverts](https://tidyverts.org/) ecosystem
+  framework in the [tidyverts](https://tidyverts.org/) ecosystem with
+  ARIMA, ETS, and many other models
 - [forecast](https://pkg.robjhyndman.com/forecast/) - The classic R
   forecasting package with auto.arima, ets, and many other methods
 - [prophet](https://facebook.github.io/prophet/) - Facebook’s
   forecasting package for time series with strong seasonal patterns
 - [modeltime](https://business-science.github.io/modeltime/) - A
   tidymodels framework for time series forecasting
+
+`{forecastbaselines}` focuses specifically on baseline models for
+forecast evaluation and integrates with the scoringutils/hubverse
+ecosystem.
 
 ## Citation
 
