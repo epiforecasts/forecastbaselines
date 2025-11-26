@@ -21,21 +21,6 @@ knitr::opts_chunk$set(
 Julia package, giving you access to 10 baseline forecasting models with
 uncertainty quantification and evaluation tools.
 
-Some of the models included here are already available through other packages such as [fable](https://fable.tidyverts.org/), which provides a rich ecosystem of models such as ARIMA, ETS, and many others with tidyverse integration.
-
-`{forecastbaselines}` focuses on:
-
-- Baseline models for evaluation: Includes simple benchmarks (Constant,
-  Marginal) and specialised models (LSD, IDS, INARCH) designed for comparing
-  against more complex forecasting methods
-- Seamless scoringutils integration: Native support for the
-  [scoringutils](https://epiforecasts.io/scoringutils/) evaluation framework
-  and hubverse ecosystem
-- Multiple uncertainty quantification methods: Bootstrap-based, analytical,
-  and conformal prediction intervals
-- Available models: Constant, Marginal, KDE, LSD, OLS, IDS, STL, ARMA, ETS,
-  and INARCH
-
 This vignette will walk you through:
 
 1. Installation and setup
@@ -297,6 +282,7 @@ comparison <- data.frame(
   Model = score_summary$model,
   WIS = round(score_summary$wis, 2),
   Coverage_50 = paste0(round(score_summary$interval_coverage_50 * 100, 1), "%"),
+  Coverage_80 = paste0(round(score_summary$interval_coverage_80 * 100, 1), "%"),
   Coverage_95 = paste0(round(score_summary$interval_coverage_95 * 100, 1), "%")
 )
 print(comparison)

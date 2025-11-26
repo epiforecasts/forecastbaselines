@@ -7,10 +7,28 @@
 > [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
 
 An R package providing access to 10 baseline forecasting models from the
-Julia ForecastBaselines.jl library, with comprehensive uncertainty
-quantification and seamless integration with the
+Julia ForecastBaselines.jl library, with uncertainty quantification and
+seamless integration with the
 [scoringutils](https://epiforecasts.io/scoringutils/) evaluation
 framework.
+
+## Why `{forecastbaselines}`?
+
+Some of the models included here are already available through other
+packages such as [fable](https://fable.tidyverts.org/), which provides a
+rich ecosystem of models such as ARIMA, ETS, and many others with
+tidyverse integration.
+
+`{forecastbaselines}` focuses on:
+
+- Baseline models for evaluation: Includes simple benchmarks (Constant,
+  Marginal) and specialised models (LSD, IDS, INARCH) designed for
+  comparing against more complex forecasting methods
+- Seamless scoringutils integration: Native support for the
+  [scoringutils](https://epiforecasts.io/scoringutils/) evaluation
+  framework and hubverse ecosystem
+- Multiple uncertainty quantification methods: Bootstrap-based,
+  analytical, and conformal prediction intervals
 
 ## Features
 
@@ -18,8 +36,8 @@ framework.
   advanced time series models (ARMA, ETS, STL)
 - Probabilistic Forecasting: Multiple methods for prediction intervals
   (empirical, parametric, model-based)
-- Comprehensive Scoring: Compatible with scoringutils for all standard
-  forecast evaluation metrics
+- Scoring: Compatible with scoringutils for all standard forecast
+  evaluation metrics
 - Data Transformations: Log, power, Box-Cox transformations with
   automatic back-transformation
 
@@ -170,7 +188,9 @@ For bugs and feature requests:
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
 <!-- prettier-ignore-start -->
+
 <!-- markdownlint-disable -->
 
 All contributions to this project are gratefully acknowledged using the
@@ -181,5 +201,7 @@ specification. Contributions of any kind are welcome!
 <a href="https://github.com/epiforecasts/forecastbaselines/commits?author=sbfnk">sbfnk</a>
 
 <!-- markdownlint-enable -->
+
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
