@@ -9,8 +9,8 @@
 An R package providing access to 10 baseline forecasting models from the
 Julia ForecastBaselines.jl library, with uncertainty quantification and
 seamless integration with the
-[scoringutils](https://epiforecasts.io/scoringutils/) evaluation
-framework and hubverse ecosystem.
+[scoringutils](https://epiforecasts.io/scoringutils/) package and
+[hubverse](https://hubverse.io/) ecosystem.
 
 ## Features
 
@@ -132,7 +132,8 @@ other R packages. For time series forecasting in R, consider:
   tidymodels framework for time series forecasting
 
 `{forecastbaselines}` focuses specifically on baseline models for
-forecast evaluation and integrates with the scoringutils/hubverse
+forecast evaluation and integrates with the
+[scoringutils](https://epiforecasts.io/scoringutils/)/[hubverse](https://hubverse.io/)
 ecosystem.
 
 ## Citation
