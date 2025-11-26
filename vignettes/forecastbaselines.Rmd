@@ -173,7 +173,7 @@ fc_with_intervals <- forecast(
     seed = 42
   ),
   horizon = 1:12,
-  levels = c(0.50, 0.80, 0.95),
+  levels = c(0.50, 0.90, 0.95),
   include_median = FALSE,
   model_name = "Constant"
 )
@@ -191,6 +191,7 @@ library(hubVis)
 hubVis::plot_step_ahead_model_output(
   constant_hubverse$model_output,
   constant_hubverse$target_data,
+  intervals = c(0.5, 0.9, 0.95),
   interactive = TRUE
 )
 ```
@@ -209,7 +210,7 @@ arma_fc <- forecast(
   arma_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = c(0.50, 0.80, 0.95),
+  levels = c(0.50, 0.90, 0.95),
   include_median = FALSE,
   model_name = "ARMA(2,1)"
 )
@@ -226,13 +227,14 @@ arma_hubverse <- as_hubverse(
 hubVis::plot_step_ahead_model_output(
   arma_hubverse$model_output,
   arma_hubverse$target_data,
+  intervals = c(0.5, 0.9, 0.95),
   interactive = TRUE
 )
 ```
 
 The hubVis visualizations show:
 
-- Prediction intervals at 50%, 80%, and 95% confidence levels
+- Prediction intervals at 50%, 90%, and 95% confidence levels
 - Observed truth values overlaid on the forecasts
 
 # Model Evaluation
@@ -259,7 +261,7 @@ forecasts <- lapply(names(models), function(name) {
   forecast(fitted,
     interval_method = EmpiricalInterval(n_trajectories = 1000),
     horizon = 1:12,
-    levels = c(0.50, 0.80, 0.95),
+    levels = c(0.50, 0.90, 0.95),
     include_median = FALSE,
     model_name = name
   )
@@ -277,13 +279,13 @@ all_quantiles <- scoringutils::as_forecast_quantile(all_quantiles)
 scores <- scoringutils::score(all_quantiles)
 score_summary <- scoringutils::summarise_scores(scores, by = "model")
 
-# Display key metrics (WIS decomposition)
+# Display key metrics
 comparison <- data.frame(
   Model = score_summary$model,
   WIS = round(score_summary$wis, 2),
-  Dispersion = round(score_summary$dispersion, 2),
-  Underprediction = round(score_summary$underprediction, 2),
-  Overprediction = round(score_summary$overprediction, 2)
+  Coverage_50 = paste0(round(score_summary$interval_coverage_50 * 100, 1), "%"),
+  Coverage_90 = paste0(round(score_summary$interval_coverage_90 * 100, 1), "%"),
+  Coverage_95 = paste0(round(score_summary$interval_coverage_95 * 100, 1), "%")
 )
 print(comparison)
 
@@ -300,6 +302,7 @@ comparison_hubverse <- as_hubverse(
 hubVis::plot_step_ahead_model_output(
   comparison_hubverse$model_output,
   comparison_hubverse$target_data,
+  intervals = c(0.5, 0.9, 0.95),
   interactive = TRUE
 )
 ```
@@ -324,7 +327,7 @@ stl_fitted <- fit_baseline(seasonal_data, stl_model)
 stl_fc <- forecast(stl_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = c(0.50, 0.80, 0.95),
+  levels = c(0.50, 0.90, 0.95),
   include_median = FALSE,
   truth = future_seasonal,
   model_name = "STL"
@@ -336,7 +339,7 @@ lsd_fitted <- fit_baseline(seasonal_data, lsd_model)
 lsd_fc <- forecast(lsd_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
   horizon = 1:12,
-  levels = c(0.50, 0.80, 0.95),
+  levels = c(0.50, 0.90, 0.95),
   include_median = FALSE,
   truth = future_seasonal,
   model_name = "LSD"
@@ -364,6 +367,7 @@ filtered_output <- seasonal_hubverse$model_output[seasonal_hubverse$model_output
 hubVis::plot_step_ahead_model_output(
   filtered_output,
   filtered_target,
+  intervals = c(0.5, 0.9, 0.95),
   interactive = TRUE
 )
 ```
