@@ -6,14 +6,9 @@
   # Try automatic setup
   tryCatch(
     {
-      # Try to setup Julia connection (don't install Julia automatically
-      # in .onLoad)
       JuliaCall::julia_setup()
-
-      # Try to load ForecastBaselines.jl if it exists
       JuliaCall::julia_eval("using ForecastBaselines")
 
-      # Load helper functions (semicolon suppresses output)
       helper_file <- system.file(
         "julia", "forecast_helpers.jl",
         package = "forecastbaselines"
@@ -24,19 +19,25 @@
         )
       }
 
-      packageStartupMessage(
-        "forecastbaselines: Julia backend loaded successfully"
-      )
+      .fbr_env$setup_ok <- TRUE
     },
     error = function(e) {
-      packageStartupMessage(
-        "forecastbaselines: R interface to ForecastBaselines.jl"
-      )
-      packageStartupMessage(
-        "Julia setup incomplete. Run setup_ForecastBaselines() to configure."
-      )
+      .fbr_env$setup_ok <- FALSE
     }
   )
+}
+
+.onAttach <- function(libname, pkgname) {
+  if (isTRUE(.fbr_env$setup_ok)) {
+    packageStartupMessage(
+      "forecastbaselines: Julia backend loaded successfully"
+    )
+  } else {
+    packageStartupMessage(
+      "forecastbaselines: R interface to ForecastBaselines.jl\n",
+      "Julia setup incomplete. Run setup_ForecastBaselines() to configure."
+    )
+  }
 }
 
 #' Setup Julia and load ForecastBaselines.jl

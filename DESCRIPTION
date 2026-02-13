@@ -29,5 +29,6 @@ Suggests:
     hubVis,
     knitr,
     rmarkdown
+VignetteBuilder: knitr
 Remotes:
     hubverse-org/hubVis

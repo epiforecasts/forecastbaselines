@@ -9,7 +9,7 @@ OLSModel(degree = 1L, differencing = 0L)
 \arguments{
 \item{degree}{Polynomial degree (default: 1 for linear trend)}
 
-\item{s}{Seasonal period (default: NULL for no seasonality)}
+\item{differencing}{Order of differencing (default: 0 for no differencing)}
 }
 \value{
 An OLSModel object
@@ -22,7 +22,7 @@ Creates an ordinary least squares model with polynomial trend.
 # Linear trend
 model <- OLSModel(degree = 1)
 
-# Quadratic trend with seasonality
-model <- OLSModel(degree = 2, s = 12)
+# Quadratic trend with differencing
+model <- OLSModel(degree = 2, differencing = 1)
 }
 }

@@ -39,8 +39,8 @@ hubVis for visualization. Returns a list with model_output and target_data
 data frames.
 }
 \details{
-The hubVis and hubUtils packages are not on CRAN and must be installed from GitHub:
-\code{remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))}
+The hubVis package is not on CRAN and must be installed from GitHub:
+\code{remotes::install_github("hubverse-org/hubVis")}
 }
 \examples{
 \dontrun{
@@ -51,8 +51,8 @@ hubverse_data <- as_hubverse(forecast,
   observed_data = full_data
 )
 
-# Install hubVis/hubUtils from GitHub for visualization
-# remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))
+# Install hubVis from GitHub for visualization
+# remotes::install_github("hubverse-org/hubVis")
 
 # Visualize with hubVis (if installed)
 # Note: as_hubverse() automatically converts model_output to model_out_tbl

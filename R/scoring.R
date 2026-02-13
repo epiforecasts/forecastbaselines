@@ -28,8 +28,8 @@ NULL
 #'   }
 #'
 #' @details
-#' The hubVis and hubUtils packages are not on CRAN and must be installed from GitHub:
-#' \code{remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))}
+#' The hubVis package is not on CRAN and must be installed from GitHub:
+#' \code{remotes::install_github("hubverse-org/hubVis")}
 #'
 #' @export
 #'
@@ -42,8 +42,8 @@ NULL
 #'   observed_data = full_data
 #' )
 #'
-#' # Install hubVis/hubUtils from GitHub for visualization
-#' # remotes::install_github(c("hubverse-org/hubUtils", "hubverse-org/hubVis"))
+#' # Install hubVis from GitHub for visualization
+#' # remotes::install_github("hubverse-org/hubVis")
 #'
 #' # Visualize with hubVis (if installed)
 #' # Note: as_hubverse() automatically converts model_output to model_out_tbl
@@ -188,11 +188,6 @@ as_hubverse.default <- function(data,
       observation = data$observed,
       stringsAsFactors = FALSE
     ))
-  }
-
-  # Convert model_output to model_out_tbl if hubUtils is available
-  if (requireNamespace("hubUtils", quietly = TRUE)) {
-    model_output <- hubUtils::as_model_out_tbl(model_output)
   }
 
   list(

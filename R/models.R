@@ -98,7 +98,7 @@ LSDModel <- function(s, window_width = 1L, trend_correction = FALSE) {
 #' Creates an ordinary least squares model with polynomial trend.
 #'
 #' @param degree Polynomial degree (default: 1 for linear trend)
-#' @param s Seasonal period (default: NULL for no seasonality)
+#' @param differencing Order of differencing (default: 0 for no differencing)
 #'
 #' @return An OLSModel object
 #' @export
@@ -108,8 +108,8 @@ LSDModel <- function(s, window_width = 1L, trend_correction = FALSE) {
 #' # Linear trend
 #' model <- OLSModel(degree = 1)
 #'
-#' # Quadratic trend with seasonality
-#' model <- OLSModel(degree = 2, s = 12)
+#' # Quadratic trend with differencing
+#' model <- OLSModel(degree = 2, differencing = 1)
 #' }
 OLSModel <- function(degree = 1L, differencing = 0L) {
   check_setup()
@@ -197,7 +197,7 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L,
 
   # Use keyword argument syntax for Julia
   JuliaCall::julia_assign("p_val", as.integer(p))
-  JuliaCall::julia_assign("q_val", as.integer(p))
+  JuliaCall::julia_assign("q_val", as.integer(q))
   JuliaCall::julia_assign("s_val", as.integer(s))
 
   # For now, use simple keyword argument approach
