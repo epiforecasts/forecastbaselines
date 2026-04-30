@@ -1,7 +1,6 @@
 # Package environment to track Julia setup state
 .fbr_env <- new.env(parent = emptyenv())
 
-#' @importFrom JuliaCall julia_eval julia_call julia_assign
 NULL
 
 #' Setup Julia and load ForecastBaselines.jl
@@ -64,7 +63,7 @@ setup_ForecastBaselines <- function(install_package = TRUE,
 is_setup <- function() {
   isTRUE(.fbr_env$ready) &&
     tryCatch(
-      JuliaCall::julia_eval("isdefined(Main, :ForecastBaselines)"),
+      juliaready::eval_julia("isdefined(Main, :ForecastBaselines)"),
       error = function(e) FALSE
     )
 }

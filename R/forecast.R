@@ -23,19 +23,19 @@ fit_baseline <- function(x, model, temporal_info = NULL) {
   check_setup()
 
   # Assign data to Julia
-  JuliaCall::julia_assign("x_data", as.numeric(x))
+  juliaready::assign_julia("x_data", as.numeric(x))
 
   # Assign model to Julia
-  JuliaCall::julia_assign("model_obj", model)
+  juliaready::assign_julia("model_obj", model)
 
   # Fit the model
   if (is.null(temporal_info)) {
-    JuliaCall::julia_eval(
+    juliaready::eval_julia(
       "fitted = ForecastBaselines.fit_baseline(x_data, model_obj)"
     )
   } else {
-    JuliaCall::julia_assign("temp_info", temporal_info)
-    JuliaCall::julia_eval(
+    juliaready::assign_julia("temp_info", temporal_info)
+    juliaready::eval_julia(
       paste0(
         "fitted = ForecastBaselines.fit_baseline(",
         "x_data, model_obj, temporal_info=temp_info)"
@@ -44,7 +44,7 @@ fit_baseline <- function(x, model, temporal_info = NULL) {
   }
 
   # Return the fitted model
-  JuliaCall::julia_eval("fitted")
+  juliaready::eval_julia("fitted")
 }
 
 #' Generate Point Forecasts
@@ -64,15 +64,15 @@ fit_baseline <- function(x, model, temporal_info = NULL) {
 point_forecast <- function(fitted, horizon = 1L) {
   check_setup()
 
-  JuliaCall::julia_assign("fitted_obj", fitted)
+  juliaready::assign_julia("fitted_obj", fitted)
 
   if (length(horizon) == 1) {
-    JuliaCall::julia_assign("h", as.integer(horizon))
+    juliaready::assign_julia("h", as.integer(horizon))
   } else {
-    JuliaCall::julia_assign("h", as.integer(horizon))
+    juliaready::assign_julia("h", as.integer(horizon))
   }
 
-  result <- JuliaCall::julia_eval(
+  result <- juliaready::eval_julia(
     "ForecastBaselines.point_forecast(fitted_obj, h)"
   )
   as.numeric(result)
@@ -124,20 +124,20 @@ forecast <- function(fitted,
   check_setup()
 
   # Assign objects to Julia
-  JuliaCall::julia_assign("fitted_obj", fitted)
-  JuliaCall::julia_assign("interval_method_obj", interval_method)
-  JuliaCall::julia_assign("h", as.integer(horizon))
+  juliaready::assign_julia("fitted_obj", fitted)
+  juliaready::assign_julia("interval_method_obj", interval_method)
+  juliaready::assign_julia("h", as.integer(horizon))
   # Ensure levels is always a vector in Julia
   if (length(levels) == 1) {
     # For single values, create Julia vector directly
-    JuliaCall::julia_command(sprintf("lvls = [%f]", as.numeric(levels)))
+    juliaready::command_julia(sprintf("lvls = [%f]", as.numeric(levels)))
   } else {
     # For multiple values, assign and convert
-    JuliaCall::julia_assign("lvls_temp", as.numeric(levels))
-    JuliaCall::julia_command("lvls = vec(lvls_temp)")
+    juliaready::assign_julia("lvls_temp", as.numeric(levels))
+    juliaready::command_julia("lvls = vec(lvls_temp)")
   }
-  JuliaCall::julia_assign("inc_median", include_median)
-  JuliaCall::julia_assign("mdl_name", as.character(model_name))
+  juliaready::assign_julia("inc_median", include_median)
+  juliaready::assign_julia("mdl_name", as.character(model_name))
 
   # Build the forecast call and convert using Julia helper
   # Note: Julia code must be on a single line to avoid parse errors
@@ -150,19 +150,19 @@ forecast <- function(fitted,
       "interval_method = interval_method_obj, horizon = h, levels = lvls, ",
       "include_median = inc_median, model_name = mdl_name)"
     )
-    JuliaCall::julia_command(julia_cmd)
-    forecast_result <- JuliaCall::julia_eval(
+    juliaready::command_julia(julia_cmd)
+    forecast_result <- juliaready::eval_julia(
       sprintf("forecast_to_r_dict(%s)", fc_id)
     )
   } else {
-    JuliaCall::julia_assign("truth_vals", as.numeric(truth))
+    juliaready::assign_julia("truth_vals", as.numeric(truth))
     julia_cmd <- paste0(
       fc_id, " = ForecastBaselines.forecast(fitted_obj; ",
       "interval_method = interval_method_obj, horizon = h, levels = lvls, ",
       "include_median = inc_median, truth = truth_vals, model_name = mdl_name)"
     )
-    JuliaCall::julia_command(julia_cmd)
-    forecast_result <- JuliaCall::julia_eval(
+    juliaready::command_julia(julia_cmd)
+    forecast_result <- juliaready::eval_julia(
       sprintf("forecast_to_r_dict(%s)", fc_id)
     )
   }
@@ -198,20 +198,20 @@ forecast <- function(fitted,
 interval_forecast <- function(fitted, method, horizon = 1L, levels = 0.95) {
   check_setup()
 
-  JuliaCall::julia_assign("fitted_obj", fitted)
-  JuliaCall::julia_assign("method_obj", method)
-  JuliaCall::julia_assign("h", as.integer(horizon))
+  juliaready::assign_julia("fitted_obj", fitted)
+  juliaready::assign_julia("method_obj", method)
+  juliaready::assign_julia("h", as.integer(horizon))
   # Ensure levels is always a vector in Julia
   if (length(levels) == 1) {
     # For single values, create Julia vector directly
-    JuliaCall::julia_command(sprintf("lvls = [%f]", as.numeric(levels)))
+    juliaready::command_julia(sprintf("lvls = [%f]", as.numeric(levels)))
   } else {
     # For multiple values, assign and convert
-    JuliaCall::julia_assign("lvls_temp", as.numeric(levels))
-    JuliaCall::julia_command("lvls = vec(lvls_temp)")
+    juliaready::assign_julia("lvls_temp", as.numeric(levels))
+    juliaready::command_julia("lvls = vec(lvls_temp)")
   }
 
-  result <- JuliaCall::julia_eval("
+  result <- juliaready::eval_julia("
     res = ForecastBaselines.interval_forecast(fitted_obj, method_obj, h, lvls)
     interval_result_to_r_dict(res)
   ")
@@ -244,17 +244,17 @@ TemporalInfo <- function(start = 1, resolution = 1) {
   # Convert R date to Julia if needed
   if (inherits(start, "Date")) {
     start_str <- format(start, "%Y-%m-%d")
-    JuliaCall::julia_assign("start_val", start_str)
+    juliaready::assign_julia("start_val", start_str)
     # Import Dates module and create Date
-    JuliaCall::julia_eval("using Dates")
-    JuliaCall::julia_eval("start_date = Date(start_val)")
+    juliaready::eval_julia("using Dates")
+    juliaready::eval_julia("start_date = Date(start_val)")
     # Convert integer resolution to Day period
-    JuliaCall::julia_assign("res_val", as.integer(resolution))
-    JuliaCall::julia_eval(
+    juliaready::assign_julia("res_val", as.integer(resolution))
+    juliaready::eval_julia(
       "ForecastBaselines.TemporalInfo(start_date, Day(res_val))"
     )
   } else {
-    JuliaCall::julia_call(
+    juliaready::call_julia(
       "ForecastBaselines.TemporalInfo",
       as.integer(start),
       as.integer(resolution)
