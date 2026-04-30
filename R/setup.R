@@ -31,9 +31,9 @@ setup_ForecastBaselines <- function(install_package = TRUE,
                                     verbose = TRUE) {
   juliaready::julia_ready(
     packages  = "ForecastBaselines",
-    github    = c(ForecastBaselines = "ManuelStapper/ForecastBaselines.jl"),
     state_env = .fbr_env,
-    install   = install_package,
+    project   = system.file("julia", package = "forecastbaselines"),
+    install   = FALSE,
     verbose   = verbose
   )
   juliaready::julia_load_bridge(
