@@ -18,6 +18,7 @@ Depends:
     R (>= 3.5.0)
 Imports:
     JuliaCall (>= 0.17.0),
+    juliaready,
     scoringutils (>= 1.0.0)
 SystemRequirements: Julia (>= 1.9)
 RoxygenNote: 7.3.3
@@ -31,4 +32,5 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Remotes:
-    hubverse-org/hubVis
+    hubverse-org/hubVis,
+    sbfnk/juliaready

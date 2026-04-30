@@ -4,37 +4,32 @@
 \alias{setup_ForecastBaselines}
 \title{Setup Julia and load ForecastBaselines.jl}
 \usage{
-setup_ForecastBaselines(
-  JULIA_HOME = NULL,
-  install_package = TRUE,
-  rebuild = FALSE,
-  verbose = TRUE
-)
+setup_ForecastBaselines(install_package = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{JULIA_HOME}{Path to Julia installation (optional, will auto-detect
-if not provided)}
-
 \item{install_package}{Whether to install ForecastBaselines.jl if not
-already installed}
+already installed.}
 
-\item{rebuild}{Whether to rebuild the Julia system image}
-
-\item{verbose}{Whether to print verbose output during setup}
+\item{verbose}{Whether to print progress messages.}
 }
 \value{
-Invisibly returns TRUE if setup was successful
+Invisibly returns `TRUE` if setup succeeded.
 }
 \description{
-This function initializes Julia, installs ForecastBaselines.jl if needed,
-and loads the package. Must be called before using any forecasting functions.
+Initialises Julia, installs ForecastBaselines.jl if needed, and loads
+the bridge code. Idempotent: subsequent calls are no-ops once setup
+has succeeded. Heavy lifting is delegated to
+[juliaready::julia_ready()] and [juliaready::julia_load_bridge()].
+}
+\details{
+Note: this is *not* called from `.onLoad`. Eager Julia initialisation
+on package load can crash R during attach when interacting with other
+compiled backends (e.g. Stan). Call this function explicitly, or rely
+on the lazy [check_setup()] guard inside the package's exported
+functions.
 }
 \examples{
 \dontrun{
-# Basic setup (auto-detect Julia)
 setup_ForecastBaselines()
-
-# Specify Julia location
-setup_ForecastBaselines(JULIA_HOME = "/usr/local/julia/bin")
 }
 }
