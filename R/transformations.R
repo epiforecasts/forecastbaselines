@@ -13,7 +13,7 @@
 #' }
 NoTransform <- function() {
   check_setup()
-  JuliaCall::julia_eval("ForecastBaselines.NoTransform()")
+  juliaready::eval_julia("ForecastBaselines.NoTransform()")
 }
 
 #' Log Transformation
@@ -29,7 +29,7 @@ NoTransform <- function() {
 #' }
 LogTransform <- function() {
   check_setup()
-  JuliaCall::julia_eval("ForecastBaselines.LogTransform()")
+  juliaready::eval_julia("ForecastBaselines.LogTransform()")
 }
 
 #' Log Plus One Transformation
@@ -51,7 +51,7 @@ LogTransform <- function() {
 #' }
 LogPlusOneTransform <- function(c = 1.0) {
   check_setup()
-  JuliaCall::julia_call("ForecastBaselines.LogPlusOneTransform", as.numeric(c))
+  juliaready::call_julia("ForecastBaselines.LogPlusOneTransform", as.numeric(c))
 }
 
 #' Square Root Transformation
@@ -68,7 +68,7 @@ LogPlusOneTransform <- function(c = 1.0) {
 #' }
 SquareRootTransform <- function() {
   check_setup()
-  JuliaCall::julia_eval("ForecastBaselines.SquareRootTransform()")
+  juliaready::eval_julia("ForecastBaselines.SquareRootTransform()")
 }
 
 #' Power Transformation
@@ -90,7 +90,7 @@ SquareRootTransform <- function() {
 #' }
 PowerTransform <- function(lambda) {
   check_setup()
-  JuliaCall::julia_call("ForecastBaselines.PowerTransform", as.numeric(lambda))
+  juliaready::call_julia("ForecastBaselines.PowerTransform", as.numeric(lambda))
 }
 
 #' Power Plus One Transformation
@@ -114,7 +114,7 @@ PowerTransform <- function(lambda) {
 #' }
 PowerPlusOneTransform <- function(lambda, constant = 1.0) {
   check_setup()
-  JuliaCall::julia_call("ForecastBaselines.PowerPlusOneTransform",
+  juliaready::call_julia("ForecastBaselines.PowerPlusOneTransform",
     as.numeric(lambda),
     constant = as.numeric(constant)
   )
@@ -160,9 +160,9 @@ transform_data <- function(x, transformation) {
 
   # Julia transform expects a matrix (n x 1)
   x_mat <- matrix(as.numeric(x), ncol = 1)
-  JuliaCall::julia_assign("x_mat", x_mat)
-  JuliaCall::julia_assign("trans_obj", transformation)
-  result <- JuliaCall::julia_eval(
+  juliaready::assign_julia("x_mat", x_mat)
+  juliaready::assign_julia("trans_obj", transformation)
+  result <- juliaready::eval_julia(
     "ForecastBaselines.transform(x_mat, trans_obj)"
   )
   as.numeric(result)
@@ -188,9 +188,9 @@ inverse_transform_data <- function(y, transformation) {
   check_setup()
   # Julia inverse_transform expects a vector (unlike transform which needs
   # a matrix)
-  JuliaCall::julia_assign("y_vec", as.numeric(y))
-  JuliaCall::julia_assign("trans_obj", transformation)
-  result <- JuliaCall::julia_eval(
+  juliaready::assign_julia("y_vec", as.numeric(y))
+  juliaready::assign_julia("trans_obj", transformation)
+  result <- juliaready::eval_julia(
     "ForecastBaselines.inverse_transform(y_vec, trans_obj)"
   )
   as.numeric(result)

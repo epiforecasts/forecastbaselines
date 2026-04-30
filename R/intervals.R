@@ -15,7 +15,7 @@
 #' }
 NoInterval <- function() {
   check_setup()
-  JuliaCall::julia_eval("ForecastBaselines.NoInterval()")
+  juliaready::eval_julia("ForecastBaselines.NoInterval()")
 }
 
 #' Empirical Interval Method
@@ -110,7 +110,7 @@ EmpiricalInterval <- function(n_trajectories = 1000L,
   args_str <- paste(args_list, collapse = ", ")
 
   julia_code <- sprintf("ForecastBaselines.EmpiricalInterval(%s)", args_str)
-  JuliaCall::julia_eval(julia_code)
+  juliaready::eval_julia(julia_code)
 }
 
 #' Parametric Interval Method
@@ -147,7 +147,7 @@ ParametricInterval <- function(positivity_correction = "none") {
     "ForecastBaselines.ParametricInterval(positivity_correction=:%s)",
     positivity_correction
   )
-  JuliaCall::julia_eval(julia_code)
+  juliaready::eval_julia(julia_code)
 }
 
 #' Model Trajectory Interval Method
@@ -219,5 +219,5 @@ ModelTrajectoryInterval <- function(n_trajectories = 1000L,
     "ForecastBaselines.ModelTrajectoryInterval(%s)",
     args_str
   )
-  JuliaCall::julia_eval(julia_code)
+  juliaready::eval_julia(julia_code)
 }

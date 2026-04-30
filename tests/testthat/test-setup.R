@@ -11,9 +11,11 @@ test_that("Julia availability can be checked", {
   expect_no_error(is_setup())
 })
 
-test_that("package startup message is informative", {
-  # This tests the .onLoad function behavior
-  # We can't directly test .onLoad, but we can verify
-  # the function exists and doesn't error
-  expect_true(exists(".onLoad", where = asNamespace("forecastbaselines")))
+test_that("setup_ForecastBaselines exists and is exported", {
+  # Setup is now manual / lazy via check_setup() rather than .onLoad,
+  # to avoid crashing R during package attach when other compiled
+  # backends (e.g. Stan) are present.
+  expect_true(exists("setup_ForecastBaselines",
+                    where = asNamespace("forecastbaselines"),
+                    mode = "function"))
 })

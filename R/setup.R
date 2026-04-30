@@ -1,146 +1,47 @@
-# Package environment to store Julia connection
+# Package environment to track Julia setup state
 .fbr_env <- new.env(parent = emptyenv())
 
-#' @importFrom JuliaCall julia_setup julia_eval julia_call julia_assign
-.onLoad <- function(libname, pkgname) {
-  # Try automatic setup
-  tryCatch(
-    {
-      JuliaCall::julia_setup()
-      JuliaCall::julia_eval("using ForecastBaselines")
-
-      helper_file <- system.file(
-        "julia", "forecast_helpers.jl",
-        package = "forecastbaselines"
-      )
-      if (file.exists(helper_file)) {
-        JuliaCall::julia_eval(
-          sprintf('include("%s"); nothing', helper_file)
-        )
-      }
-
-      .fbr_env$setup_ok <- TRUE
-    },
-    error = function(e) {
-      .fbr_env$setup_ok <- FALSE
-    }
-  )
-}
-
-.onAttach <- function(libname, pkgname) {
-  if (isTRUE(.fbr_env$setup_ok)) {
-    packageStartupMessage(
-      "forecastbaselines: Julia backend loaded successfully"
-    )
-  } else {
-    packageStartupMessage(
-      "forecastbaselines: R interface to ForecastBaselines.jl\n",
-      "Julia setup incomplete. Run setup_ForecastBaselines() to configure."
-    )
-  }
-}
+NULL
 
 #' Setup Julia and load ForecastBaselines.jl
 #'
-#' This function initializes Julia, installs ForecastBaselines.jl if needed,
-#' and loads the package. Must be called before using any forecasting functions.
+#' Initialises Julia, installs ForecastBaselines.jl if needed, and loads
+#' the bridge code. Idempotent: subsequent calls are no-ops once setup
+#' has succeeded. Heavy lifting is delegated to
+#' [juliaready::julia_ready()] and [juliaready::julia_load_bridge()].
 #'
-#' @param JULIA_HOME Path to Julia installation (optional, will auto-detect
-#'   if not provided)
+#' Note: this is *not* called from `.onLoad`. Eager Julia initialisation
+#' on package load can crash R during attach when interacting with other
+#' compiled backends (e.g. Stan). Call this function explicitly, or rely
+#' on the lazy [check_setup()] guard inside the package's exported
+#' functions.
+#'
 #' @param install_package Whether to install ForecastBaselines.jl if not
-#'   already installed
-#' @param rebuild Whether to rebuild the Julia system image
-#' @param verbose Whether to print verbose output during setup
+#'   already installed.
+#' @param verbose Whether to print progress messages.
 #'
-#' @return Invisibly returns TRUE if setup was successful
+#' @return Invisibly returns `TRUE` if setup succeeded.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Basic setup (auto-detect Julia)
 #' setup_ForecastBaselines()
-#'
-#' # Specify Julia location
-#' setup_ForecastBaselines(JULIA_HOME = "/usr/local/julia/bin")
 #' }
-setup_ForecastBaselines <- function(JULIA_HOME = NULL,
-                                    install_package = TRUE,
-                                    rebuild = FALSE,
+setup_ForecastBaselines <- function(install_package = TRUE,
                                     verbose = TRUE) {
-  if (verbose) {
-    message("Initializing Julia...")
-  }
-
-  # Setup Julia
-  if (is.null(JULIA_HOME)) {
-    .fbr_env$julia <- JuliaCall::julia_setup(rebuild = rebuild)
-  } else {
-    .fbr_env$julia <- JuliaCall::julia_setup(
-      JULIA_HOME = JULIA_HOME,
-      rebuild = rebuild
-    )
-  }
-
-  if (verbose) {
-    message("Julia initialized successfully")
-  }
-
-  # Install ForecastBaselines.jl if requested
-  if (install_package) {
-    if (verbose) {
-      message("Checking ForecastBaselines.jl installation...")
-    }
-
-    # Try to load the package, install if it fails
-    tryCatch(
-      {
-        JuliaCall::julia_eval("using ForecastBaselines")
-        if (verbose) {
-          message("ForecastBaselines.jl is already installed")
-        }
-      },
-      error = function(e) {
-        if (verbose) {
-          message("Installing ForecastBaselines.jl...")
-        }
-        JuliaCall::julia_eval(
-          paste0(
-            'using Pkg; Pkg.add(url="',
-            'https://github.com/ManuelStapper/ForecastBaselines.jl")'
-          )
-        )
-        JuliaCall::julia_eval("using ForecastBaselines")
-        if (verbose) {
-          message("ForecastBaselines.jl installed successfully")
-        }
-      }
-    )
-  } else {
-    # Just try to load
-    JuliaCall::julia_eval("using ForecastBaselines")
-  }
-
-  # Load helper functions for R conversion
-  if (verbose) {
-    message("Loading R conversion helpers...")
-  }
-  helper_file <- system.file(
-    "julia", "forecast_helpers.jl",
-    package = "forecastbaselines"
+  juliaready::julia_ready(
+    packages  = "ForecastBaselines",
+    state_env = .fbr_env,
+    project   = system.file("julia", package = "forecastbaselines"),
+    install   = FALSE,
+    verbose   = verbose
   )
-  if (file.exists(helper_file)) {
-    JuliaCall::julia_eval(sprintf('include("%s"); nothing', helper_file))
-  } else {
-    warning(
-      "Could not find forecast_helpers.jl - ",
-      "some functions may not work correctly"
-    )
-  }
-
-  if (verbose) {
-    message("forecastbaselines setup complete!")
-  }
-
+  juliaready::julia_load_bridge(
+    package = "forecastbaselines",
+    files   = "forecast_helpers.jl",
+    verbose = verbose
+  )
+  if (verbose) message("forecastbaselines setup complete!")
   invisible(TRUE)
 }
 
@@ -160,25 +61,14 @@ setup_ForecastBaselines <- function(JULIA_HOME = NULL,
 #' }
 #' }
 is_setup <- function() {
-  tryCatch(
-    {
-      # Check if Julia is available and ForecastBaselines is loaded
-      JuliaCall::julia_eval("isdefined(Main, :ForecastBaselines)")
-    },
-    error = function(e) {
-      # Julia not available at all
-      FALSE
-    }
-  )
+  isTRUE(.fbr_env$ready) &&
+    tryCatch(
+      juliaready::eval_julia("isdefined(Main, :ForecastBaselines)"),
+      error = function(e) FALSE
+    )
 }
 
-# Internal function to check setup and give helpful error message
+# Internal: lazy-init guard. Call from any function that needs Julia.
 check_setup <- function() {
-  if (!is_setup()) {
-    stop(
-      "Julia and ForecastBaselines.jl are not set up. ",
-      "Please run setup_ForecastBaselines() first.",
-      call. = FALSE
-    )
-  }
+  juliaready::ensure_julia(.fbr_env, setup_ForecastBaselines)
 }

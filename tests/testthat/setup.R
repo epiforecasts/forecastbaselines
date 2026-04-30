@@ -19,7 +19,7 @@ tryCatch(
     helper_loaded <- FALSE
     for (helper_file in possible_paths) {
       if (file.exists(helper_file) && !helper_loaded) {
-        JuliaCall::julia_command(sprintf('include("%s")', normalizePath(helper_file)))
+        juliaready::command_julia(sprintf('include("%s")', normalizePath(helper_file)))
         helper_loaded <- TRUE
         break
       }
