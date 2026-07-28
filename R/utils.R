@@ -111,7 +111,7 @@ add_truth <- function(forecast, truth) {
       fc_id, fc_var
     )
   )
-  result <- juliaready::eval_julia(sprintf("forecast_to_r_dict(%s)", fc_id))
+  result <- eval_julia_value(sprintf("forecast_to_r(%s)", fc_id))
   class(result) <- c("ForecastBaselines_Forecast", "list")
   attr(result, "julia_ref") <- fc_id
   result
@@ -135,7 +135,7 @@ add_median <- function(forecast, median) {
       fc_id, fc_var
     )
   )
-  result <- juliaready::eval_julia(sprintf("forecast_to_r_dict(%s)", fc_id))
+  result <- eval_julia_value(sprintf("forecast_to_r(%s)", fc_id))
   class(result) <- c("ForecastBaselines_Forecast", "list")
   attr(result, "julia_ref") <- fc_id
   result
@@ -151,9 +151,9 @@ add_intervals <- function(forecast, intervals) {
   check_setup()
   fc_var <- get_fc_ref(forecast)
   juliaready::assign_julia("intervals_obj", intervals)
-  result <- juliaready::eval_julia(
+  result <- eval_julia_value(
     sprintf(
-      "forecast_to_r_dict(ForecastBaselines.add_intervals(%s, intervals_obj))",
+      "forecast_to_r(ForecastBaselines.add_intervals(%s, intervals_obj))",
       fc_var
     )
   )
@@ -171,9 +171,9 @@ add_trajectories <- function(forecast, trajectories) {
   check_setup()
   fc_var <- get_fc_ref(forecast)
   juliaready::assign_julia("traj_mat", as.matrix(trajectories))
-  result <- juliaready::eval_julia(
+  result <- eval_julia_value(
     sprintf(
-      "forecast_to_r_dict(ForecastBaselines.add_trajectories(%s, traj_mat))",
+      "forecast_to_r(ForecastBaselines.add_trajectories(%s, traj_mat))",
       fc_var
     )
   )
@@ -196,10 +196,10 @@ add_temporal_info <- function(forecast, reference_date, target_date,
   juliaready::assign_julia("ref_date", reference_date)
   juliaready::assign_julia("tgt_date", target_date)
   juliaready::assign_julia("res_val", resolution)
-  result <- juliaready::eval_julia(
+  result <- eval_julia_value(
     sprintf(
       paste0(
-        "forecast_to_r_dict(ForecastBaselines.add_temporal_info(",
+        "forecast_to_r(ForecastBaselines.add_temporal_info(",
         "%s, ref_date, tgt_date, res_val))"
       ),
       fc_var
@@ -229,7 +229,7 @@ truncate_horizon <- function(forecast, max_h) {
       fc_id, fc_var
     )
   )
-  result <- juliaready::eval_julia(sprintf("forecast_to_r_dict(%s)", fc_id))
+  result <- eval_julia_value(sprintf("forecast_to_r(%s)", fc_id))
   class(result) <- c("ForecastBaselines_Forecast", "list")
   attr(result, "julia_ref") <- fc_id
   result
@@ -253,7 +253,7 @@ filter_horizons <- function(forecast, horizons) {
       fc_id, fc_var
     )
   )
-  result <- juliaready::eval_julia(sprintf("forecast_to_r_dict(%s)", fc_id))
+  result <- eval_julia_value(sprintf("forecast_to_r(%s)", fc_id))
   class(result) <- c("ForecastBaselines_Forecast", "list")
   attr(result, "julia_ref") <- fc_id
   result
@@ -269,9 +269,9 @@ filter_levels <- function(forecast, levels) {
   check_setup()
   fc_var <- get_fc_ref(forecast)
   juliaready::assign_julia("lvls_vec", as.numeric(levels))
-  result <- juliaready::eval_julia(
+  result <- eval_julia_value(
     sprintf(
-      "forecast_to_r_dict(ForecastBaselines.filter_levels(%s, lvls_vec))",
+      "forecast_to_r(ForecastBaselines.filter_levels(%s, lvls_vec))",
       fc_var
     )
   )

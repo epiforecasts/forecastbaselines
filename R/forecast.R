@@ -151,8 +151,8 @@ forecast <- function(fitted,
       "include_median = inc_median, model_name = mdl_name)"
     )
     juliaready::command_julia(julia_cmd)
-    forecast_result <- juliaready::eval_julia(
-      sprintf("forecast_to_r_dict(%s)", fc_id)
+    forecast_result <- eval_julia_value(
+      sprintf("forecast_to_r(%s)", fc_id)
     )
   } else {
     juliaready::assign_julia("truth_vals", as.numeric(truth))
@@ -162,8 +162,8 @@ forecast <- function(fitted,
       "include_median = inc_median, truth = truth_vals, model_name = mdl_name)"
     )
     juliaready::command_julia(julia_cmd)
-    forecast_result <- juliaready::eval_julia(
-      sprintf("forecast_to_r_dict(%s)", fc_id)
+    forecast_result <- eval_julia_value(
+      sprintf("forecast_to_r(%s)", fc_id)
     )
   }
 
@@ -211,9 +211,9 @@ interval_forecast <- function(fitted, method, horizon = 1L, levels = 0.95) {
     juliaready::command_julia("lvls = vec(lvls_temp)")
   }
 
-  result <- juliaready::eval_julia("
+  result <- eval_julia_value("
     res = ForecastBaselines.interval_forecast(fitted_obj, method_obj, h, lvls)
-    interval_result_to_r_dict(res)
+    interval_result_to_r(res)
   ")
 
   # Already converted by Julia helper

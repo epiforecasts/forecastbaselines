@@ -72,3 +72,11 @@ is_setup <- function() {
 check_setup <- function() {
   juliaready::ensure_julia(.fbr_env, setup_ForecastBaselines)
 }
+
+# Internal: evaluate Julia code and fully translate the result into R.
+# eval_julia() returns composite values (NamedTuples, Dicts, structs) as
+# proxy environments; get_julia() converts them to plain R objects, so a
+# NamedTuple arrives as a named list.
+eval_julia_value <- function(code) {
+  juliaready::get_julia(juliaready::eval_julia(code))
+}

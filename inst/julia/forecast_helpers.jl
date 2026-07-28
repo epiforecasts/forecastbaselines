@@ -33,17 +33,12 @@ function to_r_compatible(x)
 end
 
 """
-Convert a ForecastBaselines.Forecast object to an R-compatible Dict.
+Convert a ForecastBaselines.Forecast object to a NamedTuple that
+JuliaConnectoR's `juliaGet()` translates into a plain named R list.
 """
-function forecast_to_r_dict(fc)
-    result = Dict{String, Any}()
-
-    # Convert each field, handling Nothing and 0-d arrays
-    result["horizon"] = to_r_compatible(fc.horizon)
-    result["mean"] = to_r_compatible(fc.mean)
-    result["median"] = to_r_compatible(fc.median)
-    result["truth"] = to_r_compatible(fc.truth)
-    result["model_name"] = String(fc.model_name)
+function forecast_to_r(fc)
+    quantiles = nothing
+    quantile_levels_sorted = nothing
 
     # Extract quantiles from intervals if present
     if fc.intervals !== nothing && !isempty(fc.intervals)
@@ -100,30 +95,31 @@ function forecast_to_r_dict(fc)
 
         # Sort columns by quantile level
         perm = sortperm(quantile_levels)
-        result["quantiles"] = quantiles_matrix[:, perm]
-        result["quantile_levels"] = quantile_levels[perm]
-    else
-        result["quantiles"] = nothing
-        result["quantile_levels"] = nothing
+        quantiles = quantiles_matrix[:, perm]
+        quantile_levels_sorted = quantile_levels[perm]
     end
 
-    # Skip trajectories for now
-    result["trajectories"] = nothing
-
-    return result
+    return (
+        horizon = to_r_compatible(fc.horizon),
+        mean = to_r_compatible(fc.mean),
+        median = to_r_compatible(fc.median),
+        truth = to_r_compatible(fc.truth),
+        model_name = String(fc.model_name),
+        quantiles = quantiles,
+        quantile_levels = quantile_levels_sorted,
+        trajectories = nothing,  # Skip trajectories for now
+    )
 end
 
 """
-Convert interval forecast results to R-compatible format.
+Convert interval forecast results to a NamedTuple for translation to R.
 """
-function interval_result_to_r_dict(res)
-    result = Dict{String, Any}()
-
+function interval_result_to_r(res)
     # res is a tuple: (point, median, intervals, trajectories)
-    result["point"] = to_r_compatible(res[1])
-    result["median"] = to_r_compatible(res[2])
-    result["intervals"] = res[3]  # Skip for now
-    result["trajectories"] = res[4]  # Skip for now
-
-    return result
+    return (
+        point = to_r_compatible(res[1]),
+        median = to_r_compatible(res[2]),
+        intervals = res[3],
+        trajectories = res[4],
+    )
 end
