@@ -177,8 +177,8 @@ STLModel <- function(s) {
 #' @param k Number of harmonic waves used to represent seasonality
 #'   (default: 1). Higher values allow sharper, asymmetric seasonal shapes.
 #'   Only meaningful when `s > 0`. Estimation in ForecastBaselines.jl runs a
-#'   derivative-free search from an all-zero start and stops at its default
-#'   limit of 1000 iterations, so a fit falls short when the series sits far
+#'   derivative-free search whose mean parameters start at zero, and it
+#'   stops at a default limit of 1000 iterations, so a fit falls short when the series sits far
 #'   from zero and the mean function carries many parameters: on counts around
 #'   5 two waves are recovered accurately, at a mean of 100 two waves already
 #'   come back with the intercept near zero, and three waves fail at either
