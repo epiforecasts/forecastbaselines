@@ -201,10 +201,19 @@ test_that("INARCHModel creates valid model with higher order", {
   expect_true(!is.null(model))
 })
 
+test_that("INARCHModel warns about harmonics beyond the first", {
+  skip_if_no_julia()
+
+  expect_warning(
+    INARCHModel(p = 1, s = 52, k = 2),
+    "not carried into the forecasts"
+  )
+})
+
 test_that("INARCHModel passes seasonality and negative binomial through", {
   skip_if_no_julia()
 
-  model <- INARCHModel(p = 1, s = 52, k = 4, nb = TRUE)
+  model <- suppressWarnings(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
   expect_equal(as.integer(model$s), 52L)
   expect_equal(as.integer(model$k), 4L)
   expect_true(as.logical(model$nb))

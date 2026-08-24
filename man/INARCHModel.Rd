@@ -12,7 +12,11 @@ INARCHModel(p = 1L, s = 0L, k = 1L, nb = FALSE)
 \item{s}{Seasonal period (default: 0 for no seasonality)}
 
 \item{k}{Number of harmonic waves used to represent seasonality
-(default: 1). Only meaningful when `s > 0`.}
+(default: 1). Only meaningful when `s > 0`. Values above 1 are fitted
+correctly but not forecast correctly: `point_forecast()` and
+`interval_forecast()` in ForecastBaselines.jl evaluate every harmonic
+coefficient at the fundamental frequency, so forecasts do not reflect
+the seasonality that was estimated. Constructing such a model warns.}
 
 \item{nb}{Whether to use a negative binomial conditional distribution
 instead of Poisson, allowing for overdispersion (default: FALSE)}
@@ -30,6 +34,6 @@ counts follow a Poisson distribution unless `nb = TRUE`.
 model <- INARCHModel(p = 1)
 
 # Overdispersed counts with weekly data and annual seasonality
-model <- INARCHModel(p = 1, s = 52, k = 4, nb = TRUE)
+model <- INARCHModel(p = 1, s = 52, nb = TRUE)
 }
 }

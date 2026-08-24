@@ -220,7 +220,11 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
 #' @param p Order of the INARCH model (default: 1)
 #' @param s Seasonal period (default: 0 for no seasonality)
 #' @param k Number of harmonic waves used to represent seasonality
-#'   (default: 1). Only meaningful when `s > 0`.
+#'   (default: 1). Only meaningful when `s > 0`. Values above 1 are fitted
+#'   correctly but not forecast correctly: `point_forecast()` and
+#'   `interval_forecast()` in ForecastBaselines.jl evaluate every harmonic
+#'   coefficient at the fundamental frequency, so forecasts do not reflect
+#'   the seasonality that was estimated. Constructing such a model warns.
 #' @param nb Whether to use a negative binomial conditional distribution
 #'   instead of Poisson, allowing for overdispersion (default: FALSE)
 #'
@@ -232,10 +236,18 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
 #' model <- INARCHModel(p = 1)
 #'
 #' # Overdispersed counts with weekly data and annual seasonality
-#' model <- INARCHModel(p = 1, s = 52, k = 4, nb = TRUE)
+#' model <- INARCHModel(p = 1, s = 52, nb = TRUE)
 #' }
 INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
   check_harmonics(s, k)
+  if (as.integer(k) > 1L) {
+    warning(
+      "INARCH forecasts evaluate every harmonic at the fundamental ",
+      "frequency, so seasonality estimated with k > 1 is not carried into ",
+      "the forecasts.",
+      call. = FALSE
+    )
+  }
   negbin <- julia_bool(nb)
   check_setup()
 

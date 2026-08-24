@@ -805,7 +805,9 @@ Parameter Guidance:
 
 - `k` (harmonic waves):
   - 1: Smooth, symmetric seasonal wave
-  - 2-4: Sharper, asymmetric seasonal peaks
+  - Above 1: fitted correctly, but forecasts in ForecastBaselines.jl evaluate
+    every harmonic at the fundamental frequency, so the estimated seasonal
+    shape is not carried into the forecasts
 
 - `nb` (negative binomial):
   - Set to `TRUE` when counts are overdispersed relative to a Poisson
