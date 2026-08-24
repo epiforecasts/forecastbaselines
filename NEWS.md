@@ -19,6 +19,9 @@
   trend to the mean of the series (#7).
 * `ARMAModel()` and `INARCHModel()` gain `k`, the number of harmonic waves
   representing seasonality. Values above 1 allow sharper, asymmetric seasonal
-  shapes than a single sinusoid (#7).
+  shapes than a single sinusoid, subject to the limits documented on each
+  function: ARMA fits with several waves stop before the search converges, and
+  INARCH forecasts do not carry the estimated seasonality, which
+  `INARCHModel()` warns about (#7).
 * `INARCHModel()` gains `s` (seasonal period) and `nb` (negative binomial
   conditional distribution for overdispersed counts) (#7).
