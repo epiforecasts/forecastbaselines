@@ -182,10 +182,11 @@ STLModel <- function(s) {
 #'   inside that limit on small-count series; beyond that, two things spoil
 #'   the result: a series sitting far from zero leaves the intercept short of
 #'   its target, and a mean function carrying many parameters leaves the
-#'   seasonal shape poorly resolved whatever the scale. On counts around 5 two waves are recovered
-#'   accurately; at a mean of 100 two waves already come back with the
-#'   intercept near zero; three waves are unreliable at either scale. Compare
-#'   the fitted mean with the data before trusting a seasonal fit.
+#'   seasonal shape poorly resolved whatever the scale. On counts around 5
+#'   two waves are recovered accurately; at a mean of 100 two waves already
+#'   come back with the intercept near zero; three waves are unreliable at
+#'   either scale. Compare the fitted mean with the data before trusting a
+#'   seasonal fit.
 #' @param include_drift Whether to include a linear trend in the mean
 #'   (default: FALSE)
 #'
