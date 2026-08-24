@@ -172,7 +172,12 @@ STLModel <- function(s) {
 #' @param s Seasonal period (default: 0 for no seasonality)
 #' @param k Number of harmonic waves used to represent seasonality
 #'   (default: 1). Higher values allow sharper, asymmetric seasonal shapes.
-#'   Only meaningful when `s > 0`.
+#'   Only meaningful when `s > 0`. Each wave adds two parameters to the mean
+#'   function, which are estimated by a derivative-free search started from
+#'   zero, so fits become unreliable as `k` grows: on a series with a mean of
+#'   100 and two genuine harmonics, `k = 1` recovers the seasonal shape while
+#'   `k = 2` and above collapse towards a zero intercept. Check the fitted
+#'   mean against the data before trusting a model with several waves.
 #' @param include_drift Whether to include a linear trend in the mean
 #'   (default: FALSE)
 #'
@@ -191,7 +196,7 @@ STLModel <- function(s) {
 #' model <- ARMAModel(p = 2, q = 1, s = 12)
 #'
 #' # Annual seasonality with sharper peaks, plus a linear trend
-#' model <- ARMAModel(p = 1, s = 52, k = 4, include_drift = TRUE)
+#' model <- ARMAModel(p = 1, s = 52, k = 2, include_drift = TRUE)
 #' }
 ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
                       include_drift = FALSE) {

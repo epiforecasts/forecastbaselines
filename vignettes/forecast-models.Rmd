@@ -650,7 +650,9 @@ Parameters:
 - `p`: Autoregressive order
 - `q`: Moving average order
 - `s`: Seasonal period (0 for no seasonality)
-- `k`: Number of harmonic waves representing seasonality (default: 1)
+- `k`: Number of harmonic waves representing seasonality (default: 1). Each
+  wave adds two parameters, and estimation starts from zero, so fits on data
+  with a large mean become unreliable beyond one or two waves
 - `include_drift`: Add a linear trend to the mean (default: FALSE)
 
 Example:
