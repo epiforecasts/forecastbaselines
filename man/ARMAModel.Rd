@@ -17,13 +17,14 @@ ARMAModel(p = 0L, q = 0L, s = 0L, k = 1L, include_drift = FALSE)
 (default: 1). Higher values allow sharper, asymmetric seasonal shapes.
 Only meaningful when `s > 0`. Estimation in ForecastBaselines.jl runs a
 derivative-free search whose mean parameters start at zero, and it
-stops at a default limit of 1000 iterations, so a fit falls short when the series sits far
-from zero and the mean function carries many parameters: on counts around
-5 two waves are recovered accurately, at a mean of 100 two waves already
-come back with the intercept near zero, and three waves fail at either
-scale. Given more iterations the same fits converge, which makes this a
-limit of the estimator rather than of the model. Compare the fitted mean
-with the data before trusting a seasonal fit.}
+stops at a default limit of 1000 iterations, which every seasonal fit
+reaches without converging. Two things then spoil the result: a series
+sitting far from zero leaves the intercept short of its target, and a
+mean function carrying many parameters leaves the seasonal shape poorly
+resolved whatever the scale. On counts around 5 two waves are recovered
+accurately; at a mean of 100 two waves already come back with the
+intercept near zero; three waves are unreliable at either scale. Compare
+the fitted mean with the data before trusting a seasonal fit.}
 
 \item{include_drift}{Whether to include a linear trend in the mean
 (default: FALSE)}
