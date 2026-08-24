@@ -670,8 +670,9 @@ When to Use:
 - ✅ Stationary time series
 - ✅ Need parametric uncertainty
 - ✅ Autocorrelation structure
-- ❌ Strong trends (use differencing or detrend first)
-- ❌ Seasonal patterns (use SARIMA or seasonal models)
+- ✅ Smooth seasonality, through `s` and one harmonic wave
+- ❌ Strong trends (use differencing, detrend first, or set `include_drift`)
+- ❌ Sharp or asymmetric seasonal peaks, which need several waves (see `k`)
 
 Parameters:
 
