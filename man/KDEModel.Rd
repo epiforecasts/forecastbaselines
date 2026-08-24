@@ -13,8 +13,10 @@ A KDEModel object
 Creates a kernel density estimation model for non-parametric forecasting.
 }
 \details{
-The kernel is Gaussian and its bandwidth is selected automatically during
-estimation, so the model itself has no arguments.
+The kernel and the bandwidth selector belong to the estimation settings in
+ForecastBaselines.jl, which `fit_baseline()` does not expose, so the model
+itself has no arguments: the kernel is Gaussian and the bandwidth is
+selected automatically.
 }
 \examples{
 \dontrun{

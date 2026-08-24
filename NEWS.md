@@ -2,13 +2,16 @@
 
 ## Breaking changes
 
-* Model wrappers no longer accept arguments that ForecastBaselines.jl cannot
-  honour. `KDEModel()` drops `bandwidth` and `kernel`, `LSDModel()` drops
-  `trend_correction`, `IDSModel()` drops `threshold`, `STLModel()` drops
-  `trend` and `robust`, `ARMAModel()` drops `include_mean`, and `ETSModel()`
-  drops `damped` (damping is requested through `trend_type = "Ad"` or `"Md"`).
-  These arguments were accepted and then discarded, so a model built with them
-  was identical to one built without them (#7).
+* Model wrappers no longer accept arguments they cannot pass on to
+  ForecastBaselines.jl. `LSDModel()` drops `trend_correction`, `IDSModel()`
+  drops `threshold` and `STLModel()` drops `trend`, none of which exists in
+  Julia; `KDEModel()` drops `bandwidth` and `kernel` and `STLModel()` drops
+  `robust`, which are estimation settings that `fit_baseline()` does not
+  expose; `ARMAModel()` drops `include_mean`, as the intercept is always
+  estimated; and `ETSModel()` drops `damped`, since damping is requested
+  through `trend_type = "Ad"` or `"Md"`. These arguments were accepted and
+  then discarded, so a model built with them was identical to one built
+  without them (#7).
 
 ## New features
 

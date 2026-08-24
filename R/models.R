@@ -46,8 +46,10 @@ MarginalModel <- function(p = NULL) {
 #'
 #' Creates a kernel density estimation model for non-parametric forecasting.
 #'
-#' The kernel is Gaussian and its bandwidth is selected automatically during
-#' estimation, so the model itself has no arguments.
+#' The kernel and the bandwidth selector belong to the estimation settings in
+#' ForecastBaselines.jl, which `fit_baseline()` does not expose, so the model
+#' itself has no arguments: the kernel is Gaussian and the bandwidth is
+#' selected automatically.
 #'
 #' @return A KDEModel object
 #' @export
@@ -138,8 +140,10 @@ IDSModel <- function(window_size = 3L) {
 #'
 #' Creates a Seasonal-Trend decomposition using Loess model.
 #'
-#' The decomposition always includes a trend component and the loess
-#' smoothing settings are fixed, so the seasonal period is the only argument.
+#' The decomposition always includes a trend component, and the loess
+#' smoothing settings, robust iterations among them, belong to the estimation
+#' settings in ForecastBaselines.jl, which `fit_baseline()` does not expose.
+#' The seasonal period is therefore the only argument.
 #'
 #' @param s Seasonal period
 #'

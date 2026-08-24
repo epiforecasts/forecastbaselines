@@ -16,8 +16,10 @@ An STLModel object
 Creates a Seasonal-Trend decomposition using Loess model.
 }
 \details{
-The decomposition always includes a trend component and the loess
-smoothing settings are fixed, so the seasonal period is the only argument.
+The decomposition always includes a trend component, and the loess
+smoothing settings, robust iterations among them, belong to the estimation
+settings in ForecastBaselines.jl, which `fit_baseline()` does not expose.
+The seasonal period is therefore the only argument.
 }
 \examples{
 \dontrun{
