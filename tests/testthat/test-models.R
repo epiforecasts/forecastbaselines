@@ -181,6 +181,11 @@ test_that("ARMAModel rejects harmonics without a seasonal period", {
   expect_error(ARMAModel(p = 1, k = 4), "require a seasonal period")
 })
 
+test_that("ARMAModel rejects fewer than one harmonic wave", {
+  # k = 0 would otherwise drop the seasonal period on the Julia side.
+  expect_error(ARMAModel(p = 1, s = 12, k = 0), "at least 1 harmonic wave")
+})
+
 test_that("ARMAModel rejects a non-logical include_drift", {
   expect_error(ARMAModel(p = 1, include_drift = "yes"), "TRUE or FALSE")
 })
@@ -221,6 +226,10 @@ test_that("INARCHModel passes seasonality and negative binomial through", {
 
 test_that("INARCHModel rejects harmonics without a seasonal period", {
   expect_error(INARCHModel(p = 1, k = 4), "require a seasonal period")
+})
+
+test_that("INARCHModel rejects fewer than one harmonic wave", {
+  expect_error(INARCHModel(p = 1, s = 52, k = 0), "at least 1 harmonic wave")
 })
 
 test_that("INARCHModel rejects a non-logical nb", {

@@ -357,8 +357,12 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
 }
 
 
-# Internal: harmonic seasonality only has meaning alongside a seasonal period.
+# Internal: harmonic seasonality only has meaning alongside a seasonal period,
+# and fewer than one wave would drop the seasonal period on the Julia side.
 check_harmonics <- function(s, k) {
+  if (as.integer(k) < 1L) {
+    stop("'k' must be at least 1 harmonic wave", call. = FALSE)
+  }
   if (as.integer(k) > 1L && as.integer(s) == 0L) {
     stop(
       "'k' harmonic waves require a seasonal period: set 's' to a positive ",
