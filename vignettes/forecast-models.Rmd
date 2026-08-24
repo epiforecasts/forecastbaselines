@@ -679,9 +679,10 @@ Parameters:
 - `q`: Moving average order
 - `s`: Seasonal period (0 for no seasonality)
 - `k`: Number of harmonic waves representing seasonality (default: 1).
-  Several waves need more optimiser iterations than ForecastBaselines.jl
-  currently allows, so those fits come back part-way through the search;
-  compare the fitted mean with the data
+  Estimation starts from zero and stops at 1000 iterations, so several waves
+  on a series far from zero fall short of the fit: two waves are accurate on
+  counts around 5 but not at a mean of 100, and three waves fail at either
+  scale. Compare the fitted mean with the data
 - `include_drift`: Add a linear trend to the mean (default: FALSE)
 
 Example:
