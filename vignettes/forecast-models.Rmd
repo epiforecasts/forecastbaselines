@@ -125,9 +125,14 @@ plot_df <- rbind(
 
 ggplot(plot_df, aes(x = time, y = value)) +
   geom_line(aes(color = type), linewidth = 1) +
-  geom_hline(yintercept = data[100], linetype = "dashed", color = "red", alpha = 0.5) +
+  geom_hline(
+    yintercept = data[100], linetype = "dashed", color = "red", alpha = 0.5
+  ) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "Constant Model: Random Walk Forecast", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "Constant Model: Random Walk Forecast", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -255,7 +260,9 @@ data <- c(
 marginal <- fit_baseline(data, MarginalModel())
 kde <- fit_baseline(data, KDEModel())
 
-fc_marginal <- forecast(marginal, interval_method = NoInterval(), horizon = 1:100)
+fc_marginal <- forecast(
+  marginal, interval_method = NoInterval(), horizon = 1:100
+)
 fc_kde <- forecast(kde, interval_method = NoInterval(), horizon = 1:100)
 
 # KDE produces smoother samples
@@ -271,7 +278,10 @@ density_df <- rbind(
 ggplot(density_df, aes(x = x, y = y, color = type)) +
   geom_line(linewidth = 1.5) +
   scale_color_manual(values = c("Marginal" = "red", "KDE" = "blue")) +
-  labs(title = "Marginal vs KDE", x = "Forecast Value", y = "Density", color = NULL) +
+  labs(
+    title = "Marginal vs KDE", x = "Forecast Value", y = "Density",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "topright")
 ```
@@ -345,7 +355,10 @@ plot_df <- rbind(
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "LSD Model: Seasonal Forecast", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "LSD Model: Seasonal Forecast", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -413,7 +426,9 @@ linear <- fit_baseline(data, OLSModel(degree = 1))
 quadratic <- fit_baseline(data, OLSModel(degree = 2))
 
 fc_linear <- forecast(linear, interval_method = NoInterval(), horizon = 1:10)
-fc_quadratic <- forecast(quadratic, interval_method = NoInterval(), horizon = 1:10)
+fc_quadratic <- forecast(
+  quadratic, interval_method = NoInterval(), horizon = 1:10
+)
 
 # Plot
 n_data <- length(data)
@@ -425,9 +440,16 @@ plot_df <- rbind(
 
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(aes(linewidth = type)) +
-  scale_linewidth_manual(values = c("Data" = 0.5, "Linear" = 1, "Quadratic" = 1)) +
-  scale_color_manual(values = c("Data" = "black", "Linear" = "blue", "Quadratic" = "red")) +
-  labs(title = "OLS: Linear vs Quadratic Trend", x = "Time", y = "Value", color = NULL, linewidth = NULL) +
+  scale_linewidth_manual(
+    values = c("Data" = 0.5, "Linear" = 1, "Quadratic" = 1)
+  ) +
+  scale_color_manual(
+    values = c("Data" = "black", "Linear" = "blue", "Quadratic" = "red")
+  ) +
+  labs(
+    title = "OLS: Linear vs Quadratic Trend", x = "Time", y = "Value",
+    color = NULL, linewidth = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -518,7 +540,10 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   geom_vline(xintercept = c(30, 50), linetype = "dashed", alpha = 0.5) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "IDS Model: Trend Detection", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "IDS Model: Trend Detection", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -594,7 +619,10 @@ plot_df <- rbind(
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "STL Model: Trend + Seasonality", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "STL Model: Trend + Seasonality", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -879,7 +907,9 @@ model_auto <- ETSModel()
 fitted_auto <- fit_baseline(data, model_auto)
 
 # Specific: Multiplicative error, additive trend, multiplicative season
-model_specific <- ETSModel(error_type = "M", trend_type = "A", season_type = "M", s = 12)
+model_specific <- ETSModel(
+  error_type = "M", trend_type = "A", season_type = "M", s = 12
+)
 fitted_specific <- fit_baseline(data, model_specific)
 
 # Forecast
@@ -898,7 +928,10 @@ plot_df <- rbind(
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "ETS Model: Complex Seasonality", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "ETS Model: Complex Seasonality", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```

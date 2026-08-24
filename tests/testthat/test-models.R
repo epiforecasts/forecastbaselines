@@ -255,14 +255,18 @@ test_that("ETSModel creates Holt's linear trend (A,A,N)", {
 test_that("ETSModel creates Holt-Winters additive (A,A,A)", {
   skip_if_no_julia()
 
-  model <- ETSModel(error_type = "A", trend_type = "A", season_type = "A", s = 12)
+  model <- ETSModel(
+    error_type = "A", trend_type = "A", season_type = "A", s = 12
+  )
   expect_true(!is.null(model))
 })
 
 test_that("ETSModel creates Holt-Winters multiplicative (M,M,M)", {
   skip_if_no_julia()
 
-  model <- ETSModel(error_type = "M", trend_type = "M", season_type = "M", s = 12)
+  model <- ETSModel(
+    error_type = "M", trend_type = "M", season_type = "M", s = 12
+  )
   expect_true(!is.null(model))
 })
 
