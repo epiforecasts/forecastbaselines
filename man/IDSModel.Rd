@@ -4,11 +4,9 @@
 \alias{IDSModel}
 \title{IDS Model}
 \usage{
-IDSModel(threshold = 0, window_size = 3L)
+IDSModel(window_size = 3L)
 }
 \arguments{
-\item{threshold}{Threshold for trend detection (default: 0.0)}
-
 \item{window_size}{Window size for trend calculation (default: 3)}
 }
 \value{
@@ -20,6 +18,6 @@ Creates an Increase-Decrease-Stable model for trend detection.
 \examples{
 \dontrun{
 model <- IDSModel()
-model <- IDSModel(threshold = 0.1, window_size = 5)
+model <- IDSModel(window_size = 5)
 }
 }

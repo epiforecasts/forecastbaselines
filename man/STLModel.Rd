@@ -4,14 +4,10 @@
 \alias{STLModel}
 \title{STL Model}
 \usage{
-STLModel(s, trend = TRUE, robust = FALSE)
+STLModel(s)
 }
 \arguments{
 \item{s}{Seasonal period}
-
-\item{trend}{Whether to include trend component (default: TRUE)}
-
-\item{robust}{Whether to use robust fitting (default: FALSE)}
 }
 \value{
 An STLModel object
@@ -19,12 +15,13 @@ An STLModel object
 \description{
 Creates a Seasonal-Trend decomposition using Loess model.
 }
+\details{
+The decomposition always includes a trend component and the loess
+smoothing settings are fixed, so the seasonal period is the only argument.
+}
 \examples{
 \dontrun{
 # Monthly seasonality
 model <- STLModel(s = 12)
-
-# Robust STL
-model <- STLModel(s = 12, robust = TRUE)
 }
 }

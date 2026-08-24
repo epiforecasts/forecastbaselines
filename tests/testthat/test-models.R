@@ -34,11 +34,8 @@ test_that("KDEModel creates valid model with defaults", {
   expect_true(!is.null(model))
 })
 
-test_that("KDEModel creates valid model with bandwidth", {
-  skip_if_no_julia()
-
-  model <- KDEModel(bandwidth = 0.5)
-  expect_true(!is.null(model))
+test_that("KDEModel takes no arguments", {
+  expect_error(KDEModel(bandwidth = 0.5), "unused argument")
 })
 
 # LSDModel Tests --------------------------------------------------------
@@ -57,11 +54,8 @@ test_that("LSDModel creates valid model with window_width", {
   expect_true(!is.null(model))
 })
 
-test_that("LSDModel creates valid model with trend_correction", {
-  skip_if_no_julia()
-
-  model <- LSDModel(s = 7, trend_correction = TRUE)
-  expect_true(!is.null(model))
+test_that("LSDModel rejects unsupported trend_correction", {
+  expect_error(LSDModel(s = 7, trend_correction = TRUE), "unused argument")
 })
 
 # OLSModel Tests --------------------------------------------------------
@@ -97,11 +91,15 @@ test_that("IDSModel creates valid model with defaults", {
   expect_true(!is.null(model))
 })
 
-test_that("IDSModel creates valid model with custom parameters", {
+test_that("IDSModel creates valid model with custom window size", {
   skip_if_no_julia()
 
-  model <- IDSModel(threshold = 0.1, window_size = 5)
+  model <- IDSModel(window_size = 5)
   expect_true(!is.null(model))
+})
+
+test_that("IDSModel rejects unsupported threshold", {
+  expect_error(IDSModel(threshold = 0.1), "unused argument")
 })
 
 # STLModel Tests --------------------------------------------------------
@@ -113,18 +111,9 @@ test_that("STLModel creates valid model with seasonal period", {
   expect_true(!is.null(model))
 })
 
-test_that("STLModel creates valid model with trend", {
-  skip_if_no_julia()
-
-  model <- STLModel(s = 12, trend = TRUE)
-  expect_true(!is.null(model))
-})
-
-test_that("STLModel creates valid model with robust option", {
-  skip_if_no_julia()
-
-  model <- STLModel(s = 12, robust = TRUE)
-  expect_true(!is.null(model))
+test_that("STLModel rejects unsupported trend and robust options", {
+  expect_error(STLModel(s = 12, trend = TRUE), "unused argument")
+  expect_error(STLModel(s = 12, robust = TRUE), "unused argument")
 })
 
 # ARMAModel Tests -------------------------------------------------------
@@ -157,11 +146,43 @@ test_that("ARMAModel creates model with seasonality", {
   expect_true(!is.null(model))
 })
 
-test_that("ARMAModel creates model with mean and drift", {
+test_that("ARMAModel creates model with drift", {
   skip_if_no_julia()
 
-  model <- ARMAModel(p = 1, include_mean = TRUE, include_drift = TRUE)
+  model <- ARMAModel(p = 1, include_drift = TRUE)
   expect_true(!is.null(model))
+})
+
+test_that("ARMAModel drift reaches the Julia model", {
+  skip_if_no_julia()
+
+  # A drift term adds one parameter to the mean function; were it dropped,
+  # the two models would be identical.
+  expect_equal(mean_dim(ARMAModel(p = 1)), 1L)
+  expect_equal(mean_dim(ARMAModel(p = 1, include_drift = TRUE)), 2L)
+})
+
+test_that("ARMAModel harmonics reach the Julia model", {
+  skip_if_no_julia()
+
+  # Intercept plus 2k harmonic coefficients, plus one more for the drift.
+  expect_equal(mean_dim(ARMAModel(p = 1, s = 52)), 3L)
+  expect_equal(mean_dim(ARMAModel(p = 1, s = 52, k = 4)), 9L)
+  expect_equal(
+    mean_dim(ARMAModel(p = 1, s = 52, k = 4, include_drift = TRUE)), 10L
+  )
+})
+
+test_that("ARMAModel rejects unsupported include_mean", {
+  expect_error(ARMAModel(p = 1, include_mean = FALSE), "unused argument")
+})
+
+test_that("ARMAModel rejects harmonics without a seasonal period", {
+  expect_error(ARMAModel(p = 1, k = 4), "require a seasonal period")
+})
+
+test_that("ARMAModel rejects a non-logical include_drift", {
+  expect_error(ARMAModel(p = 1, include_drift = "yes"), "TRUE or FALSE")
 })
 
 # INARCHModel Tests -----------------------------------------------------
@@ -178,6 +199,23 @@ test_that("INARCHModel creates valid model with higher order", {
 
   model <- INARCHModel(p = 2)
   expect_true(!is.null(model))
+})
+
+test_that("INARCHModel passes seasonality and negative binomial through", {
+  skip_if_no_julia()
+
+  model <- INARCHModel(p = 1, s = 52, k = 4, nb = TRUE)
+  expect_equal(as.integer(model$s), 52L)
+  expect_equal(as.integer(model$k), 4L)
+  expect_true(as.logical(model$nb))
+})
+
+test_that("INARCHModel rejects harmonics without a seasonal period", {
+  expect_error(INARCHModel(p = 1, k = 4), "require a seasonal period")
+})
+
+test_that("INARCHModel rejects a non-logical nb", {
+  expect_error(INARCHModel(p = 1, nb = 1), "TRUE or FALSE")
 })
 
 # ETSModel Tests --------------------------------------------------------
@@ -234,6 +272,13 @@ test_that("ETSModel validates season_type", {
   expect_error(
     ETSModel(error_type = "A", trend_type = "N", season_type = "X"),
     "season_type must be one of"
+  )
+})
+
+test_that("ETSModel rejects unsupported damped argument", {
+  expect_error(
+    ETSModel(error_type = "A", trend_type = "A", damped = TRUE),
+    "unused argument"
   )
 })
 

@@ -123,3 +123,37 @@ function interval_result_to_r(res)
         trajectories = res[4],
     )
 end
+
+"""
+Construct an `ARMAModel` with `k` seasonal harmonic waves and an optional
+linear trend.
+
+The keyword constructor in ForecastBaselines.jl hardcodes a single harmonic
+pair, so this builds the mean function directly and passes it to the inner
+constructor:
+
+    μ(θ, t) = θ[1] + ∑_{j=1}^k [θ[2j] sin(2πjt/s) + θ[2j+1] cos(2πjt/s)]
+              (+ θ[2k+2] t if trend)
+
+With `k = 1` this reproduces the keyword constructor exactly.
+"""
+function arma_model(p::Int, q::Int, s::Int, k::Int, trend::Bool)
+    if s <= 0 || k <= 0
+        μ = trend ? (θ, t) -> θ[1] + θ[2] * t : (θ, t) -> θ[1]
+        return ForecastBaselines.ARMAModel(p, q, μ, trend ? 2 : 1)
+    end
+
+    μDim = 1 + 2 * k + (trend ? 1 : 0)
+    μ = function (θ, t)
+        m = θ[1]
+        for j in 1:k
+            ω = 2 * π * j * t / s
+            m += θ[2 * j] * sin(ω) + θ[2 * j + 1] * cos(ω)
+        end
+        if trend
+            m += θ[2 * k + 2] * t
+        end
+        return m
+    end
+    return ForecastBaselines.ARMAModel(p, q, μ, μDim)
+end

@@ -41,7 +41,7 @@ plot(data, type = "l", main = "Seasonal Time Series",
 cat("\n=== Method 1: STL Model ===\n\n")
 
 # Create and fit STL model
-model_stl <- STLModel(s = months_per_year, robust = TRUE)
+model_stl <- STLModel(s = months_per_year)
 fitted_stl <- fit_baseline(data, model_stl)
 
 # Forecast next 12 months

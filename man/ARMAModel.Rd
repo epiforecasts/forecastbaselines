@@ -4,7 +4,7 @@
 \alias{ARMAModel}
 \title{ARMA Model}
 \usage{
-ARMAModel(p = 0L, q = 0L, s = 0L, include_mean = TRUE, include_drift = FALSE)
+ARMAModel(p = 0L, q = 0L, s = 0L, k = 1L, include_drift = FALSE)
 }
 \arguments{
 \item{p}{AR order (default: 0)}
@@ -13,15 +13,24 @@ ARMAModel(p = 0L, q = 0L, s = 0L, include_mean = TRUE, include_drift = FALSE)
 
 \item{s}{Seasonal period (default: 0 for no seasonality)}
 
-\item{include_mean}{Whether to include a mean term (default: TRUE)}
+\item{k}{Number of harmonic waves used to represent seasonality
+(default: 1). Higher values allow sharper, asymmetric seasonal shapes.
+Only meaningful when `s > 0`.}
 
-\item{include_drift}{Whether to include a drift term (default: FALSE)}
+\item{include_drift}{Whether to include a linear trend in the mean
+(default: FALSE)}
 }
 \value{
 An ARMAModel object
 }
 \description{
-Creates an AutoRegressive Moving Average model.
+Creates an AutoRegressive Moving Average model. The series is modelled
+around a deterministic mean
+\deqn{\mu_t = \theta_1 +
+  \sum_{j=1}^k [\theta_{2j} \sin(2\pi j t / s) +
+                \theta_{2j+1} \cos(2\pi j t / s)] + \theta_{2k+2} t}
+where the harmonic terms are present when `s > 0` and the linear term when
+`include_drift = TRUE`. An intercept is always estimated.
 }
 \examples{
 \dontrun{
@@ -33,5 +42,8 @@ model <- ARMAModel(q = 1)
 
 # ARMA(2,1) with seasonality
 model <- ARMAModel(p = 2, q = 1, s = 12)
+
+# Annual seasonality with sharper peaks, plus a linear trend
+model <- ARMAModel(p = 1, s = 52, k = 4, include_drift = TRUE)
 }
 }

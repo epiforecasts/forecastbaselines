@@ -316,7 +316,7 @@ When to Use:
 
 Parameters:
 
-- `window`: Number of similar periods to average (default: 1)
+- `window_width`: Number of similar periods to average (default: 1)
 - `s`: Seasonal period (e.g., 12 for monthly, 7 for daily)
 
 Example:
@@ -358,7 +358,7 @@ Parameter Guidance:
   - 24 for hourly data with daily patterns
   - 52 for weekly data with yearly patterns
 
-- `window` (averaging window):
+- `window_width` (averaging window):
   - 1: Use only last similar period (more responsive)
   - 3-5: Smooth average (more stable)
   - Large: Very smooth but less adaptive
@@ -488,7 +488,6 @@ When to Use:
 Parameters:
 
 - `window_size`: Number of windows to analyze (default: 3)
-- `threshold`: Threshold for detecting changes (default: 0.0)
 
 Example:
 
@@ -650,6 +649,9 @@ Parameters:
 
 - `p`: Autoregressive order
 - `q`: Moving average order
+- `s`: Seasonal period (0 for no seasonality)
+- `k`: Number of harmonic waves representing seasonality (default: 1)
+- `include_drift`: Add a linear trend to the mean (default: FALSE)
 
 Example:
 
@@ -760,7 +762,10 @@ When to Use:
 Parameters:
 
 - `p`: Order of lags
-- `s`: Seasonal period (optional)
+- `s`: Seasonal period (0 for no seasonality)
+- `k`: Number of harmonic waves representing seasonality (default: 1)
+- `nb`: Use a negative binomial instead of a Poisson distribution
+  (default: FALSE)
 
 Example:
 
@@ -797,6 +802,13 @@ Parameter Guidance:
 - `s` (seasonality):
   - Omit if no seasonality
   - Set to period if seasonal counts
+
+- `k` (harmonic waves):
+  - 1: Smooth, symmetric seasonal wave
+  - 2-4: Sharper, asymmetric seasonal peaks
+
+- `nb` (negative binomial):
+  - Set to `TRUE` when counts are overdispersed relative to a Poisson
 
 Strengths:
 

@@ -38,3 +38,10 @@ tryCatch(
 skip_if_no_julia <- function() {
   testthat::skip_if_not(is_setup(), "Julia/ForecastBaselines not available")
 }
+
+# Number of mean-function parameters of a Julia ARMAModel. The field is named
+# "\u03bcDim" (muDim) in Julia; it is written as an escape to keep this file
+# ASCII.
+mean_dim <- function(model) {
+  as.integer(model[["\u03bcDim"]])
+}

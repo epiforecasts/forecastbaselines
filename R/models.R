@@ -46,8 +46,8 @@ MarginalModel <- function(p = NULL) {
 #'
 #' Creates a kernel density estimation model for non-parametric forecasting.
 #'
-#' @param bandwidth Bandwidth for KDE (default: NULL for automatic selection)
-#' @param kernel Kernel function to use (default: "gaussian")
+#' The kernel is Gaussian and its bandwidth is selected automatically during
+#' estimation, so the model itself has no arguments.
 #'
 #' @return A KDEModel object
 #' @export
@@ -55,11 +55,9 @@ MarginalModel <- function(p = NULL) {
 #' @examples
 #' \dontrun{
 #' model <- KDEModel()
-#' model <- KDEModel(bandwidth = 0.5)
 #' }
-KDEModel <- function(bandwidth = NULL, kernel = "gaussian") {
+KDEModel <- function() {
   check_setup()
-  # KDEModel in Julia doesn't take parameters, ignoring bandwidth for now
   juliaready::eval_julia("ForecastBaselines.KDEModel()")
 }
 
@@ -71,8 +69,6 @@ KDEModel <- function(bandwidth = NULL, kernel = "gaussian") {
 #' @param s Seasonal period (e.g., 7 for weekly, 12 for monthly)
 #' @param window_width Width of the window for averaging similar dates
 #'   (default: 1)
-#' @param trend_correction Whether to apply trend correction
-#'   (default: FALSE)
 #'
 #' @return An LSDModel object
 #' @export
@@ -85,9 +81,8 @@ KDEModel <- function(bandwidth = NULL, kernel = "gaussian") {
 #' # Monthly seasonality with window
 #' model <- LSDModel(s = 12, window_width = 2)
 #' }
-LSDModel <- function(s, window_width = 1L, trend_correction = FALSE) {
+LSDModel <- function(s, window_width = 1L) {
   check_setup()
-  # Julia API uses 's' and 'w' parameters, trend_correction not supported
   juliaready::assign_julia("s_val", as.integer(s))
   juliaready::assign_julia("w_val", as.integer(window_width))
   juliaready::eval_julia("ForecastBaselines.LSDModel(s=s_val, w=w_val)")
@@ -123,7 +118,6 @@ OLSModel <- function(degree = 1L, differencing = 0L) {
 #'
 #' Creates an Increase-Decrease-Stable model for trend detection.
 #'
-#' @param threshold Threshold for trend detection (default: 0.0)
 #' @param window_size Window size for trend calculation (default: 3)
 #'
 #' @return An IDSModel object
@@ -132,11 +126,10 @@ OLSModel <- function(degree = 1L, differencing = 0L) {
 #' @examples
 #' \dontrun{
 #' model <- IDSModel()
-#' model <- IDSModel(threshold = 0.1, window_size = 5)
+#' model <- IDSModel(window_size = 5)
 #' }
-IDSModel <- function(threshold = 0.0, window_size = 3L) {
+IDSModel <- function(window_size = 3L) {
   check_setup()
-  # Julia API only takes 'p' parameter
   juliaready::assign_julia("p_val", as.integer(window_size))
   juliaready::eval_julia("ForecastBaselines.IDSModel(p=p_val)")
 }
@@ -145,9 +138,10 @@ IDSModel <- function(threshold = 0.0, window_size = 3L) {
 #'
 #' Creates a Seasonal-Trend decomposition using Loess model.
 #'
+#' The decomposition always includes a trend component and the loess
+#' smoothing settings are fixed, so the seasonal period is the only argument.
+#'
 #' @param s Seasonal period
-#' @param trend Whether to include trend component (default: TRUE)
-#' @param robust Whether to use robust fitting (default: FALSE)
 #'
 #' @return An STLModel object
 #' @export
@@ -156,26 +150,31 @@ IDSModel <- function(threshold = 0.0, window_size = 3L) {
 #' \dontrun{
 #' # Monthly seasonality
 #' model <- STLModel(s = 12)
-#'
-#' # Robust STL
-#' model <- STLModel(s = 12, robust = TRUE)
 #' }
-STLModel <- function(s, trend = TRUE, robust = FALSE) {
+STLModel <- function(s) {
   check_setup()
-  # Julia API only takes 's' parameter, trend and robust not supported
   juliaready::assign_julia("s_val", as.integer(s))
   juliaready::eval_julia("ForecastBaselines.STLModel(s=s_val)")
 }
 
 #' ARMA Model
 #'
-#' Creates an AutoRegressive Moving Average model.
+#' Creates an AutoRegressive Moving Average model. The series is modelled
+#' around a deterministic mean
+#' \deqn{\mu_t = \theta_1 +
+#'   \sum_{j=1}^k [\theta_{2j} \sin(2\pi j t / s) +
+#'                 \theta_{2j+1} \cos(2\pi j t / s)] + \theta_{2k+2} t}
+#' where the harmonic terms are present when `s > 0` and the linear term when
+#' `include_drift = TRUE`. An intercept is always estimated.
 #'
 #' @param p AR order (default: 0)
 #' @param q MA order (default: 0)
 #' @param s Seasonal period (default: 0 for no seasonality)
-#' @param include_mean Whether to include a mean term (default: TRUE)
-#' @param include_drift Whether to include a drift term (default: FALSE)
+#' @param k Number of harmonic waves used to represent seasonality
+#'   (default: 1). Higher values allow sharper, asymmetric seasonal shapes.
+#'   Only meaningful when `s > 0`.
+#' @param include_drift Whether to include a linear trend in the mean
+#'   (default: FALSE)
 #'
 #' @return An ARMAModel object
 #' @export
@@ -190,29 +189,40 @@ STLModel <- function(s, trend = TRUE, robust = FALSE) {
 #'
 #' # ARMA(2,1) with seasonality
 #' model <- ARMAModel(p = 2, q = 1, s = 12)
+#'
+#' # Annual seasonality with sharper peaks, plus a linear trend
+#' model <- ARMAModel(p = 1, s = 52, k = 4, include_drift = TRUE)
 #' }
-ARMAModel <- function(p = 0L, q = 0L, s = 0L,
-                      include_mean = TRUE, include_drift = FALSE) {
+ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
+                      include_drift = FALSE) {
+  check_harmonics(s, k)
+  trend <- julia_bool(include_drift)
   check_setup()
 
-  # Use keyword argument syntax for Julia
   juliaready::assign_julia("p_val", as.integer(p))
   juliaready::assign_julia("q_val", as.integer(q))
   juliaready::assign_julia("s_val", as.integer(s))
+  juliaready::assign_julia("k_val", as.integer(k))
 
-  # For now, use simple keyword argument approach
-  # Note: include_mean and include_drift may not be directly supported
-  # They may need to be handled differently in Julia API
-  juliaready::eval_julia(
-    "ForecastBaselines.ARMAModel(p=p_val, q=q_val, s=s_val)"
-  )
+  # arma_model() is defined in inst/julia/forecast_helpers.jl; it builds the
+  # mean function for arbitrary k on top of the ARMAModel inner constructor.
+  juliaready::eval_julia(sprintf(
+    "arma_model(p_val, q_val, s_val, k_val, %s)", trend
+  ))
 }
 
 #' INARCH Model
 #'
-#' Creates an Integer-valued ARCH model for count time series.
+#' Creates an Integer-valued ARCH model for count time series. Seasonality
+#' enters the conditional mean through `k` harmonic waves of period `s`, and
+#' counts follow a Poisson distribution unless `nb = TRUE`.
 #'
-#' @param p Order of the INARCH model
+#' @param p Order of the INARCH model (default: 1)
+#' @param s Seasonal period (default: 0 for no seasonality)
+#' @param k Number of harmonic waves used to represent seasonality
+#'   (default: 1). Only meaningful when `s > 0`.
+#' @param nb Whether to use a negative binomial conditional distribution
+#'   instead of Poisson, allowing for overdispersion (default: FALSE)
 #'
 #' @return An INARCHModel object
 #' @export
@@ -220,11 +230,21 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L,
 #' @examples
 #' \dontrun{
 #' model <- INARCHModel(p = 1)
+#'
+#' # Overdispersed counts with weekly data and annual seasonality
+#' model <- INARCHModel(p = 1, s = 52, k = 4, nb = TRUE)
 #' }
-INARCHModel <- function(p = 1L) {
+INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
+  check_harmonics(s, k)
+  negbin <- julia_bool(nb)
   check_setup()
+
   juliaready::assign_julia("p_val", as.integer(p))
-  juliaready::eval_julia("ForecastBaselines.INARCHModel(p=p_val)")
+  juliaready::assign_julia("s_val", as.integer(s))
+  juliaready::assign_julia("k_val", as.integer(k))
+  juliaready::eval_julia(sprintf(
+    "ForecastBaselines.INARCHModel(p=p_val, s=s_val, k=k_val, nb=%s)", negbin
+  ))
 }
 
 #' ETS Model
@@ -234,11 +254,11 @@ INARCHModel <- function(p = 1L) {
 #' @param error_type Error type: "A" (additive), "M" (multiplicative), or
 #'   "N" (none)
 #' @param trend_type Trend type: "A" (additive), "M" (multiplicative), "Ad"
-#'   (damped additive), "Md" (damped multiplicative), or "N" (none)
+#'   (damped additive), "Md" (damped multiplicative), or "N" (none). Damping
+#'   is requested through "Ad" or "Md".
 #' @param season_type Season type: "A" (additive), "M" (multiplicative), or
 #'   "N" (none)
 #' @param s Seasonal period (required if season_type is not "N")
-#' @param damped Whether to use damped trend (default: FALSE)
 #'
 #' @return An ETSModel object
 #' @export
@@ -262,7 +282,7 @@ INARCHModel <- function(p = 1L) {
 #' )
 #' }
 ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
-                     s = NULL, damped = FALSE) {
+                     s = NULL) {
   check_setup()
 
   # Validate inputs
@@ -313,4 +333,26 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
   }
 
   juliaready::eval_julia(julia_code)
+}
+
+
+# Internal: harmonic seasonality only has meaning alongside a seasonal period.
+check_harmonics <- function(s, k) {
+  if (as.integer(k) > 1L && as.integer(s) == 0L) {
+    stop(
+      "'k' harmonic waves require a seasonal period: set 's' to a positive ",
+      "value, or leave 'k' at 1.",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
+# Internal: render an R logical as a Julia boolean literal, rejecting values
+# that cannot be honoured rather than silently treating them as FALSE.
+julia_bool <- function(x, arg = deparse(substitute(x))) {
+  if (!is.logical(x) || length(x) != 1L || is.na(x)) {
+    stop("'", arg, "' must be either TRUE or FALSE", call. = FALSE)
+  }
+  if (x) "true" else "false"
 }

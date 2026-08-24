@@ -4,16 +4,13 @@
 \alias{LSDModel}
 \title{Last Similar Dates (LSD) Model}
 \usage{
-LSDModel(s, window_width = 1L, trend_correction = FALSE)
+LSDModel(s, window_width = 1L)
 }
 \arguments{
 \item{s}{Seasonal period (e.g., 7 for weekly, 12 for monthly)}
 
 \item{window_width}{Width of the window for averaging similar dates
 (default: 1)}
-
-\item{trend_correction}{Whether to apply trend correction
-(default: FALSE)}
 }
 \value{
 An LSDModel object
