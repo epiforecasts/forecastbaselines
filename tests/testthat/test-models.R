@@ -181,6 +181,12 @@ test_that("ARMAModel rejects harmonics without a seasonal period", {
   expect_error(ARMAModel(p = 1, k = 4), "require a seasonal period")
 })
 
+test_that("ARMAModel rejects a negative seasonal period", {
+  # A negative period would reach Julia as a non-seasonal model, silently
+  # dropping both the period and the harmonics.
+  expect_error(ARMAModel(p = 1, s = -12, k = 3), "non-negative seasonal period")
+})
+
 test_that("ARMAModel rejects fewer than one harmonic wave", {
   # k = 0 would otherwise drop the seasonal period on the Julia side.
   expect_error(ARMAModel(p = 1, s = 12, k = 0), "at least 1 harmonic wave")
