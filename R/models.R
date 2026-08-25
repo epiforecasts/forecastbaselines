@@ -381,7 +381,7 @@ julia_bool <- function(x, arg = deparse(substitute(x))) {
 
 # Internal: reject anything that is not one of the labels a component accepts.
 # Checking the shape as well as the value keeps NULL and other empty values
-# from reaching `%in%`, which would fail with a length-zero condition.
+# from reaching `if`, which errors on the length-zero condition they produce.
 check_component <- function(value, valid, arg) {
   if (!is.character(value) || length(value) != 1L || !value %in% valid) {
     stop(
