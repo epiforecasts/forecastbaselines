@@ -176,17 +176,14 @@ STLModel <- function(s) {
 #' @param s Seasonal period (default: 0 for no seasonality)
 #' @param k Number of harmonic waves used to represent seasonality
 #'   (default: 1). Higher values allow sharper, asymmetric seasonal shapes.
-#'   Only meaningful when `s > 0`. Estimation in ForecastBaselines.jl runs a
-#'   derivative-free search whose mean parameters start at zero, and it
-#'   stops at a default limit of 1000 iterations. A single wave converges
-#'   inside that limit on small-count series; beyond that, two things spoil
-#'   the result: a series sitting far from zero leaves the intercept short of
-#'   its target, and a mean function carrying many parameters leaves the
-#'   seasonal shape poorly resolved whatever the scale. On counts around 5
-#'   two waves are recovered accurately; at a mean of 100 two waves already
-#'   come back with the intercept near zero; three waves are unreliable at
-#'   either scale. Compare the fitted mean with the data before trusting a
-#'   seasonal fit.
+#'   Only meaningful when `s > 0`. The mean parameters are estimated by a
+#'   derivative-free search started from zero, which can settle on a solution
+#'   far from the data; the risk grows with the number of waves and with the
+#'   distance of the series from zero. On counts around 5 two waves are
+#'   recovered accurately, while at a mean of 100 two waves already come back
+#'   with the intercept near zero, and three waves are unreliable at either
+#'   scale. Compare the fitted mean with the data before trusting a seasonal
+#'   fit.
 #' @param include_drift Whether to include a linear trend in the mean
 #'   (default: FALSE)
 #'

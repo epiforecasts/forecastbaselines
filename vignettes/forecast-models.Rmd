@@ -680,12 +680,11 @@ Parameters:
 - `q`: Moving average order
 - `s`: Seasonal period (0 for no seasonality)
 - `k`: Number of harmonic waves representing seasonality (default: 1).
-  Estimation starts its mean parameters at zero and stops at 1000 iterations.
-  One wave converges inside that limit on small-count series; past that, a
-  series far from zero leaves the intercept short, and many parameters leave
-  the seasonal shape poorly resolved at any scale. Two waves are accurate on counts around 5 but not at
-  a mean of 100, and three waves are unreliable either way. Compare the fitted
-  mean with the data
+  Estimation starts its mean parameters at zero and can settle on a solution
+  far from the data; the risk grows with the number of waves and with the
+  distance of the series from zero. Two waves are accurate on counts around 5
+  but not at a mean of 100, and three waves are unreliable either way. Compare
+  the fitted mean with the data
 - `include_drift`: Add a linear trend to the mean (default: FALSE)
 
 Example:
