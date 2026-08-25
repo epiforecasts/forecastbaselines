@@ -179,21 +179,11 @@ This is normal! Julia uses Just-In-Time (JIT) compilation, so the first run of e
 
 ### Problem: Package conflicts
 
-If you have conflicts with other Julia packages, create a new Julia environment:
-
-In Julia:
-```julia
-using Pkg
-Pkg.activate("forecastenv")
-Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
-```
-
-Then in R:
-```r
-# Point to the custom environment
-Sys.setenv(JULIA_PROJECT = "~/forecastenv")
-setup_ForecastBaselines()
-```
+Julia packages you have installed elsewhere cannot conflict with this one.
+`setup_ForecastBaselines()` activates the pinned Julia project the package
+ships in `inst/julia`, which holds ForecastBaselines.jl and its dependencies
+at fixed versions and nothing else. Setting `JULIA_PROJECT` beforehand has no
+effect: setup overwrites it when it activates that project.
 
 ## Testing Installation
 
