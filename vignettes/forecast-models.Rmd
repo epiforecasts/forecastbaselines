@@ -914,9 +914,11 @@ data <- trend * seasonal_mult * exp(rnorm(72, sd = 0.05))
 model_auto <- ETSModel()
 fitted_auto <- fit_baseline(data, model_auto)
 
-# Specific: multiplicative error, additive trend, multiplicative season
+# Specific: additive error, additive trend, multiplicative season. A
+# multiplicative error (error_type = "M") is available too, and fits this
+# series less well.
 model_specific <- ETSModel(
-  error_type = "M", trend_type = "A", season_type = "M", s = 12
+  error_type = "A", trend_type = "A", season_type = "M", s = 12
 )
 fitted_specific <- fit_baseline(data, model_specific)
 
