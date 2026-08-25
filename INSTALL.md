@@ -48,33 +48,30 @@ Download and install RStudio from [posit.co](https://posit.co/downloads/).
 
 ## Installing forecastbaselines
 
-### Step 1: Install JuliaCall
+### Step 1: Install remotes
 
-Open R or RStudio and run:
+The package talks to Julia through juliaready, which lives on GitHub, so
+installation needs remotes. Open R or RStudio and run:
 
 ```r
-install.packages("JuliaCall")
+install.packages("remotes")
 ```
 
 ### Step 2: Install forecastbaselines
 
-#### Option A: Install from local directory
+#### Option A: Install from GitHub
 
 ```r
-# Install devtools if not already installed
-if (!require("devtools")) install.packages("devtools")
+remotes::install_github("epiforecasts/forecastbaselines")
+```
 
-# Install from local directory
-devtools::install_local("/path/to/forecastbaselines")
+#### Option B: Install from a local copy
+
+```r
+remotes::install_local("/path/to/forecastbaselines")
 ```
 
 Replace `/path/to/forecastbaselines` with the actual path to the package directory.
-
-#### Option B: Install from GitHub (when available)
-
-```r
-devtools::install_github("ManuelStapper/ForecastBaselines.jl", subdir = "forecastbaselines")
-```
 
 ### Step 3: Load and Setup
 
@@ -119,10 +116,12 @@ If you see forecast values printed, installation was successful!
 
 ### Problem: Julia not found
 
-**Solution**: Specify Julia location explicitly:
+**Solution**: Point JuliaConnectoR at the Julia installation before setting
+up, using the `bin` directory that `Sys.BINDIR` reports inside Julia:
 
 ```r
-setup_ForecastBaselines(JULIA_HOME = "/path/to/julia/bin")
+Sys.setenv(JULIA_BINDIR = "/path/to/julia/bin")
+setup_ForecastBaselines()
 ```
 
 On Linux/macOS, find Julia location with:
@@ -137,38 +136,42 @@ C:/Users/YourUsername/AppData/Local/Programs/Julia-1.x.x/bin
 
 ### Problem: ForecastBaselines.jl installation fails
 
-**Solution**: Install manually in Julia, then load in R:
+Setup instantiates the pinned Julia project the package ships, which downloads
+ForecastBaselines.jl and its dependencies into the Julia depot. Adding the
+package by hand in a Julia terminal does not help, because it lands in your
+default environment and setup activates the shipped one.
 
-1. Open Julia terminal
-2. Run:
-```julia
-using Pkg
-Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
-```
+**Solution**: Read what Julia's package manager reports as setup runs; it
+prints to the console. Failures at this point are usually a network problem or
+a depot the current user cannot write to; see the permission-errors section
+below for the latter.
 
-3. Then in R:
+### Problem: Julia errors appear part-way through a modelling call
+
+Loading the package does not start Julia; the first function that needs it
+does. A configuration problem therefore surfaces inside whatever call you
+happened to make first, wrapped in that function's context.
+
+**Solution**: Start Julia on its own, before any modelling, so the error
+arrives with nothing else around it:
+
 ```r
-setup_ForecastBaselines(install_package = FALSE)
-```
-
-### Problem: JuliaCall errors on load
-
-**Solution**: Rebuild Julia system image:
-
-```r
-setup_ForecastBaselines(rebuild = TRUE)
+setup_ForecastBaselines()
 ```
 
 ### Problem: Permission errors on Linux/macOS
 
-**Solution**: Install Julia packages to local directory:
+**Solution**: Point Julia's depot at a directory you can write to. Julia reads
+`JULIA_DEPOT_PATH` when it starts, so set it before setup starts Julia:
 
-In Julia, run:
-```julia
-ENV["JULIA_DEPOT_PATH"] = expanduser("~/.julia")
-using Pkg
-Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
+```r
+Sys.setenv(JULIA_DEPOT_PATH = path.expand("~/julia-depot"))
+setup_ForecastBaselines()
 ```
+
+Choose any writable path; the default depot is `~/.julia`, so naming that one
+changes nothing. Packages already downloaded into the old depot are downloaded
+again into the new one.
 
 ### Problem: Slow first run
 
@@ -176,21 +179,11 @@ This is normal! Julia uses Just-In-Time (JIT) compilation, so the first run of e
 
 ### Problem: Package conflicts
 
-If you have conflicts with other Julia packages, create a new Julia environment:
-
-In Julia:
-```julia
-using Pkg
-Pkg.activate("forecastenv")
-Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
-```
-
-Then in R:
-```r
-# Point to the custom environment
-Sys.setenv(JULIA_PROJECT = "~/forecastenv")
-setup_ForecastBaselines()
-```
+Julia packages you have installed elsewhere cannot conflict with this one.
+`setup_ForecastBaselines()` activates the pinned Julia project the package
+ships in `inst/julia`, which holds ForecastBaselines.jl and its dependencies
+at fixed versions and nothing else. Setting `JULIA_PROJECT` beforehand has no
+effect: setup overwrites it when it activates that project.
 
 ## Testing Installation
 
@@ -209,8 +202,8 @@ source("examples/seasonal_forecasting.R")
 If you encounter issues not covered here:
 
 1. Check the [README](README.md) for usage examples
-2. Open an issue on [GitHub](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
-3. Check the [JuliaCall documentation](https://non-contradiction.github.io/JuliaCall/)
+2. Open an issue on [GitHub](https://github.com/epiforecasts/forecastbaselines/issues)
+3. Check the [JuliaConnectoR documentation](https://github.com/stefan-m-lenz/JuliaConnectoR), which juliaready builds on
 
 ## Next Steps
 

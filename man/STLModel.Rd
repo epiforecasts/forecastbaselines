@@ -4,14 +4,12 @@
 \alias{STLModel}
 \title{STL Model}
 \usage{
-STLModel(s, trend = TRUE, robust = FALSE)
+STLModel(s)
 }
 \arguments{
-\item{s}{Seasonal period}
-
-\item{trend}{Whether to include trend component (default: TRUE)}
-
-\item{robust}{Whether to use robust fitting (default: FALSE)}
+\item{s}{Seasonal period. Fitting needs more than 13 cycles of data, i.e.
+more than `13 * s` observations, because the loess smoothing span that
+ForecastBaselines.jl fixes at 13 cannot be reached with fewer.}
 }
 \value{
 An STLModel object
@@ -19,12 +17,15 @@ An STLModel object
 \description{
 Creates a Seasonal-Trend decomposition using Loess model.
 }
+\details{
+The decomposition always includes a trend component, and the loess
+smoothing settings, robust iterations among them, belong to the estimation
+settings in ForecastBaselines.jl, which `fit_baseline()` does not expose.
+The seasonal period is therefore the only argument.
+}
 \examples{
 \dontrun{
 # Monthly seasonality
 model <- STLModel(s = 12)
-
-# Robust STL
-model <- STLModel(s = 12, robust = TRUE)
 }
 }

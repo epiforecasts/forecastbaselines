@@ -73,8 +73,8 @@ Special cases:
 | LSD | Low | 2+ cycles | Yes | No | Via residuals |
 | OLS | Low | 20+ | No | Yes | Via residuals |
 | IDS | Low | 20+ | No | Yes | Via residuals |
-| STL | Medium | 2+ cycles | Yes | Yes | Via residuals |
-| ARMA | Medium | 50+ | No | No | Parametric |
+| STL | Medium | 14+ cycles | Yes | Yes | Via residuals |
+| ARMA | Medium | 50+ | Yes | Yes | Parametric |
 | INARCH | Medium | 50+ | Yes | No | Parametric |
 | ETS | High | 50+ | Yes | Yes | Parametric |
 
@@ -125,9 +125,14 @@ plot_df <- rbind(
 
 ggplot(plot_df, aes(x = time, y = value)) +
   geom_line(aes(color = type), linewidth = 1) +
-  geom_hline(yintercept = data[100], linetype = "dashed", color = "red", alpha = 0.5) +
+  geom_hline(
+    yintercept = data[100], linetype = "dashed", color = "red", alpha = 0.5
+  ) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "Constant Model: Random Walk Forecast", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "Constant Model: Random Walk Forecast", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -255,7 +260,9 @@ data <- c(
 marginal <- fit_baseline(data, MarginalModel())
 kde <- fit_baseline(data, KDEModel())
 
-fc_marginal <- forecast(marginal, interval_method = NoInterval(), horizon = 1:100)
+fc_marginal <- forecast(
+  marginal, interval_method = NoInterval(), horizon = 1:100
+)
 fc_kde <- forecast(kde, interval_method = NoInterval(), horizon = 1:100)
 
 # KDE produces smoother samples
@@ -271,7 +278,10 @@ density_df <- rbind(
 ggplot(density_df, aes(x = x, y = y, color = type)) +
   geom_line(linewidth = 1.5) +
   scale_color_manual(values = c("Marginal" = "red", "KDE" = "blue")) +
-  labs(title = "Marginal vs KDE", x = "Forecast Value", y = "Density", color = NULL) +
+  labs(
+    title = "Marginal vs KDE", x = "Forecast Value", y = "Density",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "topright")
 ```
@@ -303,7 +313,8 @@ historical periods.
 How It Works:
 
 1. For horizon $h$, look back to periods $t - s + h$, $t - 2s + h$, etc.
-2. Average the `window` most recent similar periods
+2. Average every one of them, along with the `window_width` time points
+   either side of each
 3. Handles irregular seasonality well
 
 When to Use:
@@ -316,7 +327,8 @@ When to Use:
 
 Parameters:
 
-- `window`: Number of similar periods to average (default: 1)
+- `window_width`: Number of neighbouring time points averaged either side of
+  each seasonal position (default: 0; must be smaller than `s`)
 - `s`: Seasonal period (e.g., 12 for monthly, 7 for daily)
 
 Example:
@@ -329,7 +341,8 @@ seasonal_pattern <- 20 + 10 * sin(2 * pi * months / 12)
 data <- seasonal_pattern + rnorm(240, sd = 2)
 
 # Fit LSD model
-model <- LSDModel(window_width = 3, s = 12) # Average last 3 years
+# Average each month with the 3 time points either side
+model <- LSDModel(window_width = 3, s = 12)
 fitted <- fit_baseline(data, model)
 
 # Forecast next year
@@ -345,7 +358,10 @@ plot_df <- rbind(
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "LSD Model: Seasonal Forecast", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "LSD Model: Seasonal Forecast", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -358,10 +374,11 @@ Parameter Guidance:
   - 24 for hourly data with daily patterns
   - 52 for weekly data with yearly patterns
 
-- `window` (averaging window):
-  - 1: Use only last similar period (more responsive)
-  - 3-5: Smooth average (more stable)
-  - Large: Very smooth but less adaptive
+- `window_width` (neighbouring points averaged in):
+  - 0: Each seasonal position on its own, keeping the sharpest profile
+  - 1-2: Mild smoothing across adjacent positions
+  - Larger: Blurs the seasonal profile towards a flat mean, and values of `s`
+    or more are rejected
 
 Strengths:
 
@@ -413,7 +430,9 @@ linear <- fit_baseline(data, OLSModel(degree = 1))
 quadratic <- fit_baseline(data, OLSModel(degree = 2))
 
 fc_linear <- forecast(linear, interval_method = NoInterval(), horizon = 1:10)
-fc_quadratic <- forecast(quadratic, interval_method = NoInterval(), horizon = 1:10)
+fc_quadratic <- forecast(
+  quadratic, interval_method = NoInterval(), horizon = 1:10
+)
 
 # Plot
 n_data <- length(data)
@@ -425,9 +444,16 @@ plot_df <- rbind(
 
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(aes(linewidth = type)) +
-  scale_linewidth_manual(values = c("Data" = 0.5, "Linear" = 1, "Quadratic" = 1)) +
-  scale_color_manual(values = c("Data" = "black", "Linear" = "blue", "Quadratic" = "red")) +
-  labs(title = "OLS: Linear vs Quadratic Trend", x = "Time", y = "Value", color = NULL, linewidth = NULL) +
+  scale_linewidth_manual(
+    values = c("Data" = 0.5, "Linear" = 1, "Quadratic" = 1)
+  ) +
+  scale_color_manual(
+    values = c("Data" = "black", "Linear" = "blue", "Quadratic" = "red")
+  ) +
+  labs(
+    title = "OLS: Linear vs Quadratic Trend", x = "Time", y = "Value",
+    color = NULL, linewidth = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -468,13 +494,14 @@ Tips:
 ## 2.3 IDS Model (Increase-Decrease-Stable)
 
 Description:
-Detects trend direction (increasing, decreasing, stable) over recent
-windows and extrapolates.
+Detects trend direction (increasing, decreasing, stable) across the most
+recent observations and extrapolates.
 
 How It Works:
 
-1. Divide recent history into `p` windows
-2. Classify each window's trend
+1. Take the last `window_size` observations
+2. Classify the signs of their successive differences as increasing,
+   decreasing or stable
 3. Forecast based on detected pattern
 
 When to Use:
@@ -487,8 +514,7 @@ When to Use:
 
 Parameters:
 
-- `window_size`: Number of windows to analyze (default: 3)
-- `threshold`: Threshold for detecting changes (default: 0.0)
+- `window_size`: Number of recent observations to analyse (default: 3)
 
 Example:
 
@@ -502,7 +528,7 @@ data <- c(
 )
 
 # Fit IDS model
-model <- IDSModel(window_size = 3) # Analyze last 3 windows
+model <- IDSModel(window_size = 3) # Analyse the last 3 observations
 fitted <- fit_baseline(data, model)
 
 # Forecast
@@ -519,14 +545,17 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   geom_vline(xintercept = c(30, 50), linetype = "dashed", alpha = 0.5) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "IDS Model: Trend Detection", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "IDS Model: Trend Detection", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
 
 Parameter Guidance:
 
-- `p` (number of windows):
+- `window_size` (observations analysed):
   - 2-3: More reactive to recent changes
   - 4-6: More stable, less reactive
   - Too large: Misses recent trends
@@ -562,7 +591,7 @@ When to Use:
 - ✅ Need decomposition for interpretation
 - ✅ Regular seasonal patterns
 - ❌ Irregular seasonality
-- ❌ Less than 2 seasonal cycles
+- ❌ 13 seasonal cycles or fewer, which the fit rejects
 
 Parameters:
 
@@ -595,7 +624,10 @@ plot_df <- rbind(
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "STL Model: Trend + Seasonality", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "STL Model: Trend + Seasonality", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -614,7 +646,7 @@ Strengths:
 Limitations:
 
 - Fixed seasonal period
-- Needs at least 2 cycles
+- Needs more than 13 cycles
 - More complex than LSD
 
 Use Case:
@@ -643,13 +675,22 @@ When to Use:
 - ✅ Stationary time series
 - ✅ Need parametric uncertainty
 - ✅ Autocorrelation structure
-- ❌ Strong trends (use differencing or detrend first)
-- ❌ Seasonal patterns (use SARIMA or seasonal models)
+- ✅ Smooth seasonality, through `s` and one harmonic wave
+- ❌ Strong trends (use differencing, detrend first, or set `include_drift`)
+- ❌ Sharp or asymmetric seasonal peaks, which need several waves (see `k`)
 
 Parameters:
 
 - `p`: Autoregressive order
 - `q`: Moving average order
+- `s`: Seasonal period (0 for no seasonality)
+- `k`: Number of harmonic waves representing seasonality (default: 1).
+  Estimation starts its mean parameters at zero and can settle on a solution
+  far from the data. The risk grows with the number of waves and with the
+  distance of the series from zero: at a mean of 100 two waves fail,
+  while on low-count series they usually, though not always, succeed. Compare
+  the fitted mean with the data
+- `include_drift`: Add a linear trend to the mean (default: FALSE)
 
 Example:
 
@@ -760,7 +801,10 @@ When to Use:
 Parameters:
 
 - `p`: Order of lags
-- `s`: Seasonal period (optional)
+- `s`: Seasonal period (0 for no seasonality)
+- `k`: Number of harmonic waves representing seasonality (default: 1)
+- `nb`: Use a negative binomial instead of a Poisson distribution
+  (default: FALSE)
 
 Example:
 
@@ -797,6 +841,15 @@ Parameter Guidance:
 - `s` (seasonality):
   - Omit if no seasonality
   - Set to period if seasonal counts
+
+- `k` (harmonic waves):
+  - 1: Smooth, symmetric seasonal wave
+  - Above 1: fitted correctly, but forecasts in ForecastBaselines.jl evaluate
+    every harmonic at the fundamental frequency, so the estimated seasonal
+    shape is not carried into the forecasts
+
+- `nb` (negative binomial):
+  - Set to `TRUE` when counts are overdispersed relative to a Poisson
 
 Strengths:
 
@@ -835,7 +888,6 @@ Components:
 When to Use:
 
 - ✅ Complex seasonal patterns
-- ✅ Need automatic model selection
 - ✅ Business forecasting
 - ✅ Various data characteristics
 - ❌ Very short series (< 2 cycles)
@@ -843,9 +895,10 @@ When to Use:
 
 Parameters:
 
-- `error`: "A" (additive) or "M" (multiplicative) or NULL (auto)
-- `trend`: "N", "A", "M", "Ad", "Md", or NULL (auto)
-- `season`: "N", "A", "M", or NULL (auto)
+- `error_type`: "A" (additive) or "M" (multiplicative)
+- `trend_type`: "N", "A", "M", "Ad" (damped additive) or "Md" (damped
+  multiplicative)
+- `season_type`: "N", "A" or "M"
 - `s`: Seasonal period (if seasonal)
 
 Example:
@@ -858,12 +911,16 @@ trend <- 100 + 2 * time
 seasonal_mult <- 1 + 0.3 * sin(2 * pi * time / 12)
 data <- trend * seasonal_mult * exp(rnorm(72, sd = 0.05))
 
-# Automatic selection
-model_auto <- ETSModel()
-fitted_auto <- fit_baseline(data, model_auto)
+# Defaults: additive error, no trend, no seasonality
+model_default <- ETSModel()
+fitted_default <- fit_baseline(data, model_default)
 
-# Specific: Multiplicative error, additive trend, multiplicative season
-model_specific <- ETSModel(error_type = "M", trend_type = "A", season_type = "M", s = 12)
+# Specific: additive error, additive trend, multiplicative season. A
+# multiplicative error (error_type = "M") is available too; on this series it
+# forecasts less accurately.
+model_specific <- ETSModel(
+  error_type = "A", trend_type = "A", season_type = "M", s = 12
+)
 fitted_specific <- fit_baseline(data, model_specific)
 
 # Forecast
@@ -882,7 +939,10 @@ plot_df <- rbind(
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "ETS Model: Complex Seasonality", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "ETS Model: Complex Seasonality", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -919,7 +979,6 @@ Common Models:
 Strengths:
 
 - Extremely flexible (30 models)
-- Automatic selection available
 - Well-tested in practice
 - Handles many data types
 
@@ -932,7 +991,7 @@ Limitations:
 
 Tips:
 
-- Start with automatic selection (NULL parameters)
+- Start from the (A,N,N) defaults and add components the data calls for
 - Use additive for stable variance
 - Use multiplicative for percentage seasonality
 - Damped trends for long horizons
@@ -1038,7 +1097,7 @@ Fastest → Slowest:
 | LSD | 2*s | 3*s+ |
 | OLS | degree+1 | 30+ |
 | IDS | 10 | 30+ |
-| STL | 2*s | 3*s+ |
+| STL | 13*s + 1 | 15*s+ |
 | ARMA | p+q | 50+ |
 | INARCH | 20 | 50+ |
 | ETS | 2*s (if seasonal) | 50+ |
@@ -1088,6 +1147,6 @@ STLModel(s = 12)
 
 # Advanced
 ARMAModel(p = 1, q = 1)
-INARCHModel(p = 1, s = NULL)
+INARCHModel(p = 1, s = 0)
 ETSModel(error_type = "A", trend_type = "N", season_type = "N", s = NULL)
 ```

@@ -15,8 +15,8 @@ seamless integration with the
 ## Features
 
 - Baseline and benchmark models for forecast evaluation
-- Multiple uncertainty quantification methods (bootstrap, analytical,
-  conformal)
+- Multiple uncertainty quantification methods (empirical, parametric and
+  model-trajectory intervals)
 - Seamless integration with
   [scoringutils](https://epiforecasts.io/scoringutils/) for proper
   scoring rules
@@ -29,7 +29,8 @@ seamless integration with the
 1.  Julia (\>= 1.9): Download from
     [julialang.org](https://julialang.org/downloads/)
 2.  R (\>= 3.5.0)
-3.  JuliaCall R package: `install.packages("JuliaCall")`
+3.  remotes R package, to pull in the juliaready dependency:
+    `install.packages("remotes")`
 
 ### Installing forecastbaselines
 

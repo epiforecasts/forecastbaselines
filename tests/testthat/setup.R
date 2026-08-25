@@ -19,7 +19,9 @@ tryCatch(
     helper_loaded <- FALSE
     for (helper_file in possible_paths) {
       if (file.exists(helper_file) && !helper_loaded) {
-        juliaready::command_julia(sprintf('include("%s")', normalizePath(helper_file)))
+        juliaready::command_julia(
+          sprintf('include("%s")', normalizePath(helper_file))
+        )
         helper_loaded <- TRUE
         break
       }
@@ -30,11 +32,26 @@ tryCatch(
     }
   },
   error = function(e) {
-    message("Could not automatically setup ForecastBaselines for tests: ", e$message)
+    message(
+      "Could not automatically setup ForecastBaselines for tests: ", e$message
+    )
   }
 )
 
 # Skip helper for Julia/ForecastBaselines availability
 skip_if_no_julia <- function() {
   testthat::skip_if_not(is_setup(), "Julia/ForecastBaselines not available")
+}
+
+# Number of mean-function parameters of a Julia ARMAModel. The field is named
+# "\u03bcDim" (muDim) in Julia; it is written as an escape to keep this file
+# ASCII.
+mean_dim <- function(model) {
+  as.integer(model[["\u03bcDim"]])
+}
+
+# Name of the Julia error type a fitted ETS model carries.
+julia_error_type <- function(model) {
+  juliaready::assign_julia("model_tmp", model)
+  juliaready::eval_julia("string(typeof(model_tmp.error))")
 }

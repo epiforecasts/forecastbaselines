@@ -4,27 +4,20 @@
 \alias{ETSModel}
 \title{ETS Model}
 \usage{
-ETSModel(
-  error_type = "A",
-  trend_type = "N",
-  season_type = "N",
-  s = NULL,
-  damped = FALSE
-)
+ETSModel(error_type = "A", trend_type = "N", season_type = "N", s = NULL)
 }
 \arguments{
-\item{error_type}{Error type: "A" (additive), "M" (multiplicative), or
-"N" (none)}
+\item{error_type}{Error type: "A" (additive) or "M" (multiplicative).
+Every ETS model has an error term, so there is no "none".}
 
 \item{trend_type}{Trend type: "A" (additive), "M" (multiplicative), "Ad"
-(damped additive), "Md" (damped multiplicative), or "N" (none)}
+(damped additive), "Md" (damped multiplicative), or "N" (none). Damping
+is requested through "Ad" or "Md".}
 
 \item{season_type}{Season type: "A" (additive), "M" (multiplicative), or
 "N" (none)}
 
 \item{s}{Seasonal period (required if season_type is not "N")}
-
-\item{damped}{Whether to use damped trend (default: FALSE)}
 }
 \value{
 An ETSModel object

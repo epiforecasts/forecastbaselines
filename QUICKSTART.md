@@ -5,11 +5,11 @@ Get up and running with forecastbaselines in 5 minutes!
 ## Installation (First Time Only)
 
 ```r
-# 1. Install JuliaCall
-install.packages("JuliaCall")
+# 1. Install remotes, which pulls in the juliaready dependency
+install.packages("remotes")
 
 # 2. Install forecastbaselines
-devtools::install_local("/path/to/forecastbaselines")
+remotes::install_github("epiforecasts/forecastbaselines")
 
 # 3. Load and setup (this may take a few minutes the first time)
 library(forecastbaselines)

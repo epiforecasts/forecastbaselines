@@ -13,7 +13,8 @@ setup_ForecastBaselines()
 cat("\n=== Generating Seasonal Time Series ===\n\n")
 
 set.seed(123)
-n_years <- 4
+# STL needs more than 13 seasonal cycles, so generate 15 years
+n_years <- 15
 months_per_year <- 12
 n <- n_years * months_per_year
 
@@ -41,7 +42,7 @@ plot(data, type = "l", main = "Seasonal Time Series",
 cat("\n=== Method 1: STL Model ===\n\n")
 
 # Create and fit STL model
-model_stl <- STLModel(s = months_per_year, robust = TRUE)
+model_stl <- STLModel(s = months_per_year)
 fitted_stl <- fit_baseline(data, model_stl)
 
 # Forecast next 12 months
@@ -115,7 +116,8 @@ fitted_ets <- fit_baseline(data, model_ets)
 
 fc_ets <- forecast(
   fitted_ets,
-  interval_method = ParametricInterval(),
+  # ForecastBaselines.jl has no parametric intervals for ETS
+  interval_method = EmpiricalInterval(n_trajectories = 2000),
   horizon = 1:12,
   levels = c(0.80, 0.95),
   model_name = "ETS(A,A,A)"
@@ -172,10 +174,10 @@ cat("\nModel Performance:\n")
 print(comparison)
 
 best_mae <- comparison$Model[which.min(comparison$MAE)]
-best_crps <- comparison$Model[which.min(comparison$CRPS)]
+best_rmse <- comparison$Model[which.min(comparison$RMSE)]
 
 cat("\nBest model (MAE):", best_mae, "\n")
-cat("Best model (CRPS):", best_crps, "\n")
+cat("Best model (RMSE):", best_rmse, "\n")
 
 # ============================================================================
 # Visualization

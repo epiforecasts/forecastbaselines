@@ -1,7 +1,7 @@
 Package: forecastbaselines
 Type: Package
 Title: R Interface to ForecastBaselines.jl
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Manuel", "Stapper", role = c("aut")),
     person("Sebastian", "Funk", email = "sebastian.funk@lshtm.ac.uk",

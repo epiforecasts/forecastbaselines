@@ -143,13 +143,18 @@ fc$mean
 # Plot data and forecast
 plot_df <- rbind(
   data.frame(time = 1:n_train, value = data, type = "Observed"),
-  data.frame(time = (n_train + 1):(n_train + 12), value = fc$mean, type = "Forecast")
+  data.frame(
+    time = (n_train + 1):(n_train + 12), value = fc$mean, type = "Forecast"
+  )
 )
 
 ggplot(plot_df, aes(x = time, y = value, color = type)) +
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("Observed" = "black", "Forecast" = "red")) +
-  labs(title = "Forecast with Constant Model", x = "Time", y = "Value", color = NULL) +
+  labs(
+    title = "Forecast with Constant Model", x = "Time", y = "Value",
+    color = NULL
+  ) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
@@ -289,7 +294,9 @@ comparison <- data.frame(
 )
 print(comparison)
 
-cat("\nBest model by WIS:", comparison$Model[which.min(score_summary$wis)], "\n")
+cat(
+  "\nBest model by WIS:", comparison$Model[which.min(score_summary$wis)], "\n"
+)
 
 # Visualize model comparison with hubVis
 comparison_hubverse <- as_hubverse(
@@ -312,11 +319,13 @@ hubVis::plot_step_ahead_model_output(
 For data with strong seasonal patterns, use seasonal models:
 
 ```{r seasonal}
-# Generate seasonal data: 15 years training (Jan 2010-Dec 2024) + 1 year test (2025)
+# Generate seasonal data: 15 years training (Jan 2010-Dec 2024)
+# plus 1 year test (2025)
 set.seed(789)
 n_total_months <- 192  # 16 years total
 n_train_months <- 180  # 15 years for training
-full_seasonal <- 10 + 5 * sin(2 * pi * (1:n_total_months) / 12) + rnorm(n_total_months, sd = 0.5)
+full_seasonal <- 10 + 5 * sin(2 * pi * (1:n_total_months) / 12) +
+  rnorm(n_total_months, sd = 0.5)
 seasonal_data <- full_seasonal[1:n_train_months]
 future_seasonal <- full_seasonal[(n_train_months + 1):n_total_months]
 
@@ -334,7 +343,7 @@ stl_fc <- forecast(stl_fitted,
 )
 
 # Last Similar Dates model
-lsd_model <- LSDModel(window_width = 10, s = 12)
+lsd_model <- LSDModel(s = 12)
 lsd_fitted <- fit_baseline(seasonal_data, lsd_model)
 lsd_fc <- forecast(lsd_fitted,
   interval_method = EmpiricalInterval(n_trajectories = 1000),
@@ -360,8 +369,12 @@ seasonal_hubverse <- as_hubverse(
 
 # Filter to show only last 5 years + forecast for cleaner visualization
 cutoff_date <- as.Date("2020-01-01")
-filtered_target <- seasonal_hubverse$target_data[seasonal_hubverse$target_data$date >= cutoff_date, ]
-filtered_output <- seasonal_hubverse$model_output[seasonal_hubverse$model_output$target_date >= cutoff_date, ]
+filtered_target <- seasonal_hubverse$target_data[
+  seasonal_hubverse$target_data$date >= cutoff_date,
+]
+filtered_output <- seasonal_hubverse$model_output[
+  seasonal_hubverse$model_output$target_date >= cutoff_date,
+]
 
 # Visualize both models with hubVis
 hubVis::plot_step_ahead_model_output(
@@ -482,7 +495,7 @@ MarginalModel() # Sample from marginal distribution
 
 # Seasonal
 STLModel(s = 12) # Monthly seasonality
-LSDModel(window_width = 10, s = 12) # Last similar dates
+LSDModel(s = 12) # Last similar dates
 
 # Time Series
 ARMAModel(p = 2, q = 1) # ARMA
