@@ -494,13 +494,14 @@ Tips:
 ## 2.3 IDS Model (Increase-Decrease-Stable)
 
 Description:
-Detects trend direction (increasing, decreasing, stable) over recent
-windows and extrapolates.
+Detects trend direction (increasing, decreasing, stable) across the most
+recent observations and extrapolates.
 
 How It Works:
 
-1. Divide recent history into `p` windows
-2. Classify each window's trend
+1. Take the last `window_size` observations
+2. Classify the signs of their successive differences as increasing,
+   decreasing or stable
 3. Forecast based on detected pattern
 
 When to Use:
@@ -513,7 +514,7 @@ When to Use:
 
 Parameters:
 
-- `window_size`: Number of windows to analyze (default: 3)
+- `window_size`: Number of recent observations to analyse (default: 3)
 
 Example:
 
@@ -527,7 +528,7 @@ data <- c(
 )
 
 # Fit IDS model
-model <- IDSModel(window_size = 3) # Analyze last 3 windows
+model <- IDSModel(window_size = 3) # Analyse the last 3 observations
 fitted <- fit_baseline(data, model)
 
 # Forecast
@@ -554,7 +555,7 @@ ggplot(plot_df, aes(x = time, y = value, color = type)) +
 
 Parameter Guidance:
 
-- `p` (number of windows):
+- `window_size` (observations analysed):
   - 2-3: More reactive to recent changes
   - 4-6: More stable, less reactive
   - Too large: Misses recent trends
