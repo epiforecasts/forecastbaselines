@@ -59,23 +59,19 @@ install.packages("remotes")
 
 ### Step 2: Install forecastbaselines
 
-#### Option A: Install from local directory
+#### Option A: Install from GitHub
 
 ```r
-# Install devtools if not already installed
-if (!require("devtools")) install.packages("devtools")
+remotes::install_github("epiforecasts/forecastbaselines")
+```
 
-# Install from local directory
-devtools::install_local("/path/to/forecastbaselines")
+#### Option B: Install from a local copy
+
+```r
+remotes::install_local("/path/to/forecastbaselines")
 ```
 
 Replace `/path/to/forecastbaselines` with the actual path to the package directory.
-
-#### Option B: Install from GitHub (when available)
-
-```r
-devtools::install_github("ManuelStapper/ForecastBaselines.jl", subdir = "forecastbaselines")
-```
 
 ### Step 3: Load and Setup
 
@@ -202,7 +198,7 @@ source("examples/seasonal_forecasting.R")
 If you encounter issues not covered here:
 
 1. Check the [README](README.md) for usage examples
-2. Open an issue on [GitHub](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
+2. Open an issue on [GitHub](https://github.com/epiforecasts/forecastbaselines/issues)
 3. Check the [JuliaConnectoR documentation](https://github.com/stefan-m-lenz/JuliaConnectoR), which juliaready builds on
 
 ## Next Steps
