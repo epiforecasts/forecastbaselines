@@ -19,6 +19,9 @@
   0.1.0 it was `error_type = "N"` — documented there as "none" — that gave
   multiplicative errors, while `"M"` gave additive ones. Code written against
   0.1.0 should read `"N"` as `"M"`, and `"M"` as `"A"`.
+* `setup_ForecastBaselines()` drops `install_package`, which it accepted and
+  then ignored: the package always initialises Julia against the pinned
+  project it ships in `inst/julia`.
 * `LSDModel()` defaults `window_width` to 0, matching ForecastBaselines.jl.
   The previous default of 1 averaged in the time points either side of each
   seasonal position, blurring the seasonal profile without saying so.

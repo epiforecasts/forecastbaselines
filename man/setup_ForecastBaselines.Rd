@@ -4,21 +4,18 @@
 \alias{setup_ForecastBaselines}
 \title{Setup Julia and load ForecastBaselines.jl}
 \usage{
-setup_ForecastBaselines(install_package = TRUE, verbose = TRUE)
+setup_ForecastBaselines(verbose = TRUE)
 }
 \arguments{
-\item{install_package}{Whether to install ForecastBaselines.jl if not
-already installed.}
-
 \item{verbose}{Whether to print progress messages.}
 }
 \value{
 Invisibly returns `TRUE` if setup succeeded.
 }
 \description{
-Initialises Julia, installs ForecastBaselines.jl if needed, and loads
-the bridge code. Idempotent: subsequent calls are no-ops once setup
-has succeeded. Heavy lifting is delegated to
+Initialises Julia against the pinned Julia project the package ships in
+`inst/julia`, and loads the bridge code. Idempotent: subsequent calls are
+no-ops once setup has succeeded. Heavy lifting is delegated to
 [juliaready::julia_ready()] and [juliaready::julia_load_bridge()].
 }
 \details{

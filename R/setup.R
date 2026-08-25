@@ -5,9 +5,9 @@ NULL
 
 #' Setup Julia and load ForecastBaselines.jl
 #'
-#' Initialises Julia, installs ForecastBaselines.jl if needed, and loads
-#' the bridge code. Idempotent: subsequent calls are no-ops once setup
-#' has succeeded. Heavy lifting is delegated to
+#' Initialises Julia against the pinned Julia project the package ships in
+#' `inst/julia`, and loads the bridge code. Idempotent: subsequent calls are
+#' no-ops once setup has succeeded. Heavy lifting is delegated to
 #' [juliaready::julia_ready()] and [juliaready::julia_load_bridge()].
 #'
 #' Note: this is *not* called from `.onLoad`. Eager Julia initialisation
@@ -16,8 +16,6 @@ NULL
 #' on the lazy [check_setup()] guard inside the package's exported
 #' functions.
 #'
-#' @param install_package Whether to install ForecastBaselines.jl if not
-#'   already installed.
 #' @param verbose Whether to print progress messages.
 #'
 #' @return Invisibly returns `TRUE` if setup succeeded.
@@ -27,8 +25,7 @@ NULL
 #' \dontrun{
 #' setup_ForecastBaselines()
 #' }
-setup_ForecastBaselines <- function(install_package = TRUE,
-                                    verbose = TRUE) {
+setup_ForecastBaselines <- function(verbose = TRUE) {
   juliaready::julia_ready(
     packages  = "ForecastBaselines",
     state_env = .fbr_env,
