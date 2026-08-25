@@ -174,10 +174,10 @@ cat("\nModel Performance:\n")
 print(comparison)
 
 best_mae <- comparison$Model[which.min(comparison$MAE)]
-best_crps <- comparison$Model[which.min(comparison$CRPS)]
+best_rmse <- comparison$Model[which.min(comparison$RMSE)]
 
 cat("\nBest model (MAE):", best_mae, "\n")
-cat("Best model (CRPS):", best_crps, "\n")
+cat("Best model (RMSE):", best_rmse, "\n")
 
 # ============================================================================
 # Visualization
