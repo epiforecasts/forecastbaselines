@@ -73,7 +73,7 @@ Special cases:
 | LSD | Low | 2+ cycles | Yes | No | Via residuals |
 | OLS | Low | 20+ | No | Yes | Via residuals |
 | IDS | Low | 20+ | No | Yes | Via residuals |
-| STL | Medium | 2+ cycles | Yes | Yes | Via residuals |
+| STL | Medium | 14+ cycles | Yes | Yes | Via residuals |
 | ARMA | Medium | 50+ | Yes | Yes | Parametric |
 | INARCH | Medium | 50+ | Yes | No | Parametric |
 | ETS | High | 50+ | Yes | Yes | Parametric |
@@ -591,7 +591,7 @@ When to Use:
 - ✅ Need decomposition for interpretation
 - ✅ Regular seasonal patterns
 - ❌ Irregular seasonality
-- ❌ Less than 2 seasonal cycles
+- ❌ 13 seasonal cycles or fewer, which the fit rejects
 
 Parameters:
 
@@ -646,7 +646,7 @@ Strengths:
 Limitations:
 
 - Fixed seasonal period
-- Needs at least 2 cycles
+- Needs more than 13 cycles
 - More complex than LSD
 
 Use Case:
@@ -1097,7 +1097,7 @@ Fastest → Slowest:
 | LSD | 2*s | 3*s+ |
 | OLS | degree+1 | 30+ |
 | IDS | 10 | 30+ |
-| STL | 2*s | 3*s+ |
+| STL | 13*s + 1 | 15*s+ |
 | ARMA | p+q | 50+ |
 | INARCH | 20 | 50+ |
 | ETS | 2*s (if seasonal) | 50+ |

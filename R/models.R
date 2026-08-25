@@ -149,7 +149,9 @@ IDSModel <- function(window_size = 3L) {
 #' settings in ForecastBaselines.jl, which `fit_baseline()` does not expose.
 #' The seasonal period is therefore the only argument.
 #'
-#' @param s Seasonal period
+#' @param s Seasonal period. Fitting needs more than 13 cycles of data, i.e.
+#'   more than `13 * s` observations, because the loess smoothing span that
+#'   ForecastBaselines.jl fixes at 13 cannot be reached with fewer.
 #'
 #' @return An STLModel object
 #' @export
