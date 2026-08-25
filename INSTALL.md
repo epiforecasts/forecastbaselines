@@ -141,14 +141,10 @@ ForecastBaselines.jl and its dependencies into the Julia depot. Adding the
 package by hand in a Julia terminal does not help, because it lands in your
 default environment and setup activates the shipped one.
 
-**Solution**: Re-run setup and read what Julia's package manager reports:
-
-```r
-setup_ForecastBaselines(verbose = TRUE)
-```
-
-Failures at this point are usually a network problem or a depot the current
-user cannot write to; see the permission-errors section below for the latter.
+**Solution**: Read what Julia's package manager reports as setup runs; it
+prints to the console. Failures at this point are usually a network problem or
+a depot the current user cannot write to; see the permission-errors section
+below for the latter.
 
 ### Problem: Julia fails to start on load
 
