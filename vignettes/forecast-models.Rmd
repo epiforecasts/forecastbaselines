@@ -313,7 +313,8 @@ historical periods.
 How It Works:
 
 1. For horizon $h$, look back to periods $t - s + h$, $t - 2s + h$, etc.
-2. Average the `window` most recent similar periods
+2. Average every one of them, along with the `window_width` time points
+   either side of each
 3. Handles irregular seasonality well
 
 When to Use:
