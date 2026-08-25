@@ -146,9 +146,14 @@ prints to the console. Failures at this point are usually a network problem or
 a depot the current user cannot write to; see the permission-errors section
 below for the latter.
 
-### Problem: Julia fails to start on load
+### Problem: Julia errors appear part-way through a modelling call
 
-**Solution**: Run the setup explicitly and read what it reports:
+Loading the package does not start Julia; the first function that needs it
+does. A configuration problem therefore surfaces inside whatever call you
+happened to make first, wrapped in that function's context.
+
+**Solution**: Start Julia on its own, before any modelling, so the error
+arrives with nothing else around it:
 
 ```r
 setup_ForecastBaselines()
