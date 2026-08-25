@@ -48,12 +48,13 @@ Download and install RStudio from [posit.co](https://posit.co/downloads/).
 
 ## Installing forecastbaselines
 
-### Step 1: Install JuliaCall
+### Step 1: Install remotes
 
-Open R or RStudio and run:
+The package talks to Julia through juliaready, which lives on GitHub, so
+installation needs remotes. Open R or RStudio and run:
 
 ```r
-install.packages("JuliaCall")
+install.packages("remotes")
 ```
 
 ### Step 2: Install forecastbaselines
@@ -151,12 +152,12 @@ Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
 setup_ForecastBaselines(install_package = FALSE)
 ```
 
-### Problem: JuliaCall errors on load
+### Problem: Julia fails to start on load
 
-**Solution**: Rebuild Julia system image:
+**Solution**: Run the setup explicitly and read what it reports:
 
 ```r
-setup_ForecastBaselines(rebuild = TRUE)
+setup_ForecastBaselines(verbose = TRUE)
 ```
 
 ### Problem: Permission errors on Linux/macOS
@@ -210,7 +211,7 @@ If you encounter issues not covered here:
 
 1. Check the [README](README.md) for usage examples
 2. Open an issue on [GitHub](https://github.com/ManuelStapper/ForecastBaselines.jl/issues)
-3. Check the [JuliaCall documentation](https://non-contradiction.github.io/JuliaCall/)
+3. Check the [JuliaConnectoR documentation](https://github.com/stefan-m-lenz/JuliaConnectoR), which juliaready builds on
 
 ## Next Steps
 
