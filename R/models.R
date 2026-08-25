@@ -169,7 +169,8 @@ STLModel <- function(s) {
 #'   \sum_{j=1}^k [\theta_{2j} \sin(2\pi j t / s) +
 #'                 \theta_{2j+1} \cos(2\pi j t / s)] + \theta_{2k+2} t}
 #' where the harmonic terms are present when `s > 0` and the linear term when
-#' `include_drift = TRUE`. An intercept is always estimated.
+#' `include_drift = TRUE`. An intercept is always estimated. Without
+#' seasonality `k` counts as 0, so the drift is \eqn{\theta_2}.
 #'
 #' @param p AR order (default: 0)
 #' @param q MA order (default: 0)
