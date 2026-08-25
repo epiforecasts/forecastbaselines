@@ -151,7 +151,7 @@ below for the latter.
 **Solution**: Run the setup explicitly and read what it reports:
 
 ```r
-setup_ForecastBaselines(verbose = TRUE)
+setup_ForecastBaselines()
 ```
 
 ### Problem: Permission errors on Linux/macOS
