@@ -120,10 +120,12 @@ If you see forecast values printed, installation was successful!
 
 ### Problem: Julia not found
 
-**Solution**: Specify Julia location explicitly:
+**Solution**: Point JuliaConnectoR at the Julia installation before setting
+up, using the `bin` directory that `Sys.BINDIR` reports inside Julia:
 
 ```r
-setup_ForecastBaselines(JULIA_HOME = "/path/to/julia/bin")
+Sys.setenv(JULIA_BINDIR = "/path/to/julia/bin")
+setup_ForecastBaselines()
 ```
 
 On Linux/macOS, find Julia location with:
@@ -149,7 +151,7 @@ Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
 
 3. Then in R:
 ```r
-setup_ForecastBaselines(install_package = FALSE)
+setup_ForecastBaselines()
 ```
 
 ### Problem: Julia fails to start on load
