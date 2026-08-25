@@ -164,9 +164,13 @@ setup_ForecastBaselines(verbose = TRUE)
 `JULIA_DEPOT_PATH` when it starts, so set it before setup starts Julia:
 
 ```r
-Sys.setenv(JULIA_DEPOT_PATH = path.expand("~/.julia"))
+Sys.setenv(JULIA_DEPOT_PATH = path.expand("~/julia-depot"))
 setup_ForecastBaselines()
 ```
+
+Choose any writable path; the default depot is `~/.julia`, so naming that one
+changes nothing. Packages already downloaded into the old depot are downloaded
+again into the new one.
 
 ### Problem: Slow first run
 
