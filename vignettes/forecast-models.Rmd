@@ -326,7 +326,8 @@ When to Use:
 
 Parameters:
 
-- `window_width`: Number of similar periods to average (default: 1)
+- `window_width`: Number of neighbouring time points averaged either side of
+  each seasonal position (default: 1; must be smaller than `s`)
 - `s`: Seasonal period (e.g., 12 for monthly, 7 for daily)
 
 Example:
@@ -339,7 +340,8 @@ seasonal_pattern <- 20 + 10 * sin(2 * pi * months / 12)
 data <- seasonal_pattern + rnorm(240, sd = 2)
 
 # Fit LSD model
-model <- LSDModel(window_width = 3, s = 12) # Average last 3 years
+# Average each month with the 3 time points either side
+model <- LSDModel(window_width = 3, s = 12)
 fitted <- fit_baseline(data, model)
 
 # Forecast next year
@@ -371,10 +373,11 @@ Parameter Guidance:
   - 24 for hourly data with daily patterns
   - 52 for weekly data with yearly patterns
 
-- `window_width` (averaging window):
-  - 1: Use only last similar period (more responsive)
-  - 3-5: Smooth average (more stable)
-  - Large: Very smooth but less adaptive
+- `window_width` (neighbouring points averaged in):
+  - 0: Each seasonal position on its own, keeping the sharpest profile
+  - 1-2: Mild smoothing across adjacent positions
+  - Larger: Blurs the seasonal profile towards a flat mean, and values of `s`
+    or more are rejected
 
 Strengths:
 

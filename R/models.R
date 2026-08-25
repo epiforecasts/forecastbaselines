@@ -66,11 +66,15 @@ KDEModel <- function() {
 #' Last Similar Dates (LSD) Model
 #'
 #' Creates a seasonal forecasting model based on similar historical
-#' dates.
+#' dates. Each seasonal position is forecast by the mean of every historical
+#' observation at that position, together with the `window_width` time points
+#' either side of it.
 #'
 #' @param s Seasonal period (e.g., 7 for weekly, 12 for monthly)
-#' @param window_width Width of the window for averaging similar dates
-#'   (default: 1)
+#' @param window_width Number of neighbouring time points averaged either side
+#'   of each seasonal position (default: 1). Use 0 to average each position on
+#'   its own; wider windows blur the seasonal profile, and the value must be
+#'   smaller than `s`.
 #'
 #' @return An LSDModel object
 #' @export
