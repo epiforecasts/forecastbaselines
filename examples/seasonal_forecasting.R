@@ -116,7 +116,8 @@ fitted_ets <- fit_baseline(data, model_ets)
 
 fc_ets <- forecast(
   fitted_ets,
-  interval_method = ParametricInterval(),
+  # ForecastBaselines.jl has no parametric intervals for ETS
+  interval_method = EmpiricalInterval(n_trajectories = 2000),
   horizon = 1:12,
   levels = c(0.80, 0.95),
   model_name = "ETS(A,A,A)"
