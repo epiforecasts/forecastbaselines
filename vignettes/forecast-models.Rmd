@@ -74,7 +74,7 @@ Special cases:
 | OLS | Low | 20+ | No | Yes | Via residuals |
 | IDS | Low | 20+ | No | Yes | Via residuals |
 | STL | Medium | 2+ cycles | Yes | Yes | Via residuals |
-| ARMA | Medium | 50+ | No | No | Parametric |
+| ARMA | Medium | 50+ | Yes | Yes | Parametric |
 | INARCH | Medium | 50+ | Yes | No | Parametric |
 | ETS | High | 50+ | Yes | Yes | Parametric |
 
