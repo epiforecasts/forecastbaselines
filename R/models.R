@@ -358,8 +358,9 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
 
 
 # Internal: harmonic seasonality only has meaning alongside a seasonal period,
-# and fewer than one wave, or a negative period, would drop the seasonality on
-# the Julia side.
+# and fewer than one wave would drop the seasonality on the Julia side. A
+# negative period does the same on the ARMA path, while the INARCH constructor
+# rejects it; the guard is shared so both report the same error.
 check_harmonics <- function(s, k) {
   if (as.integer(s) < 0L) {
     stop("'s' must be a non-negative seasonal period", call. = FALSE)
