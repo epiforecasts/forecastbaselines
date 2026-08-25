@@ -277,8 +277,9 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
 #'
 #' Creates an Error-Trend-Season exponential smoothing model.
 #'
-#' @param error_type Error type: "A" (additive), "M" (multiplicative), or
-#'   "N" (none)
+#' @param error_type Error type: "A" (additive) or "M" (multiplicative).
+#'   Every ETS model has an error term, so there is no "none". Asking for "M"
+#'   warns: ForecastBaselines.jl builds an additive-error model for it.
 #' @param trend_type Trend type: "A" (additive), "M" (multiplicative), "Ad"
 #'   (damped additive), "Md" (damped multiplicative), or "N" (none). Damping
 #'   is requested through "Ad" or "Md".
@@ -312,7 +313,7 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
   check_setup()
 
   # Validate inputs
-  valid_error <- c("A", "M", "N")
+  valid_error <- c("A", "M")
   valid_trend <- c("A", "M", "Ad", "Md", "N")
   valid_season <- c("A", "M", "N")
 
@@ -332,6 +333,14 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
     stop(
       "season_type must be one of: ",
       paste(valid_season, collapse = ", ")
+    )
+  }
+
+  if (error_type == "M") {
+    warning(
+      "ForecastBaselines.jl maps a multiplicative error onto its additive ",
+      "error type, so the fitted model has additive errors.",
+      call. = FALSE
     )
   }
 
