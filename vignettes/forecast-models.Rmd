@@ -895,8 +895,7 @@ When to Use:
 
 Parameters:
 
-- `error`: "A" (additive) or "M" (multiplicative). ForecastBaselines.jl fits
-  either as an additive error, so asking for "M" warns
+- `error`: "A" (additive) or "M" (multiplicative)
 - `trend`: "N", "A", "M", "Ad", "Md", or NULL (auto)
 - `season`: "N", "A", "M", or NULL (auto)
 - `s`: Seasonal period (if seasonal)
@@ -915,9 +914,9 @@ data <- trend * seasonal_mult * exp(rnorm(72, sd = 0.05))
 model_auto <- ETSModel()
 fitted_auto <- fit_baseline(data, model_auto)
 
-# Specific: additive error, additive trend, multiplicative season
+# Specific: multiplicative error, additive trend, multiplicative season
 model_specific <- ETSModel(
-  error_type = "A", trend_type = "A", season_type = "M", s = 12
+  error_type = "M", trend_type = "A", season_type = "M", s = 12
 )
 fitted_specific <- fit_baseline(data, model_specific)
 

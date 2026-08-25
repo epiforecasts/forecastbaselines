@@ -8,8 +8,7 @@ ETSModel(error_type = "A", trend_type = "N", season_type = "N", s = NULL)
 }
 \arguments{
 \item{error_type}{Error type: "A" (additive) or "M" (multiplicative).
-Every ETS model has an error term, so there is no "none". Asking for "M"
-warns: ForecastBaselines.jl builds an additive-error model for it.}
+Every ETS model has an error term, so there is no "none".}
 
 \item{trend_type}{Trend type: "A" (additive), "M" (multiplicative), "Ad"
 (damped additive), "Md" (damped multiplicative), or "N" (none). Damping

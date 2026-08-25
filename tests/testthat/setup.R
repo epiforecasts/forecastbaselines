@@ -49,3 +49,9 @@ skip_if_no_julia <- function() {
 mean_dim <- function(model) {
   as.integer(model[["\u03bcDim"]])
 }
+
+# Name of the Julia error type a fitted ETS model carries.
+julia_error_type <- function(model) {
+  juliaready::assign_julia("model_tmp", model)
+  juliaready::eval_julia("string(typeof(model_tmp.error))")
+}

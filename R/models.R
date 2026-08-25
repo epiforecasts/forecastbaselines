@@ -278,8 +278,7 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
 #' Creates an Error-Trend-Season exponential smoothing model.
 #'
 #' @param error_type Error type: "A" (additive) or "M" (multiplicative).
-#'   Every ETS model has an error term, so there is no "none". Asking for "M"
-#'   warns: ForecastBaselines.jl builds an additive-error model for it.
+#'   Every ETS model has an error term, so there is no "none".
 #' @param trend_type Trend type: "A" (additive), "M" (multiplicative), "Ad"
 #'   (damped additive), "Md" (damped multiplicative), or "N" (none). Damping
 #'   is requested through "Ad" or "Md".
@@ -310,8 +309,6 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
 #' }
 ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
                      s = NULL) {
-  check_setup()
-
   # Validate inputs
   valid_error <- c("A", "M")
   valid_trend <- c("A", "M", "Ad", "Md", "N")
@@ -336,25 +333,25 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
     )
   }
 
-  if (error_type == "M") {
-    warning(
-      "ForecastBaselines.jl maps a multiplicative error onto its additive ",
-      "error type, so the fitted model has additive errors.",
-      call. = FALSE
-    )
-  }
-
   if (season_type != "N" && is.null(s)) {
     stop(
       "Seasonal period 's' must be provided when season_type is not 'N'"
     )
   }
 
-  # Call Julia function using keyword arguments with String values
+  check_setup()
+
+  # The Julia constructor reaches its multiplicative error type through the
+  # string "N" and builds an additive one for every other string, so "M" has
+  # to be sent as "N" to get the model the caller asked for. The tests assert
+  # the resulting error type, so this stops working loudly if Julia's mapping
+  # is corrected.
+  julia_error <- if (error_type == "M") "N" else "A"
+
   if (is.null(s)) {
     julia_code <- sprintf(
       'ForecastBaselines.ETSModel(error="%s", trend="%s", season="%s")',
-      error_type, trend_type, season_type
+      julia_error, trend_type, season_type
     )
   } else {
     juliaready::assign_julia("s_val", as.integer(s))
@@ -363,7 +360,7 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
         'ForecastBaselines.ETSModel(error="%s", trend="%s", ',
         'season="%s", s=s_val)'
       ),
-      error_type, trend_type, season_type
+      julia_error, trend_type, season_type
     )
   }
 

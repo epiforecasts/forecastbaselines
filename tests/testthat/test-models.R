@@ -277,18 +277,22 @@ test_that("ETSModel creates Holt-Winters additive (A,A,A)", {
 test_that("ETSModel creates Holt-Winters multiplicative (M,M,M)", {
   skip_if_no_julia()
 
-  model <- suppressWarnings(ETSModel(
+  model <- ETSModel(
     error_type = "M", trend_type = "M", season_type = "M", s = 12
-  ))
-  expect_true(!is.null(model))
+  )
+  expect_equal(julia_error_type(model), "MError")
 })
 
-test_that("ETSModel warns that a multiplicative error is fitted as additive", {
+test_that("ETSModel reaches both of the Julia error types", {
   skip_if_no_julia()
 
-  expect_warning(
-    ETSModel(error_type = "M", trend_type = "N", season_type = "N"),
-    "additive errors"
+  # Julia's constructor spells its multiplicative error "N", so a wrapper that
+  # passed "M" straight through would return an additive-error model.
+  expect_equal(
+    julia_error_type(ETSModel(error_type = "A", trend_type = "N")), "AError"
+  )
+  expect_equal(
+    julia_error_type(ETSModel(error_type = "M", trend_type = "N")), "MError"
   )
 })
 
@@ -298,6 +302,12 @@ test_that("ETSModel rejects an error type that does not exist", {
     ETSModel(error_type = "N", trend_type = "N", season_type = "N"),
     "error_type must be one of"
   )
+})
+
+test_that("ETSModel validates before it needs Julia", {
+  # Argument checks run first, so they report the real problem even when
+  # Julia is unavailable.
+  expect_error(ETSModel(error_type = "X"), "error_type must be one of")
 })
 
 test_that("ETSModel validates error_type", {
