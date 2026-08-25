@@ -1139,6 +1139,6 @@ STLModel(s = 12)
 
 # Advanced
 ARMAModel(p = 1, q = 1)
-INARCHModel(p = 1, s = NULL)
+INARCHModel(p = 1, s = 0)
 ETSModel(error_type = "A", trend_type = "N", season_type = "N", s = NULL)
 ```
