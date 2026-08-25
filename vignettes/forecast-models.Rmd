@@ -894,10 +894,10 @@ When to Use:
 
 Parameters:
 
-- `error`: "A" (additive) or "M" (multiplicative)
-- `trend`: "N", "A", "M", "Ad" (damped additive) or "Md" (damped
+- `error_type`: "A" (additive) or "M" (multiplicative)
+- `trend_type`: "N", "A", "M", "Ad" (damped additive) or "Md" (damped
   multiplicative)
-- `season`: "N", "A" or "M"
+- `season_type`: "N", "A" or "M"
 - `s`: Seasonal period (if seasonal)
 
 Example:
