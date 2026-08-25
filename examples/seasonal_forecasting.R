@@ -13,7 +13,8 @@ setup_ForecastBaselines()
 cat("\n=== Generating Seasonal Time Series ===\n\n")
 
 set.seed(123)
-n_years <- 4
+# STL needs more than 13 seasonal cycles, so generate 15 years
+n_years <- 15
 months_per_year <- 12
 n <- n_years * months_per_year
 
