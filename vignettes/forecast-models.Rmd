@@ -911,8 +911,8 @@ seasonal_mult <- 1 + 0.3 * sin(2 * pi * time / 12)
 data <- trend * seasonal_mult * exp(rnorm(72, sd = 0.05))
 
 # Defaults: additive error, no trend, no seasonality
-model_auto <- ETSModel()
-fitted_auto <- fit_baseline(data, model_auto)
+model_default <- ETSModel()
+fitted_default <- fit_baseline(data, model_default)
 
 # Specific: additive error, additive trend, multiplicative season. A
 # multiplicative error (error_type = "M") is available too; on this series it
@@ -990,7 +990,7 @@ Limitations:
 
 Tips:
 
-- Start with automatic selection (NULL parameters)
+- Start from the (A,N,N) defaults and add components the data calls for
 - Use additive for stable variance
 - Use multiplicative for percentage seasonality
 - Damped trends for long horizons
