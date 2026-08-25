@@ -12,11 +12,13 @@
   through `trend_type = "Ad"` or `"Md"`. These arguments were accepted and
   then discarded, so a model built with them was identical to one built
   without them (#7).
-* `ETSModel(error_type = "M")` now returns a multiplicative-error model.
-  ForecastBaselines.jl reaches that model through the string `"N"` and builds
-  an additive-error one for every other string, so the wrapper previously
-  returned additive errors whatever was asked for. `error_type = "N"` is
-  rejected: every ETS model has an error term.
+* `ETSModel(error_type = "M")` now returns a multiplicative-error model, and
+  `error_type = "N"` is rejected: every ETS model has an error term.
+  ForecastBaselines.jl reaches its multiplicative error through the string
+  `"N"` and builds an additive-error model for every other string, so in
+  0.1.0 it was `error_type = "N"` — documented there as "none" — that gave
+  multiplicative errors, while `"M"` gave additive ones. Code written against
+  0.1.0 should read `"N"` as `"M"`, and `"M"` as `"A"`.
 * `LSDModel()` defaults `window_width` to 0, matching ForecastBaselines.jl.
   The previous default of 1 averaged in the time points either side of each
   seasonal position, blurring the seasonal profile without saying so.
