@@ -304,6 +304,13 @@ test_that("ETSModel rejects an error type that does not exist", {
   )
 })
 
+test_that("ETSModel rejects empty component labels", {
+  # There is no automatic selection, so NULL is not a stand-in for a default.
+  expect_error(ETSModel(trend_type = NULL), "trend_type must be one of")
+  expect_error(ETSModel(season_type = NULL), "season_type must be one of")
+  expect_error(ETSModel(error_type = character(0)), "error_type must be one of")
+})
+
 test_that("ETSModel validates before it needs Julia", {
   # Argument checks run first, so they report the real problem even when
   # Julia is unavailable.

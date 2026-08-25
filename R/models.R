@@ -310,28 +310,9 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
 ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
                      s = NULL) {
   # Validate inputs
-  valid_error <- c("A", "M")
-  valid_trend <- c("A", "M", "Ad", "Md", "N")
-  valid_season <- c("A", "M", "N")
-
-  if (!error_type %in% valid_error) {
-    stop(
-      "error_type must be one of: ",
-      paste(valid_error, collapse = ", ")
-    )
-  }
-  if (!trend_type %in% valid_trend) {
-    stop(
-      "trend_type must be one of: ",
-      paste(valid_trend, collapse = ", ")
-    )
-  }
-  if (!season_type %in% valid_season) {
-    stop(
-      "season_type must be one of: ",
-      paste(valid_season, collapse = ", ")
-    )
-  }
+  check_component(error_type, c("A", "M"), "error_type")
+  check_component(trend_type, c("A", "M", "Ad", "Md", "N"), "trend_type")
+  check_component(season_type, c("A", "M", "N"), "season_type")
 
   if (season_type != "N" && is.null(s)) {
     stop(
@@ -396,4 +377,17 @@ julia_bool <- function(x, arg = deparse(substitute(x))) {
     stop("'", arg, "' must be either TRUE or FALSE", call. = FALSE)
   }
   if (x) "true" else "false"
+}
+
+# Internal: reject anything that is not one of the labels a component accepts.
+# Checking the shape as well as the value keeps NULL and other empty values
+# from reaching `%in%`, which would fail with a length-zero condition.
+check_component <- function(value, valid, arg) {
+  if (!is.character(value) || length(value) != 1L || !value %in% valid) {
+    stop(
+      arg, " must be one of: ", paste(valid, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
 }
