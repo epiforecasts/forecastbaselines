@@ -15,8 +15,8 @@ seamless integration with the
 ## Features
 
 - Baseline and benchmark models for forecast evaluation
-- Multiple uncertainty quantification methods (bootstrap, analytical,
-  conformal)
+- Multiple uncertainty quantification methods (empirical, parametric and
+  model-trajectory intervals)
 - Seamless integration with
   [scoringutils](https://epiforecasts.io/scoringutils/) for proper
   scoring rules

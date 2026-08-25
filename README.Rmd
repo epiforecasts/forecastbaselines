@@ -27,7 +27,7 @@ An R package providing access to 10 baseline forecasting models from the Julia F
 ## Features
 
 - Baseline and benchmark models for forecast evaluation
-- Multiple uncertainty quantification methods (bootstrap, analytical, conformal)
+- Multiple uncertainty quantification methods (empirical, parametric and model-trajectory intervals)
 - Seamless integration with [scoringutils](https://epiforecasts.io/scoringutils/) for proper scoring rules
 - Data transformations with automatic back-transformation
 
