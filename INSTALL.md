@@ -136,19 +136,19 @@ C:/Users/YourUsername/AppData/Local/Programs/Julia-1.x.x/bin
 
 ### Problem: ForecastBaselines.jl installation fails
 
-**Solution**: Install manually in Julia, then load in R:
+Setup instantiates the pinned Julia project the package ships, which downloads
+ForecastBaselines.jl and its dependencies into the Julia depot. Adding the
+package by hand in a Julia terminal does not help, because it lands in your
+default environment and setup activates the shipped one.
 
-1. Open Julia terminal
-2. Run:
-```julia
-using Pkg
-Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
-```
+**Solution**: Re-run setup and read what Julia's package manager reports:
 
-3. Then in R:
 ```r
-setup_ForecastBaselines()
+setup_ForecastBaselines(verbose = TRUE)
 ```
+
+Failures at this point are usually a network problem or a depot the current
+user cannot write to; see the permission-errors section below for the latter.
 
 ### Problem: Julia fails to start on load
 
@@ -160,13 +160,12 @@ setup_ForecastBaselines(verbose = TRUE)
 
 ### Problem: Permission errors on Linux/macOS
 
-**Solution**: Install Julia packages to local directory:
+**Solution**: Point Julia's depot at a directory you can write to. Julia reads
+`JULIA_DEPOT_PATH` when it starts, so set it before setup starts Julia:
 
-In Julia, run:
-```julia
-ENV["JULIA_DEPOT_PATH"] = expanduser("~/.julia")
-using Pkg
-Pkg.add(url="https://github.com/ManuelStapper/ForecastBaselines.jl")
+```r
+Sys.setenv(JULIA_DEPOT_PATH = path.expand("~/.julia"))
+setup_ForecastBaselines()
 ```
 
 ### Problem: Slow first run
