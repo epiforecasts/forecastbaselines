@@ -4,14 +4,14 @@
 \alias{LSDModel}
 \title{Last Similar Dates (LSD) Model}
 \usage{
-LSDModel(s, window_width = 1L)
+LSDModel(s, window_width = 0L)
 }
 \arguments{
 \item{s}{Seasonal period (e.g., 7 for weekly, 12 for monthly)}
 
 \item{window_width}{Number of neighbouring time points averaged either side
-of each seasonal position (default: 1). Use 0 to average each position on
-its own; wider windows blur the seasonal profile, and the value must be
+of each seasonal position (default: 0, averaging each position on its
+own). Wider windows blur the seasonal profile, and the value must be
 smaller than `s`.}
 }
 \value{

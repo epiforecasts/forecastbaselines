@@ -72,8 +72,8 @@ KDEModel <- function() {
 #'
 #' @param s Seasonal period (e.g., 7 for weekly, 12 for monthly)
 #' @param window_width Number of neighbouring time points averaged either side
-#'   of each seasonal position (default: 1). Use 0 to average each position on
-#'   its own; wider windows blur the seasonal profile, and the value must be
+#'   of each seasonal position (default: 0, averaging each position on its
+#'   own). Wider windows blur the seasonal profile, and the value must be
 #'   smaller than `s`.
 #'
 #' @return An LSDModel object
@@ -87,7 +87,7 @@ KDEModel <- function() {
 #' # Monthly seasonality with window
 #' model <- LSDModel(s = 12, window_width = 2)
 #' }
-LSDModel <- function(s, window_width = 1L) {
+LSDModel <- function(s, window_width = 0L) {
   check_setup()
   juliaready::assign_julia("s_val", as.integer(s))
   juliaready::assign_julia("w_val", as.integer(window_width))

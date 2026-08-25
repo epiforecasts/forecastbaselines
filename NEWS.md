@@ -12,6 +12,9 @@
   through `trend_type = "Ad"` or `"Md"`. These arguments were accepted and
   then discarded, so a model built with them was identical to one built
   without them (#7).
+* `LSDModel()` defaults `window_width` to 0, matching ForecastBaselines.jl.
+  The previous default of 1 averaged in the time points either side of each
+  seasonal position, blurring the seasonal profile without saying so.
 
 ## New features
 

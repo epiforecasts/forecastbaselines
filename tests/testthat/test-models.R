@@ -51,7 +51,14 @@ test_that("LSDModel creates valid model with window_width", {
   skip_if_no_julia()
 
   model <- LSDModel(s = 12, window_width = 2)
-  expect_true(!is.null(model))
+  expect_equal(as.integer(model$w), 2L)
+})
+
+test_that("LSDModel averages each seasonal position on its own by default", {
+  skip_if_no_julia()
+
+  # A wider window mixes in neighbouring positions, flattening seasonality.
+  expect_equal(as.integer(LSDModel(s = 12)$w), 0L)
 })
 
 test_that("LSDModel rejects unsupported trend_correction", {
