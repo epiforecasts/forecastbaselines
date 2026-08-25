@@ -887,7 +887,6 @@ Components:
 When to Use:
 
 - ✅ Complex seasonal patterns
-- ✅ Need automatic model selection
 - ✅ Business forecasting
 - ✅ Various data characteristics
 - ❌ Very short series (< 2 cycles)
@@ -896,8 +895,9 @@ When to Use:
 Parameters:
 
 - `error`: "A" (additive) or "M" (multiplicative)
-- `trend`: "N", "A", "M", "Ad", "Md", or NULL (auto)
-- `season`: "N", "A", "M", or NULL (auto)
+- `trend`: "N", "A", "M", "Ad" (damped additive) or "Md" (damped
+  multiplicative)
+- `season`: "N", "A" or "M"
 - `s`: Seasonal period (if seasonal)
 
 Example:
@@ -910,13 +910,13 @@ trend <- 100 + 2 * time
 seasonal_mult <- 1 + 0.3 * sin(2 * pi * time / 12)
 data <- trend * seasonal_mult * exp(rnorm(72, sd = 0.05))
 
-# Automatic selection
+# Defaults: additive error, no trend, no seasonality
 model_auto <- ETSModel()
 fitted_auto <- fit_baseline(data, model_auto)
 
 # Specific: additive error, additive trend, multiplicative season. A
-# multiplicative error (error_type = "M") is available too, and fits this
-# series less well.
+# multiplicative error (error_type = "M") is available too; on this series it
+# forecasts less accurately.
 model_specific <- ETSModel(
   error_type = "A", trend_type = "A", season_type = "M", s = 12
 )
@@ -978,7 +978,6 @@ Common Models:
 Strengths:
 
 - Extremely flexible (30 models)
-- Automatic selection available
 - Well-tested in practice
 - Handles many data types
 
