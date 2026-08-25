@@ -685,7 +685,7 @@ Parameters:
 - `k`: Number of harmonic waves representing seasonality (default: 1).
   Estimation starts its mean parameters at zero and can settle on a solution
   far from the data. The risk grows with the number of waves and with the
-  distance of the series from zero: at a mean of 100 two waves already fail,
+  distance of the series from zero: at a mean of 100 two waves fail,
   while on low-count series they usually, though not always, succeed. Compare
   the fitted mean with the data
 - `include_drift`: Add a linear trend to the mean (default: FALSE)

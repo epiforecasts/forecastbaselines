@@ -18,7 +18,7 @@ ARMAModel(p = 0L, q = 0L, s = 0L, k = 1L, include_drift = FALSE)
 Only meaningful when `s > 0`. The mean parameters are estimated by a
 derivative-free search started from zero, which can settle on a solution
 far from the data. The risk grows with the number of waves and with the
-distance of the series from zero: at a mean of 100 two waves already fail,
+distance of the series from zero: at a mean of 100 two waves fail,
 while on low-count series they usually, though not always, succeed.
 Compare the fitted mean with the data before trusting a seasonal fit.}
 
