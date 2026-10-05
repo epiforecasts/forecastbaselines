@@ -7,7 +7,8 @@
 LogTransform()
 }
 \value{
-A LogTransform object
+A spec for a Julia `LogTransform`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a natural logarithm transformation. Data must be positive.

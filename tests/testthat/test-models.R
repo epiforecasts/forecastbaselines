@@ -51,14 +51,14 @@ test_that("LSDModel creates valid model with window_width", {
   skip_if_no_julia()
 
   model <- LSDModel(s = 12, window_width = 2)
-  expect_equal(as.integer(model$w), 2L)
+  expect_equal(as.integer(as_julia_object(model)$w), 2L)
 })
 
 test_that("LSDModel averages each seasonal position on its own by default", {
   skip_if_no_julia()
 
   # A wider window mixes in neighbouring positions, flattening seasonality.
-  expect_equal(as.integer(LSDModel(s = 12)$w), 0L)
+  expect_equal(as.integer(as_julia_object(LSDModel(s = 12))$w), 0L)
 })
 
 test_that("LSDModel rejects unsupported trend_correction", {
@@ -231,7 +231,9 @@ test_that("INARCHModel warns about harmonics beyond the first", {
 test_that("INARCHModel passes seasonality and negative binomial through", {
   skip_if_no_julia()
 
-  model <- suppressWarnings(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
+  model <- as_julia_object(
+    suppressWarnings(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
+  )
   expect_equal(as.integer(model$s), 52L)
   expect_equal(as.integer(model$k), 4L)
   expect_true(as.logical(model$nb))

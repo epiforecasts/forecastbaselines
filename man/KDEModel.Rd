@@ -7,7 +7,8 @@
 KDEModel()
 }
 \value{
-A KDEModel object
+A spec for a Julia `KDEModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a kernel density estimation model for non-parametric forecasting.

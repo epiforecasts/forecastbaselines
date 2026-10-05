@@ -137,7 +137,7 @@ constructor:
 
 With `k = 1` this reproduces the keyword constructor exactly.
 """
-function arma_model(p::Int, q::Int, s::Int, k::Int, trend::Bool)
+function arma_model(; p::Int, q::Int, s::Int, k::Int, trend::Bool)
     if s <= 0 || k <= 0
         μ = trend ? (θ, t) -> θ[1] + θ[2] * t : (θ, t) -> θ[1]
         return ForecastBaselines.ARMAModel(p, q, μ, trend ? 2 : 1)

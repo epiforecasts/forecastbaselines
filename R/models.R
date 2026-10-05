@@ -5,7 +5,8 @@
 #' Creates a naive forecast model that uses the last observed value as the
 #' forecast for all future horizons.
 #'
-#' @return A ConstantModel object
+#' @return A spec for a Julia `ConstantModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -13,8 +14,7 @@
 #' model <- ConstantModel()
 #' }
 ConstantModel <- function() {
-  check_setup()
-  juliaready::eval_julia("ForecastBaselines.ConstantModel()")
+  baseline_spec("ConstantModel", "model")
 }
 
 #' Marginal Model
@@ -25,7 +25,8 @@ ConstantModel <- function() {
 #' @param p Number of most recent observations to use (default: all
 #'   observations)
 #'
-#' @return A MarginalModel object
+#' @return A spec for a Julia `MarginalModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -33,13 +34,9 @@ ConstantModel <- function() {
 #' model <- MarginalModel(p = 10)
 #' }
 MarginalModel <- function(p = NULL) {
-  check_setup()
-  if (is.null(p)) {
-    juliaready::eval_julia("ForecastBaselines.MarginalModel()")
-  } else {
-    juliaready::assign_julia("p_val", as.integer(p))
-    juliaready::eval_julia("ForecastBaselines.MarginalModel(p=p_val)")
-  }
+  baseline_spec(
+    "MarginalModel", "model", p = if (!is.null(p)) as.integer(p)
+  )
 }
 
 #' KDE Model
@@ -51,7 +48,8 @@ MarginalModel <- function(p = NULL) {
 #' itself has no arguments: the kernel is Gaussian and the bandwidth is
 #' selected automatically.
 #'
-#' @return A KDEModel object
+#' @return A spec for a Julia `KDEModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -59,8 +57,7 @@ MarginalModel <- function(p = NULL) {
 #' model <- KDEModel()
 #' }
 KDEModel <- function() {
-  check_setup()
-  juliaready::eval_julia("ForecastBaselines.KDEModel()")
+  baseline_spec("KDEModel", "model")
 }
 
 #' Last Similar Dates (LSD) Model
@@ -76,7 +73,8 @@ KDEModel <- function() {
 #'   own). Wider windows blur the seasonal profile, and the value must be
 #'   smaller than `s`.
 #'
-#' @return An LSDModel object
+#' @return A spec for a Julia `LSDModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -88,10 +86,9 @@ KDEModel <- function() {
 #' model <- LSDModel(s = 12, window_width = 2)
 #' }
 LSDModel <- function(s, window_width = 0L) {
-  check_setup()
-  juliaready::assign_julia("s_val", as.integer(s))
-  juliaready::assign_julia("w_val", as.integer(window_width))
-  juliaready::eval_julia("ForecastBaselines.LSDModel(s=s_val, w=w_val)")
+  baseline_spec(
+    "LSDModel", "model", s = as.integer(s), w = as.integer(window_width)
+  )
 }
 
 #' OLS Model
@@ -101,7 +98,8 @@ LSDModel <- function(s, window_width = 0L) {
 #' @param degree Polynomial degree (default: 1 for linear trend)
 #' @param differencing Order of differencing (default: 0 for no differencing)
 #'
-#' @return An OLSModel object
+#' @return A spec for a Julia `OLSModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -113,11 +111,10 @@ LSDModel <- function(s, window_width = 0L) {
 #' model <- OLSModel(degree = 2, differencing = 1)
 #' }
 OLSModel <- function(degree = 1L, differencing = 0L) {
-  check_setup()
   # Julia API uses 'p' (polynomial degree) and 'd' (differencing)
-  juliaready::assign_julia("p_val", as.integer(degree))
-  juliaready::assign_julia("d_val", as.integer(differencing))
-  juliaready::eval_julia("ForecastBaselines.OLSModel(p=p_val, d=d_val)")
+  baseline_spec(
+    "OLSModel", "model", p = as.integer(degree), d = as.integer(differencing)
+  )
 }
 
 #' IDS Model
@@ -126,7 +123,8 @@ OLSModel <- function(degree = 1L, differencing = 0L) {
 #'
 #' @param window_size Window size for trend calculation (default: 3)
 #'
-#' @return An IDSModel object
+#' @return A spec for a Julia `IDSModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -135,9 +133,7 @@ OLSModel <- function(degree = 1L, differencing = 0L) {
 #' model <- IDSModel(window_size = 5)
 #' }
 IDSModel <- function(window_size = 3L) {
-  check_setup()
-  juliaready::assign_julia("p_val", as.integer(window_size))
-  juliaready::eval_julia("ForecastBaselines.IDSModel(p=p_val)")
+  baseline_spec("IDSModel", "model", p = as.integer(window_size))
 }
 
 #' STL Model
@@ -153,7 +149,8 @@ IDSModel <- function(window_size = 3L) {
 #'   more than `13 * s` observations, because the loess smoothing span that
 #'   ForecastBaselines.jl fixes at 13 cannot be reached with fewer.
 #'
-#' @return An STLModel object
+#' @return A spec for a Julia `STLModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -162,9 +159,7 @@ IDSModel <- function(window_size = 3L) {
 #' model <- STLModel(s = 12)
 #' }
 STLModel <- function(s) {
-  check_setup()
-  juliaready::assign_julia("s_val", as.integer(s))
-  juliaready::eval_julia("ForecastBaselines.STLModel(s=s_val)")
+  baseline_spec("STLModel", "model", s = as.integer(s))
 }
 
 #' ARMA Model
@@ -192,7 +187,8 @@ STLModel <- function(s) {
 #' @param include_drift Whether to include a linear trend in the mean
 #'   (default: FALSE)
 #'
-#' @return An ARMAModel object
+#' @return A spec for a Julia `ARMAModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -212,19 +208,15 @@ STLModel <- function(s) {
 ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
                       include_drift = FALSE) {
   check_harmonics(s, k)
-  trend <- julia_bool(include_drift)
-  check_setup()
-
-  juliaready::assign_julia("p_val", as.integer(p))
-  juliaready::assign_julia("q_val", as.integer(q))
-  juliaready::assign_julia("s_val", as.integer(s))
-  juliaready::assign_julia("k_val", as.integer(k))
-
+  check_flag(include_drift)
   # arma_model() is defined in inst/julia/forecast_helpers.jl; it builds the
   # mean function for arbitrary k on top of the ARMAModel inner constructor.
-  juliaready::eval_julia(sprintf(
-    "arma_model(p_val, q_val, s_val, k_val, %s)", trend
-  ))
+  baseline_spec(
+    "ARMAModel", "model",
+    p = as.integer(p), q = as.integer(q), s = as.integer(s), k = as.integer(k),
+    trend = include_drift,
+    .fn = "arma_model"
+  )
 }
 
 #' INARCH Model
@@ -244,7 +236,8 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
 #' @param nb Whether to use a negative binomial conditional distribution
 #'   instead of Poisson, allowing for overdispersion (default: FALSE)
 #'
-#' @return An INARCHModel object
+#' @return A spec for a Julia `INARCHModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -264,15 +257,11 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
       call. = FALSE
     )
   }
-  negbin <- julia_bool(nb)
-  check_setup()
-
-  juliaready::assign_julia("p_val", as.integer(p))
-  juliaready::assign_julia("s_val", as.integer(s))
-  juliaready::assign_julia("k_val", as.integer(k))
-  juliaready::eval_julia(sprintf(
-    "ForecastBaselines.INARCHModel(p=p_val, s=s_val, k=k_val, nb=%s)", negbin
-  ))
+  check_flag(nb)
+  baseline_spec(
+    "INARCHModel", "model",
+    p = as.integer(p), s = as.integer(s), k = as.integer(k), nb = nb
+  )
 }
 
 #' ETS Model
@@ -288,7 +277,8 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
 #'   "N" (none)
 #' @param s Seasonal period (required if season_type is not "N")
 #'
-#' @return An ETSModel object
+#' @return A spec for a Julia `ETSModel`, built when it is fitted
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -322,32 +312,18 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
     )
   }
 
-  check_setup()
-
   # The Julia constructor reaches its multiplicative error type through the
   # string "N" and builds an additive one for every other string, so "M" has
   # to be sent as "N" to get the model the caller asked for. The tests assert
   # the resulting error type, so this stops working loudly if Julia's mapping
   # is corrected.
-  julia_error <- if (error_type == "M") "N" else "A"
-
-  if (is.null(s)) {
-    julia_code <- sprintf(
-      'ForecastBaselines.ETSModel(error="%s", trend="%s", season="%s")',
-      julia_error, trend_type, season_type
-    )
-  } else {
-    juliaready::assign_julia("s_val", as.integer(s))
-    julia_code <- sprintf(
-      paste0(
-        'ForecastBaselines.ETSModel(error="%s", trend="%s", ',
-        'season="%s", s=s_val)'
-      ),
-      julia_error, trend_type, season_type
-    )
-  }
-
-  juliaready::eval_julia(julia_code)
+  baseline_spec(
+    "ETSModel", "model",
+    error = if (error_type == "M") "N" else "A",
+    trend = trend_type,
+    season = season_type,
+    s = if (!is.null(s)) as.integer(s)
+  )
 }
 
 
@@ -372,13 +348,14 @@ check_harmonics <- function(s, k) {
   invisible(TRUE)
 }
 
-# Internal: render an R logical as a Julia boolean literal, rejecting values
-# that cannot be honoured rather than silently treating them as FALSE.
-julia_bool <- function(x, arg = deparse(substitute(x))) {
+
+# Internal: reject flags that cannot be honoured, since NA would reach Julia
+# as `missing` and anything longer as a vector.
+check_flag <- function(x, arg = deparse(substitute(x))) {
   if (!is.logical(x) || length(x) != 1L || is.na(x)) {
     stop("'", arg, "' must be either TRUE or FALSE", call. = FALSE)
   }
-  if (x) "true" else "false"
+  invisible(TRUE)
 }
 
 # Internal: reject anything that is not one of the labels a component accepts.

@@ -4,7 +4,8 @@
 #'
 #' Creates a transformation that applies no changes to the data.
 #'
-#' @return A NoTransform object
+#' @return A spec for a Julia `NoTransform`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -12,15 +13,15 @@
 #' trans <- NoTransform()
 #' }
 NoTransform <- function() {
-  check_setup()
-  juliaready::eval_julia("ForecastBaselines.NoTransform()")
+  baseline_spec("NoTransform", "transform")
 }
 
 #' Log Transformation
 #'
 #' Creates a natural logarithm transformation. Data must be positive.
 #'
-#' @return A LogTransform object
+#' @return A spec for a Julia `LogTransform`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -28,8 +29,7 @@ NoTransform <- function() {
 #' trans <- LogTransform()
 #' }
 LogTransform <- function() {
-  check_setup()
-  juliaready::eval_julia("ForecastBaselines.LogTransform()")
+  baseline_spec("LogTransform", "transform")
 }
 
 #' Log Plus One Transformation
@@ -38,7 +38,8 @@ LogTransform <- function() {
 #'
 #' @param c Constant to add before taking log (default: 1)
 #'
-#' @return A LogPlusOneTransform object
+#' @return A spec for a Julia `LogPlusOneTransform`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -50,8 +51,7 @@ LogTransform <- function() {
 #' trans <- LogPlusOneTransform(c = 0.5)
 #' }
 LogPlusOneTransform <- function(c = 1.0) {
-  check_setup()
-  juliaready::call_julia("ForecastBaselines.LogPlusOneTransform", as.numeric(c))
+  baseline_spec("LogPlusOneTransform", "transform", as.numeric(c))
 }
 
 #' Square Root Transformation
@@ -59,7 +59,8 @@ LogPlusOneTransform <- function(c = 1.0) {
 #' Creates a square root transformation. Useful for count data and variance
 #' stabilization.
 #'
-#' @return A SquareRootTransform object
+#' @return A spec for a Julia `SquareRootTransform`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -67,8 +68,7 @@ LogPlusOneTransform <- function(c = 1.0) {
 #' trans <- SquareRootTransform()
 #' }
 SquareRootTransform <- function() {
-  check_setup()
-  juliaready::eval_julia("ForecastBaselines.SquareRootTransform()")
+  baseline_spec("SquareRootTransform", "transform")
 }
 
 #' Power Transformation
@@ -77,7 +77,8 @@ SquareRootTransform <- function() {
 #'
 #' @param lambda Power parameter (lambda = 0 is log, lambda = 0.5 is sqrt)
 #'
-#' @return A PowerTransform object
+#' @return A spec for a Julia `PowerTransform`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -89,8 +90,7 @@ SquareRootTransform <- function() {
 #' trans <- PowerTransform(lambda = 1 / 3)
 #' }
 PowerTransform <- function(lambda) {
-  check_setup()
-  juliaready::call_julia("ForecastBaselines.PowerTransform", as.numeric(lambda))
+  baseline_spec("PowerTransform", "transform", as.numeric(lambda))
 }
 
 #' Power Plus One Transformation
@@ -101,7 +101,8 @@ PowerTransform <- function(lambda) {
 #' @param lambda Power parameter
 #' @param constant Constant to add before transformation (default: 1.0)
 #'
-#' @return A PowerPlusOneTransform object
+#' @return A spec for a Julia `PowerPlusOneTransform`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -113,9 +114,8 @@ PowerTransform <- function(lambda) {
 #' trans <- PowerPlusOneTransform(lambda = 0.5, constant = 0.5)
 #' }
 PowerPlusOneTransform <- function(lambda, constant = 1.0) {
-  check_setup()
-  juliaready::call_julia("ForecastBaselines.PowerPlusOneTransform",
-    as.numeric(lambda),
+  baseline_spec(
+    "PowerPlusOneTransform", "transform", as.numeric(lambda),
     constant = as.numeric(constant)
   )
 }
@@ -148,10 +148,8 @@ PowerPlusOneTransform <- function(lambda, constant = 1.0) {
 #' transformed <- log(data)
 #' }
 transform_data <- function(x, transformation) {
-  check_setup()
-
   # Warn about SquareRootTransform bug
-  if (inherits(transformation, "SquareRootTransform")) {
+  if (identical(transformation$fn, "ForecastBaselines.SquareRootTransform")) {
     warning(
       "SquareRootTransform has a bug in ForecastBaselines.jl. ",
       "Use sqrt() in R instead, or PowerTransform(lambda=0.5)"
@@ -160,12 +158,11 @@ transform_data <- function(x, transformation) {
 
   # Julia transform expects a matrix (n x 1)
   x_mat <- matrix(as.numeric(x), ncol = 1)
-  juliaready::assign_julia("x_mat", x_mat)
-  juliaready::assign_julia("trans_obj", transformation)
-  result <- juliaready::eval_julia(
-    "ForecastBaselines.transform(x_mat, trans_obj)"
-  )
-  as.numeric(result)
+  check_setup()
+  as.numeric(juliabridge::call_julia(
+    "ForecastBaselines.transform",
+    x_mat, as_julia_object(transformation)
+  ))
 }
 
 #' Apply Inverse Transformation
@@ -188,12 +185,10 @@ inverse_transform_data <- function(y, transformation) {
   check_setup()
   # Julia inverse_transform expects a vector (unlike transform which needs
   # a matrix)
-  juliaready::assign_julia("y_vec", as.numeric(y))
-  juliaready::assign_julia("trans_obj", transformation)
-  result <- juliaready::eval_julia(
-    "ForecastBaselines.inverse_transform(y_vec, trans_obj)"
-  )
-  as.numeric(result)
+  as.numeric(juliabridge::call_julia(
+    "ForecastBaselines.inverse_transform",
+    julia_vector(as.numeric(y)), as_julia_object(transformation)
+  ))
 }
 
 #' Apply Transformation to Model
@@ -236,7 +231,6 @@ inverse_transform_data <- function(y, transformation) {
 #' fc$mean <- exp(fc$mean)
 #' }
 transform_model <- function(model, transformation) {
-  check_setup()
   stop("transform_model() is not implemented in ForecastBaselines.jl.\n",
     "Use manual transformation instead:\n",
     "  1. Transform data: log_data <- log(data)\n",

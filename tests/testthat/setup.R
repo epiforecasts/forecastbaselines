@@ -19,7 +19,7 @@ tryCatch(
     helper_loaded <- FALSE
     for (helper_file in possible_paths) {
       if (file.exists(helper_file) && !helper_loaded) {
-        juliaready::command_julia(
+        juliabridge::command_julia(
           sprintf('include("%s")', normalizePath(helper_file))
         )
         helper_loaded <- TRUE
@@ -47,11 +47,12 @@ skip_if_no_julia <- function() {
 # "\u03bcDim" (muDim) in Julia; it is written as an escape to keep this file
 # ASCII.
 mean_dim <- function(model) {
-  as.integer(model[["\u03bcDim"]])
+  as.integer(as_julia_object(model)[["\u03bcDim"]])
 }
 
 # Name of the Julia error type a fitted ETS model carries.
 julia_error_type <- function(model) {
-  juliaready::assign_julia("model_tmp", model)
-  juliaready::eval_julia("string(typeof(model_tmp.error))")
+  juliabridge::eval_julia(
+    sprintf("string(typeof(%s.error))", juliabridge::as_julia(model))
+  )
 }

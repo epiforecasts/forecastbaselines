@@ -20,7 +20,8 @@ is requested through "Ad" or "Md".}
 \item{s}{Seasonal period (required if season_type is not "N")}
 }
 \value{
-An ETSModel object
+A spec for a Julia `ETSModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates an Error-Trend-Season exponential smoothing model.

@@ -11,7 +11,8 @@ ParametricInterval(positivity_correction = "none")
 or "post_clip" (default: "none")}
 }
 \value{
-A ParametricInterval object
+A spec for a Julia `ParametricInterval`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates prediction intervals using parametric assumptions based on the

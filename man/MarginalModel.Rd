@@ -11,7 +11,8 @@ MarginalModel(p = NULL)
 observations)}
 }
 \value{
-A MarginalModel object
+A spec for a Julia `MarginalModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a forecast based on the empirical marginal distribution using the

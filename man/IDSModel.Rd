@@ -10,7 +10,8 @@ IDSModel(window_size = 3L)
 \item{window_size}{Window size for trend calculation (default: 3)}
 }
 \value{
-An IDSModel object
+A spec for a Julia `IDSModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates an Increase-Decrease-Stable model for trend detection.

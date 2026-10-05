@@ -12,7 +12,8 @@ OLSModel(degree = 1L, differencing = 0L)
 \item{differencing}{Order of differencing (default: 0 for no differencing)}
 }
 \value{
-An OLSModel object
+A spec for a Julia `OLSModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates an ordinary least squares model with polynomial trend.

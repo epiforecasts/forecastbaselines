@@ -20,31 +20,16 @@
 #' fitted <- fit_baseline(data, model)
 #' }
 fit_baseline <- function(x, model, temporal_info = NULL) {
+  juliabridge::assert_role(model, "model")
   check_setup()
-
-  # Assign data to Julia
-  juliaready::assign_julia("x_data", as.numeric(x))
-
-  # Assign model to Julia
-  juliaready::assign_julia("model_obj", model)
-
-  # Fit the model
-  if (is.null(temporal_info)) {
-    juliaready::eval_julia(
-      "fitted = ForecastBaselines.fit_baseline(x_data, model_obj)"
-    )
-  } else {
-    juliaready::assign_julia("temp_info", temporal_info)
-    juliaready::eval_julia(
-      paste0(
-        "fitted = ForecastBaselines.fit_baseline(",
-        "x_data, model_obj, temporal_info=temp_info)"
-      )
-    )
+  args <- list(
+    "ForecastBaselines.fit_baseline", julia_vector(as.numeric(x)),
+    as_julia_object(model)
+  )
+  if (!is.null(temporal_info)) {
+    args$temporal_info <- as_julia_object(temporal_info)
   }
-
-  # Return the fitted model
-  juliaready::eval_julia("fitted")
+  do.call(juliabridge::call_julia, args)
 }
 
 #' Generate Point Forecasts
@@ -63,19 +48,9 @@ fit_baseline <- function(x, model, temporal_info = NULL) {
 #' }
 point_forecast <- function(fitted, horizon = 1L) {
   check_setup()
-
-  juliaready::assign_julia("fitted_obj", fitted)
-
-  if (length(horizon) == 1) {
-    juliaready::assign_julia("h", as.integer(horizon))
-  } else {
-    juliaready::assign_julia("h", as.integer(horizon))
-  }
-
-  result <- juliaready::eval_julia(
-    "ForecastBaselines.point_forecast(fitted_obj, h)"
-  )
-  as.numeric(result)
+  as.numeric(juliabridge::call_julia(
+    "ForecastBaselines.point_forecast", fitted, as.integer(horizon)
+  ))
 }
 
 #' Generate Complete Forecast with Intervals
@@ -121,58 +96,18 @@ forecast <- function(fitted,
                      include_median = TRUE,
                      truth = NULL,
                      model_name = "") {
+  juliabridge::assert_role(interval_method, "interval")
   check_setup()
-
-  # Assign objects to Julia
-  juliaready::assign_julia("fitted_obj", fitted)
-  juliaready::assign_julia("interval_method_obj", interval_method)
-  juliaready::assign_julia("h", as.integer(horizon))
-  # Ensure levels is always a vector in Julia
-  if (length(levels) == 1) {
-    # For single values, create Julia vector directly
-    juliaready::command_julia(sprintf("lvls = [%f]", as.numeric(levels)))
-  } else {
-    # For multiple values, assign and convert
-    juliaready::assign_julia("lvls_temp", as.numeric(levels))
-    juliaready::command_julia("lvls = vec(lvls_temp)")
-  }
-  juliaready::assign_julia("inc_median", include_median)
-  juliaready::assign_julia("mdl_name", as.character(model_name))
-
-  # Build the forecast call and convert using Julia helper
-  # Note: Julia code must be on a single line to avoid parse errors
-  # Generate a unique ID for this forecast object
-  fc_id <- paste0("fc_", sample.int(.Machine$integer.max, 1))
-
-  if (is.null(truth)) {
-    julia_cmd <- paste0(
-      fc_id, " = ForecastBaselines.forecast(fitted_obj; ",
-      "interval_method = interval_method_obj, horizon = h, levels = lvls, ",
-      "include_median = inc_median, model_name = mdl_name)"
-    )
-    juliaready::command_julia(julia_cmd)
-    forecast_result <- eval_julia_value(
-      sprintf("forecast_to_r(%s)", fc_id)
-    )
-  } else {
-    juliaready::assign_julia("truth_vals", as.numeric(truth))
-    julia_cmd <- paste0(
-      fc_id, " = ForecastBaselines.forecast(fitted_obj; ",
-      "interval_method = interval_method_obj, horizon = h, levels = lvls, ",
-      "include_median = inc_median, truth = truth_vals, model_name = mdl_name)"
-    )
-    juliaready::command_julia(julia_cmd)
-    forecast_result <- eval_julia_value(
-      sprintf("forecast_to_r(%s)", fc_id)
-    )
-  }
-
-  # Store the Julia variable name for later use (e.g., in score())
-  attr(forecast_result, "julia_ref") <- fc_id
-
-  # Add S3 class
-  class(forecast_result) <- c("ForecastBaselines_Forecast", "list")
-  forecast_result
+  args <- list(
+    "ForecastBaselines.forecast", fitted,
+    interval_method = as_julia_object(interval_method),
+    horizon = as.integer(horizon),
+    levels = julia_vector(as.numeric(levels)),
+    include_median = include_median,
+    model_name = as.character(model_name)
+  )
+  if (!is.null(truth)) args$truth <- julia_vector(as.numeric(truth))
+  new_forecast(do.call(juliabridge::call_julia, args))
 }
 
 #' Generate Interval Forecasts
@@ -196,28 +131,16 @@ forecast <- function(fitted,
 #' )
 #' }
 interval_forecast <- function(fitted, method, horizon = 1L, levels = 0.95) {
+  juliabridge::assert_role(method, "interval")
   check_setup()
-
-  juliaready::assign_julia("fitted_obj", fitted)
-  juliaready::assign_julia("method_obj", method)
-  juliaready::assign_julia("h", as.integer(horizon))
-  # Ensure levels is always a vector in Julia
-  if (length(levels) == 1) {
-    # For single values, create Julia vector directly
-    juliaready::command_julia(sprintf("lvls = [%f]", as.numeric(levels)))
-  } else {
-    # For multiple values, assign and convert
-    juliaready::assign_julia("lvls_temp", as.numeric(levels))
-    juliaready::command_julia("lvls = vec(lvls_temp)")
-  }
-
-  result <- eval_julia_value("
-    res = ForecastBaselines.interval_forecast(fitted_obj, method_obj, h, lvls)
-    interval_result_to_r(res)
-  ")
-
-  # Already converted by Julia helper
-  result
+  result <- juliabridge::call_julia(
+    "ForecastBaselines.interval_forecast",
+    fitted, as_julia_object(method),
+    as.integer(horizon), julia_vector(as.numeric(levels))
+  )
+  juliabridge::get_julia(
+    juliabridge::call_julia("interval_result_to_r", result)
+  )
 }
 
 #' Create Temporal Information Object
@@ -227,7 +150,8 @@ interval_forecast <- function(fitted, method, horizon = 1L, levels = 0.95) {
 #' @param start Start date (Date, POSIXct, or integer)
 #' @param resolution Time resolution (integer for generic, or period object)
 #'
-#' @return A TemporalInfo object
+#' @return A spec for a Julia `TemporalInfo`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -239,42 +163,32 @@ interval_forecast <- function(fitted, method, horizon = 1L, levels = 0.95) {
 #' temp_info <- TemporalInfo(start = as.Date("2024-01-01"), resolution = 1)
 #' }
 TemporalInfo <- function(start = 1, resolution = 1) {
-  check_setup()
-
-  # Convert R date to Julia if needed
   if (inherits(start, "Date")) {
-    start_str <- format(start, "%Y-%m-%d")
-    juliaready::assign_julia("start_val", start_str)
-    # Import Dates module and create Date
-    juliaready::eval_julia("using Dates")
-    juliaready::eval_julia("start_date = Date(start_val)")
-    # Convert integer resolution to Day period
-    juliaready::assign_julia("res_val", as.integer(resolution))
-    juliaready::eval_julia(
-      "ForecastBaselines.TemporalInfo(start_date, Day(res_val))"
+    start <- juliabridge::julia_spec(
+      "ForecastBaselines.Dates.Date", format(start, "%Y-%m-%d")
+    )
+    resolution <- juliabridge::julia_spec(
+      "ForecastBaselines.Dates.Day", as.integer(resolution)
     )
   } else {
-    juliaready::call_julia(
-      "ForecastBaselines.TemporalInfo",
-      as.integer(start),
-      as.integer(resolution)
-    )
+    start <- as.integer(start)
+    resolution <- as.integer(resolution)
   }
+  juliabridge::julia_spec(
+    "ForecastBaselines.TemporalInfo", start, resolution,
+    .role = "temporal_info"
+  )
 }
 
-# Internal helper function - no longer needed, conversion done inline
-# Kept for backwards compatibility
-convert_forecast_to_r <- function(jl_forecast) {
-  # If already converted (from new inline approach), just return
-  if (is.list(jl_forecast)) {
-    class(jl_forecast) <- c("ForecastBaselines_Forecast", "list")
-    return(jl_forecast)
-  }
-
-  # Fallback: shouldn't reach here with new approach
-  warning("Using deprecated conversion path")
-  class(jl_forecast) <- c("ForecastBaselines_Forecast", "list")
-  jl_forecast
+# Internal: translate a Julia Forecast into the R list users work with,
+# keeping the Julia object alongside for the functions that act on it.
+new_forecast <- function(jl_forecast) {
+  result <- juliabridge::get_julia(
+    juliabridge::call_julia("forecast_to_r", jl_forecast)
+  )
+  class(result) <- c("ForecastBaselines_Forecast", "list")
+  attr(result, "julia_ref") <- jl_forecast
+  result
 }
 
 #' Print method for Forecast objects

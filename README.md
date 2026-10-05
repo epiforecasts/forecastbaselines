@@ -29,7 +29,7 @@ seamless integration with the
 1.  Julia (\>= 1.9): Download from
     [julialang.org](https://julialang.org/downloads/)
 2.  R (\>= 3.5.0)
-3.  remotes R package, to pull in the juliaready dependency:
+3.  remotes R package, to pull in the juliabridge dependency:
     `install.packages("remotes")`
 
 ### Installing forecastbaselines

@@ -25,6 +25,18 @@
 * `LSDModel()` defaults `window_width` to 0, matching ForecastBaselines.jl.
   The previous default of 1 averaged in the time points either side of each
   seasonal position, blurring the seasonal profile without saying so.
+* The package now talks to Julia through juliabridge, which replaces
+  juliaready. Model, interval method, transformation and `TemporalInfo()`
+  constructors return a description of the Julia call, built in Julia only
+  when it is used, so they no longer start Julia. Printing one shows the
+  Julia code it stands for, and `$kwargs` holds its arguments under their
+  ForecastBaselines.jl names, as in `LSDModel(s = 12)$kwargs$w`.
+  `as_julia_object()` builds the Julia object for inspecting it, so that
+  `as_julia_object(LSDModel(s = 12))$w` reads the field as before.
+* Every function that returns a forecast keeps it usable with the other
+  forecast functions. `add_intervals()`, `add_trajectories()`,
+  `add_temporal_info()` and `filter_levels()` used to return forecasts that
+  the `has_*()`, `add_*()` and filter functions could not act on.
 
 ## New features
 

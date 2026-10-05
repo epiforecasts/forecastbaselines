@@ -7,7 +7,8 @@
 ConstantModel()
 }
 \value{
-A ConstantModel object
+A spec for a Julia `ConstantModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a naive forecast model that uses the last observed value as the
