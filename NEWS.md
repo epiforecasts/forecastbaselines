@@ -33,10 +33,9 @@
   ForecastBaselines.jl names, as in `LSDModel(s = 12)$kwargs$w`.
   `as_julia_object()` builds the Julia object for inspecting it, so that
   `as_julia_object(LSDModel(s = 12))$w` reads the field as before.
-* Every function that returns a forecast keeps it usable with the other
-  forecast functions. `add_intervals()`, `add_trajectories()`,
-  `add_temporal_info()` and `filter_levels()` used to return forecasts that
-  the `has_*()`, `add_*()` and filter functions could not act on.
+* `add_intervals()`, `add_trajectories()` and `filter_levels()` return
+  forecasts that the `has_*()`, `add_*()` and filter functions can act on.
+  They used to return forecasts those functions refused.
 
 ## New features
 
