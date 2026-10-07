@@ -20,7 +20,7 @@
 #' fitted <- fit_baseline(data, model)
 #' }
 fit_baseline <- function(x, model, temporal_info = NULL) {
-  juliabridge::assert_role(model, "model")
+  check_role(model, "model")
   check_setup()
   args <- list(
     "ForecastBaselines.fit_baseline", julia_vector(as.numeric(x)),
@@ -96,7 +96,7 @@ forecast <- function(fitted,
                      include_median = TRUE,
                      truth = NULL,
                      model_name = "") {
-  juliabridge::assert_role(interval_method, "interval")
+  check_role(interval_method, "interval")
   check_setup()
   args <- list(
     "ForecastBaselines.forecast", fitted,
@@ -131,7 +131,7 @@ forecast <- function(fitted,
 #' )
 #' }
 interval_forecast <- function(fitted, method, horizon = 1L, levels = 0.95) {
-  juliabridge::assert_role(method, "interval")
+  check_role(method, "interval")
   check_setup()
   result <- juliabridge::call_julia(
     "ForecastBaselines.interval_forecast",

@@ -7,6 +7,15 @@ baseline_spec <- function(name, role, ...,
   juliabridge::julia_spec(.fn, ..., .role = role)
 }
 
+# Internal: check that a spec is in the slot it was made for. An object
+# already in Julia has no role to check and goes to Julia as it is.
+check_role <- function(x, role, arg_name = deparse(substitute(x))) {
+  if (inherits(x, "julia_spec")) {
+    juliabridge::assert_role(x, role, arg_name = arg_name)
+  }
+  invisible(TRUE)
+}
+
 #' Build the Julia object a model, interval method or transformation describes
 #'
 #' Models, interval methods and transformations are descriptions of a call to

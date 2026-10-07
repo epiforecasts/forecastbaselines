@@ -24,3 +24,15 @@ test_that("roles keep models and interval methods apart", {
     "must be an interval spec"
   )
 })
+
+test_that("models and interval methods already in Julia are accepted", {
+  skip_if_no_julia()
+
+  fitted <- fit_baseline(
+    as.numeric(1:20), as_julia_object(ConstantModel())
+  )
+  fc <- forecast(fitted, interval_method = as_julia_object(NoInterval()))
+  expect_s3_class(fc, "ForecastBaselines_Forecast")
+  method <- as_julia_object(EmpiricalInterval(seed = 1))
+  expect_length(interval_forecast(fitted, method)$point, 1)
+})
