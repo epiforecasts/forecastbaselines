@@ -8,9 +8,10 @@ baseline_spec <- function(name, role, ...,
 }
 
 # Internal: check that a spec is in the slot it was made for. An object
-# already in Julia has no role to check and goes to Julia as it is.
+# already in Julia has no role to check and goes to Julia as it is; anything
+# else, such as a constructor passed without its brackets, is refused in R.
 check_role <- function(x, role, arg_name = deparse(substitute(x))) {
-  if (inherits(x, "julia_spec")) {
+  if (!inherits(x, "JuliaProxy")) {
     juliabridge::assert_role(x, role, arg_name = arg_name)
   }
   invisible(TRUE)

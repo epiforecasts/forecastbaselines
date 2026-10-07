@@ -23,6 +23,12 @@ test_that("roles keep models and interval methods apart", {
     forecast(NULL, interval_method = ConstantModel()),
     "must be an interval spec"
   )
+  # A constructor passed without its brackets is refused in R too.
+  expect_error(fit_baseline(1:10, ConstantModel), "must be a model spec")
+  expect_error(
+    forecast(NULL, interval_method = EmpiricalInterval),
+    "must be an interval spec"
+  )
 })
 
 test_that("models and interval methods already in Julia are accepted", {
