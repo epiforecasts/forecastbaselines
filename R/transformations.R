@@ -149,7 +149,8 @@ PowerPlusOneTransform <- function(lambda, constant = 1.0) {
 #' }
 transform_data <- function(x, transformation) {
   # Warn about SquareRootTransform bug
-  if (identical(transformation$fn, "ForecastBaselines.SquareRootTransform")) {
+  if (inherits(transformation, "julia_spec") &&
+        identical(transformation$fn, "ForecastBaselines.SquareRootTransform")) {
     warning(
       "SquareRootTransform has a bug in ForecastBaselines.jl. ",
       "Use sqrt() in R instead, or PowerTransform(lambda=0.5)"

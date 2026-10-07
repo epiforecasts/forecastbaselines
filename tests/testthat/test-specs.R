@@ -41,4 +41,7 @@ test_that("models and interval methods already in Julia are accepted", {
   expect_s3_class(fc, "ForecastBaselines_Forecast")
   method <- as_julia_object(EmpiricalInterval(seed = 1))
   expect_length(interval_forecast(fitted, method)$point, 1)
+  expect_equal(
+    transform_data(c(1, 2), as_julia_object(LogTransform())), log(c(1, 2))
+  )
 })
