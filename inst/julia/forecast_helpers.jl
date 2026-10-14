@@ -36,8 +36,8 @@ end
 
 """
 Convert a reference or target date to an R-compatible format. Dates become
-ISO 8601 strings, so `as.Date()` can parse them back on the R side; integer
-indices pass through unchanged.
+ISO 8601 strings for `as.Date()` to parse on the R side; integer indices pass
+through unchanged.
 """
 to_r_date(x::Nothing) = nothing
 to_r_date(x::Integer) = x
