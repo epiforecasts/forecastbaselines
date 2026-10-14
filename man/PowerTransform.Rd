@@ -10,7 +10,8 @@ PowerTransform(lambda)
 \item{lambda}{Power parameter (lambda = 0 is log, lambda = 0.5 is sqrt)}
 }
 \value{
-A PowerTransform object
+A spec for a Julia `PowerTransform`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a power transformation: x^lambda (Box-Cox family).

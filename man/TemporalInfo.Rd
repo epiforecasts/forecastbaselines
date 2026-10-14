@@ -12,7 +12,8 @@ TemporalInfo(start = 1, resolution = 1)
 \item{resolution}{Time resolution (integer for generic, or period object)}
 }
 \value{
-A TemporalInfo object
+A spec for a Julia `TemporalInfo`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a TemporalInfo object to track dates and time resolution.

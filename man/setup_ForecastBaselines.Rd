@@ -16,7 +16,7 @@ Invisibly returns `TRUE` if setup succeeded.
 Initialises Julia against the pinned Julia project the package ships in
 `inst/julia`, and loads the bridge code. Idempotent: subsequent calls are
 no-ops once setup has succeeded. Heavy lifting is delegated to
-[juliaready::julia_ready()] and [juliaready::julia_load_bridge()].
+[juliabridge::julia_ready()] and [juliabridge::julia_load_bridge()].
 }
 \details{
 Note: this is *not* called from `.onLoad`. Eager Julia initialisation

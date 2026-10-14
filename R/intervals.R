@@ -5,7 +5,8 @@
 #' Creates an interval method that produces only point forecasts without
 #' prediction intervals.
 #'
-#' @return A NoInterval object
+#' @return A spec for a Julia `NoInterval`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -14,8 +15,7 @@
 #' fc <- forecast(fitted, interval_method = method, horizon = 1:12)
 #' }
 NoInterval <- function() {
-  check_setup()
-  juliaready::eval_julia("ForecastBaselines.NoInterval()")
+  baseline_spec("NoInterval", "interval")
 }
 
 #' Empirical Interval Method
@@ -38,7 +38,8 @@ NoInterval <- function() {
 #' @param return_trajectories Whether to return forecast trajectories
 #'   (default: FALSE)
 #'
-#' @return An EmpiricalInterval object
+#' @return A spec for a Julia `EmpiricalInterval`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -66,51 +67,19 @@ EmpiricalInterval <- function(n_trajectories = 1000L,
                               symmetry_correction = FALSE,
                               stepwise = FALSE,
                               return_trajectories = FALSE) {
-  check_setup()
-
-  # Validate positivity_correction
-  valid_pos_corr <- c("none", "post_clip", "truncate", "zero_floor")
-  if (!positivity_correction %in% valid_pos_corr) {
-    stop(
-      "positivity_correction must be one of: ",
-      paste(valid_pos_corr, collapse = ", ")
-    )
-  }
-
-  # Build Julia code string for the constructor
-  args <- list()
-  args$n_trajectories <- as.integer(n_trajectories)
-  args$min_observation <- as.integer(min_observation)
-
-  if (!is.null(seed)) {
-    args$seed <- as.integer(seed)
-  }
-
-  args$positivity_correction <- sprintf(":%s", positivity_correction)
-  args$symmetry_correction <- symmetry_correction
-  args$stepwise <- stepwise
-  args$return_trajectories <- return_trajectories
-
-  # Construct Julia call
-  args_list <- c(
-    sprintf("n_trajectories=%d", args$n_trajectories),
-    sprintf("min_observation=%d", args$min_observation),
-    if (!is.null(seed)) sprintf("seed=%d", args$seed),
-    sprintf("positivity_correction=%s", args$positivity_correction),
-    sprintf(
-      "symmetry_correction=%s",
-      tolower(as.character(args$symmetry_correction))
-    ),
-    sprintf("stepwise=%s", tolower(as.character(args$stepwise))),
-    sprintf(
-      "return_trajectories=%s",
-      tolower(as.character(args$return_trajectories))
-    )
+  check_positivity(
+    positivity_correction, c("none", "post_clip", "truncate", "zero_floor")
   )
-  args_str <- paste(args_list, collapse = ", ")
-
-  julia_code <- sprintf("ForecastBaselines.EmpiricalInterval(%s)", args_str)
-  juliaready::eval_julia(julia_code)
+  baseline_spec(
+    "EmpiricalInterval", "interval",
+    n_trajectories = as.integer(n_trajectories),
+    min_observation = as.integer(min_observation),
+    seed = if (!is.null(seed)) as.integer(seed),
+    positivity_correction = julia_symbol(positivity_correction),
+    symmetry_correction = symmetry_correction,
+    stepwise = stepwise,
+    return_trajectories = return_trajectories
+  )
 }
 
 #' Parametric Interval Method
@@ -121,7 +90,8 @@ EmpiricalInterval <- function(n_trajectories = 1000L,
 #' @param positivity_correction Method to ensure positive forecasts: "none"
 #'   or "post_clip" (default: "none")
 #'
-#' @return A ParametricInterval object
+#' @return A spec for a Julia `ParametricInterval`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -133,21 +103,11 @@ EmpiricalInterval <- function(n_trajectories = 1000L,
 #' method <- ParametricInterval(positivity_correction = "post_clip")
 #' }
 ParametricInterval <- function(positivity_correction = "none") {
-  check_setup()
-
-  valid_pos_corr <- c("none", "post_clip")
-  if (!positivity_correction %in% valid_pos_corr) {
-    stop(
-      "positivity_correction must be one of: ",
-      paste(valid_pos_corr, collapse = ", ")
-    )
-  }
-
-  julia_code <- sprintf(
-    "ForecastBaselines.ParametricInterval(positivity_correction=:%s)",
-    positivity_correction
+  check_positivity(positivity_correction, c("none", "post_clip"))
+  baseline_spec(
+    "ParametricInterval", "interval",
+    positivity_correction = julia_symbol(positivity_correction)
   )
-  juliaready::eval_julia(julia_code)
 }
 
 #' Model Trajectory Interval Method
@@ -162,7 +122,8 @@ ParametricInterval <- function(positivity_correction = "none") {
 #' @param return_trajectories Whether to return forecast trajectories
 #'   (default: FALSE)
 #'
-#' @return A ModelTrajectoryInterval object
+#' @return A spec for a Julia `ModelTrajectoryInterval`, built when it is used
+#'   (see [juliabridge::julia_spec()])
 #' @export
 #'
 #' @examples
@@ -183,41 +144,31 @@ ModelTrajectoryInterval <- function(n_trajectories = 1000L,
                                     seed = NULL,
                                     positivity_correction = "none",
                                     return_trajectories = FALSE) {
-  check_setup()
+  check_positivity(
+    positivity_correction, c("none", "post_clip", "truncate", "zero_floor")
+  )
+  baseline_spec(
+    "ModelTrajectoryInterval", "interval",
+    n_trajectories = as.integer(n_trajectories),
+    seed = if (!is.null(seed)) as.integer(seed),
+    positivity_correction = julia_symbol(positivity_correction),
+    return_trajectories = return_trajectories
+  )
+}
 
-  valid_pos_corr <- c("none", "post_clip", "truncate", "zero_floor")
-  if (!positivity_correction %in% valid_pos_corr) {
+
+# Internal: the positivity correction is checked against the known options
+# before it is written into Julia source as a symbol.
+check_positivity <- function(x, valid) {
+  if (!is.character(x) || length(x) != 1L || !x %in% valid) {
     stop(
-      "positivity_correction must be one of: ",
-      paste(valid_pos_corr, collapse = ", ")
+      "positivity_correction must be one of: ", paste(valid, collapse = ", "),
+      call. = FALSE
     )
   }
+  invisible(TRUE)
+}
 
-  args <- list()
-  args$n_trajectories <- as.integer(n_trajectories)
-
-  if (!is.null(seed)) {
-    args$seed <- as.integer(seed)
-  }
-
-  args$positivity_correction <- sprintf(":%s", positivity_correction)
-  args$return_trajectories <- return_trajectories
-
-  # Construct Julia call
-  args_list <- c(
-    sprintf("n_trajectories=%d", args$n_trajectories),
-    if (!is.null(seed)) sprintf("seed=%d", args$seed),
-    sprintf("positivity_correction=%s", args$positivity_correction),
-    sprintf(
-      "return_trajectories=%s",
-      tolower(as.character(args$return_trajectories))
-    )
-  )
-  args_str <- paste(args_list, collapse = ", ")
-
-  julia_code <- sprintf(
-    "ForecastBaselines.ModelTrajectoryInterval(%s)",
-    args_str
-  )
-  juliaready::eval_julia(julia_code)
+julia_symbol <- function(x) {
+  juliabridge::julia(paste0(":", x))
 }

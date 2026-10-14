@@ -7,7 +7,8 @@
 NoInterval()
 }
 \value{
-A NoInterval object
+A spec for a Julia `NoInterval`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates an interval method that produces only point forecasts without

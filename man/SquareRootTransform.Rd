@@ -7,7 +7,8 @@
 SquareRootTransform()
 }
 \value{
-A SquareRootTransform object
+A spec for a Julia `SquareRootTransform`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a square root transformation. Useful for count data and variance

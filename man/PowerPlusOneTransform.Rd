@@ -12,7 +12,8 @@ PowerPlusOneTransform(lambda, constant = 1)
 \item{constant}{Constant to add before transformation (default: 1.0)}
 }
 \value{
-A PowerPlusOneTransform object
+A spec for a Julia `PowerPlusOneTransform`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a power transformation with a constant: (x + c)^lambda.

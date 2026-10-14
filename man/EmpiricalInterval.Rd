@@ -38,7 +38,8 @@ EmpiricalInterval(
 (default: FALSE)}
 }
 \value{
-An EmpiricalInterval object
+A spec for a Julia `EmpiricalInterval`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates prediction intervals by bootstrapping from historical forecast

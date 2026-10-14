@@ -7,7 +7,8 @@
 NoTransform()
 }
 \value{
-A NoTransform object
+A spec for a Julia `NoTransform`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a transformation that applies no changes to the data.

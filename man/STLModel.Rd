@@ -12,7 +12,8 @@ more than `13 * s` observations, because the loess smoothing span that
 ForecastBaselines.jl fixes at 13 cannot be reached with fewer.}
 }
 \value{
-An STLModel object
+A spec for a Julia `STLModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a Seasonal-Trend decomposition using Loess model.

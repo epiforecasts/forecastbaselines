@@ -23,7 +23,8 @@ ModelTrajectoryInterval(
 (default: FALSE)}
 }
 \value{
-A ModelTrajectoryInterval object
+A spec for a Julia `ModelTrajectoryInterval`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates prediction intervals by simulating trajectories from the fitted

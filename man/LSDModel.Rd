@@ -15,7 +15,8 @@ own). Wider windows blur the seasonal profile, and the value must be
 smaller than `s`.}
 }
 \value{
-An LSDModel object
+A spec for a Julia `LSDModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a seasonal forecasting model based on similar historical

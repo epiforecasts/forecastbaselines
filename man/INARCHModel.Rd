@@ -22,7 +22,8 @@ the seasonality that was estimated. Constructing such a model warns.}
 instead of Poisson, allowing for overdispersion (default: FALSE)}
 }
 \value{
-An INARCHModel object
+A spec for a Julia `INARCHModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates an Integer-valued ARCH model for count time series. Seasonality

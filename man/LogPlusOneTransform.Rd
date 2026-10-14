@@ -10,7 +10,8 @@ LogPlusOneTransform(c = 1)
 \item{c}{Constant to add before taking log (default: 1)}
 }
 \value{
-A LogPlusOneTransform object
+A spec for a Julia `LogPlusOneTransform`, built when it is used
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates a log(x + c) transformation. Useful for data with zeros.

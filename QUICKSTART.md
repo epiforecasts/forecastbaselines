@@ -5,7 +5,7 @@ Get up and running with forecastbaselines in 5 minutes!
 ## Installation (First Time Only)
 
 ```r
-# 1. Install remotes, which pulls in the juliaready dependency
+# 1. Install remotes, which pulls in the juliabridge dependency
 install.packages("remotes")
 
 # 2. Install forecastbaselines

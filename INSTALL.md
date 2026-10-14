@@ -50,7 +50,7 @@ Download and install RStudio from [posit.co](https://posit.co/downloads/).
 
 ### Step 1: Install remotes
 
-The package talks to Julia through juliaready, which lives on GitHub, so
+The package talks to Julia through juliabridge, which lives on GitHub, so
 installation needs remotes. Open R or RStudio and run:
 
 ```r
@@ -203,7 +203,7 @@ If you encounter issues not covered here:
 
 1. Check the [README](README.md) for usage examples
 2. Open an issue on [GitHub](https://github.com/epiforecasts/forecastbaselines/issues)
-3. Check the [JuliaConnectoR documentation](https://github.com/stefan-m-lenz/JuliaConnectoR), which juliaready builds on
+3. Check the [JuliaConnectoR documentation](https://github.com/stefan-m-lenz/JuliaConnectoR), which juliabridge builds on
 
 ## Next Steps
 

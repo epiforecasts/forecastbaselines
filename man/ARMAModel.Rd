@@ -26,7 +26,8 @@ Compare the fitted mean with the data before trusting a seasonal fit.}
 (default: FALSE)}
 }
 \value{
-An ARMAModel object
+A spec for a Julia `ARMAModel`, built when it is fitted
+  (see [juliabridge::julia_spec()])
 }
 \description{
 Creates an AutoRegressive Moving Average model. The series is modelled
