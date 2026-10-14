@@ -49,3 +49,12 @@
   `INARCHModel()` warns about (#7).
 * `INARCHModel()` gains `s` (seasonal period) and `nb` (negative binomial
   conditional distribution for overdispersed counts) (#7).
+
+## Bug fixes
+
+* `add_temporal_info()` matches the ForecastBaselines.jl method it calls: it
+  drops `target_date`, which Julia derives from the reference date, the
+  forecast's horizon and `resolution`; takes `resolution` as a keyword
+  argument rather than positionally; and converts a `Date` reference date
+  into a Julia `Date` rather than letting it reach Julia as a `Float64`.
+  Every previous call failed with a `MethodError` (#14).
