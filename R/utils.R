@@ -129,16 +129,30 @@ add_trajectories <- function(forecast, trajectories) {
 
 #' Add Temporal Information to Forecast
 #'
+#' Sets the reference date on a forecast; ForecastBaselines.jl derives the
+#' target dates from it, the forecast's horizon and `resolution`.
+#'
 #' @param forecast A Forecast object
-#' @param reference_date Reference date
-#' @param target_date Target date
-#' @param resolution Time resolution
+#' @param reference_date Reference date (a `Date`, or an integer for
+#'   position-based indexing)
+#' @param resolution Time resolution: a number of days when `reference_date`
+#'   is a `Date`, otherwise an integer step (default: 1)
 #' @return Updated Forecast object
 #' @export
-add_temporal_info <- function(forecast, reference_date, target_date,
-                              resolution) {
+add_temporal_info <- function(forecast, reference_date, resolution = 1) {
+  if (inherits(reference_date, "Date")) {
+    reference_date <- as_julia_object(juliabridge::julia_spec(
+      "ForecastBaselines.Dates.Date", format(reference_date, "%Y-%m-%d")
+    ))
+    resolution <- as_julia_object(juliabridge::julia_spec(
+      "ForecastBaselines.Dates.Day", as.integer(resolution)
+    ))
+  } else {
+    reference_date <- as.integer(reference_date)
+    resolution <- as.integer(resolution)
+  }
   update_forecast(
-    "add_temporal_info", forecast, reference_date, target_date, resolution
+    "add_temporal_info", forecast, reference_date, resolution = resolution
   )
 }
 

@@ -131,6 +131,47 @@ test_that("add_truth adds truth values to forecast", {
   expect_equal(fc_with_truth$truth, truth_vals, tolerance = 1e-10)
 })
 
+test_that("add_temporal_info sets a Date reference and target date", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(123)
+  data <- rnorm(30, mean = 100, sd = 10)
+  model <- ConstantModel()
+  fitted <- fit_baseline(data, model)
+
+  fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:5)
+
+  fc_with_temporal <- add_temporal_info(
+    fc, as.Date("2024-01-01"), resolution = 7
+  )
+
+  expect_s3_class(fc_with_temporal, "ForecastBaselines_Forecast")
+  expect_equal(fc_with_temporal$reference_date, "2024-01-01")
+  expect_equal(
+    as.Date(fc_with_temporal$target_date),
+    as.Date("2024-01-01") + 7 * (1:5)
+  )
+})
+
+test_that("add_temporal_info sets an integer reference and target date", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(123)
+  data <- rnorm(30, mean = 100, sd = 10)
+  model <- ConstantModel()
+  fitted <- fit_baseline(data, model)
+
+  fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:5)
+
+  fc_with_temporal <- add_temporal_info(fc, reference_date = 10, resolution = 2)
+
+  expect_s3_class(fc_with_temporal, "ForecastBaselines_Forecast")
+  expect_equal(fc_with_temporal$reference_date, 10)
+  expect_equal(fc_with_temporal$target_date, 10 + 2 * (1:5))
+})
+
 test_that("add_median adds median to forecast", {
   skip_if_no_julia()
   skip_on_cran()

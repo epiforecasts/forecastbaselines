@@ -4,20 +4,21 @@
 \alias{add_temporal_info}
 \title{Add Temporal Information to Forecast}
 \usage{
-add_temporal_info(forecast, reference_date, target_date, resolution)
+add_temporal_info(forecast, reference_date, resolution = 1)
 }
 \arguments{
 \item{forecast}{A Forecast object}
 
-\item{reference_date}{Reference date}
+\item{reference_date}{Reference date (a `Date`, or an integer for
+position-based indexing)}
 
-\item{target_date}{Target date}
-
-\item{resolution}{Time resolution}
+\item{resolution}{Time resolution: a number of days when `reference_date`
+is a `Date`, otherwise an integer step (default: 1)}
 }
 \value{
 Updated Forecast object
 }
 \description{
-Add Temporal Information to Forecast
+Sets the reference date on a forecast; ForecastBaselines.jl derives the
+target dates from it, the forecast's horizon and `resolution`.
 }
