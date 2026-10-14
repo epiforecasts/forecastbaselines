@@ -1,6 +1,8 @@
 # Helper functions for converting ForecastBaselines.jl objects to R-friendly formats
 # These handle the problematic 0-dimensional arrays and complex types
 
+using Dates
+
 """
 Convert a Julia value to an R-compatible format.
 Handles Nothing, 0-d arrays, and ensures proper vector types.
@@ -31,6 +33,16 @@ function to_r_compatible(x)
     # Pass through anything else
     return x
 end
+
+"""
+Convert a reference or target date to an R-compatible format. Dates become
+ISO 8601 strings, so `as.Date()` can parse them back on the R side; integer
+indices pass through unchanged.
+"""
+to_r_date(x::Nothing) = nothing
+to_r_date(x::Integer) = x
+to_r_date(x::Union{Date, DateTime}) = Dates.format(x, "yyyy-mm-dd")
+to_r_date(x::AbstractVector) = [to_r_date(xi) for xi in x]
 
 """
 Convert a ForecastBaselines.Forecast object to a NamedTuple that
@@ -108,6 +120,8 @@ function forecast_to_r(fc)
         quantiles = quantiles,
         quantile_levels = quantile_levels_sorted,
         trajectories = nothing,  # Skip trajectories for now
+        reference_date = to_r_date(fc.reference_date),
+        target_date = to_r_date(fc.target_date),
     )
 end
 
