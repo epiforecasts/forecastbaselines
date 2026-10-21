@@ -258,8 +258,7 @@ INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
   if (as.integer(k) > 1L) {
     warning(
       "INARCH forecasts evaluate every harmonic at the fundamental ",
-      "frequency, so seasonality estimated with k > 1 is not carried into ",
-      "the forecasts.",
+      "frequency, so they do not reflect seasonality estimated with k > 1.",
       call. = FALSE
     )
   }
