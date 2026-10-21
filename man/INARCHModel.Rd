@@ -16,7 +16,9 @@ INARCHModel(p = 1L, s = 0L, k = 1L, nb = FALSE)
 correctly but not forecast correctly: `point_forecast()` and
 `interval_forecast()` in ForecastBaselines.jl evaluate every harmonic
 coefficient at the fundamental frequency, so forecasts do not reflect
-the seasonality that was estimated. Constructing such a model warns.}
+the seasonality that was estimated. Constructing such a model warns.
+Reported upstream at
+<https://github.com/ManuelStapper/ForecastBaselines.jl/issues/2>.}
 
 \item{nb}{Whether to use a negative binomial conditional distribution
 instead of Poisson, allowing for overdispersion (default: FALSE)}

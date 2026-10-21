@@ -9,7 +9,9 @@ STLModel(s)
 \arguments{
 \item{s}{Seasonal period. Fitting needs more than 13 cycles of data, i.e.
 more than `13 * s` observations, because the loess smoothing span that
-ForecastBaselines.jl fixes at 13 cannot be reached with fewer.}
+ForecastBaselines.jl fixes at 13 cannot be reached with fewer. Reported
+upstream at
+<https://github.com/ManuelStapper/ForecastBaselines.jl/issues/5>.}
 }
 \value{
 A spec for a Julia `STLModel`, built when it is fitted

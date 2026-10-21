@@ -147,7 +147,9 @@ IDSModel <- function(window_size = 3L) {
 #'
 #' @param s Seasonal period. Fitting needs more than 13 cycles of data, i.e.
 #'   more than `13 * s` observations, because the loess smoothing span that
-#'   ForecastBaselines.jl fixes at 13 cannot be reached with fewer.
+#'   ForecastBaselines.jl fixes at 13 cannot be reached with fewer. Reported
+#'   upstream at
+#'   <https://github.com/ManuelStapper/ForecastBaselines.jl/issues/5>.
 #'
 #' @return A spec for a Julia `STLModel`, built when it is fitted
 #'   (see [juliabridge::julia_spec()])
@@ -184,6 +186,8 @@ STLModel <- function(s) {
 #'   distance of the series from zero: at a mean of 100 two waves fail,
 #'   while on low-count series they usually, though not always, succeed.
 #'   Compare the fitted mean with the data before trusting a seasonal fit.
+#'   Reported upstream at
+#'   <https://github.com/ManuelStapper/ForecastBaselines.jl/issues/4>.
 #' @param include_drift Whether to include a linear trend in the mean
 #'   (default: FALSE)
 #'
@@ -233,6 +237,8 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
 #'   `interval_forecast()` in ForecastBaselines.jl evaluate every harmonic
 #'   coefficient at the fundamental frequency, so forecasts do not reflect
 #'   the seasonality that was estimated. Constructing such a model warns.
+#'   Reported upstream at
+#'   <https://github.com/ManuelStapper/ForecastBaselines.jl/issues/2>.
 #' @param nb Whether to use a negative binomial conditional distribution
 #'   instead of Poisson, allowing for overdispersion (default: FALSE)
 #'
@@ -316,7 +322,8 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
   # string "N" and builds an additive one for every other string, so "M" has
   # to be sent as "N" to get the model the caller asked for. The tests assert
   # the resulting error type, so this stops working loudly if Julia's mapping
-  # is corrected.
+  # is corrected. Reported upstream at
+  # https://github.com/ManuelStapper/ForecastBaselines.jl/issues/3
   baseline_spec(
     "ETSModel", "model",
     error = if (error_type == "M") "N" else "A",
