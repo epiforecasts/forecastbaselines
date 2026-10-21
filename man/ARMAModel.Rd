@@ -20,7 +20,9 @@ derivative-free search started from zero, which can settle on a solution
 far from the data. The risk grows with the number of waves and with the
 distance of the series from zero: at a mean of 100 two waves fail,
 while on low-count series they usually, though not always, succeed.
-Compare the fitted mean with the data before trusting a seasonal fit.}
+Compare the fitted mean with the data before trusting a seasonal fit.
+Reported upstream at
+<https://github.com/ManuelStapper/ForecastBaselines.jl/issues/4>.}
 
 \item{include_drift}{Whether to include a linear trend in the mean
 (default: FALSE)}

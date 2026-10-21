@@ -847,6 +847,7 @@ Parameter Guidance:
   - Above 1: fitted correctly, but forecasts in ForecastBaselines.jl evaluate
     every harmonic at the fundamental frequency, so the estimated seasonal
     shape is not carried into the forecasts
+    ([upstream issue 2](https://github.com/ManuelStapper/ForecastBaselines.jl/issues/2))
 
 - `nb` (negative binomial):
   - Set to `TRUE` when counts are overdispersed relative to a Poisson
