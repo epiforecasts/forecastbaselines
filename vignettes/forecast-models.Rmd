@@ -646,7 +646,7 @@ Strengths:
 Limitations:
 
 - Fixed seasonal period
-- Needs more than 13 cycles
+- Needs more than 13 cycles ([upstream issue 5](https://github.com/ManuelStapper/ForecastBaselines.jl/issues/5))
 - More complex than LSD
 
 Use Case:
@@ -690,6 +690,7 @@ Parameters:
   distance of the series from zero: at a mean of 100 two waves fail,
   while on low-count series they usually, though not always, succeed. Compare
   the fitted mean with the data
+  ([upstream issue 4](https://github.com/ManuelStapper/ForecastBaselines.jl/issues/4))
 - `include_drift`: Add a linear trend to the mean (default: FALSE)
 
 Example:
