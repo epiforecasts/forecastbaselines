@@ -646,7 +646,8 @@ Strengths:
 Limitations:
 
 - Fixed seasonal period
-- Needs more than 13 cycles ([upstream issue 5](https://github.com/ManuelStapper/ForecastBaselines.jl/issues/5))
+- Needs more than 13 cycles
+  ([upstream issue 5](https://github.com/ManuelStapper/ForecastBaselines.jl/issues/5))
 - More complex than LSD
 
 Use Case:
