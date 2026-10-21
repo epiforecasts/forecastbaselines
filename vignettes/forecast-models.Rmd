@@ -846,8 +846,8 @@ Parameter Guidance:
 - `k` (harmonic waves):
   - 1: Smooth, symmetric seasonal wave
   - Above 1: fitted correctly, but forecasts in ForecastBaselines.jl evaluate
-    every harmonic at the fundamental frequency, so the estimated seasonal
-    shape is not carried into the forecasts
+    every harmonic at the fundamental frequency, so the forecasts do not
+    reflect the estimated seasonal shape
     ([upstream issue 2](https://github.com/ManuelStapper/ForecastBaselines.jl/issues/2))
 
 - `nb` (negative binomial):

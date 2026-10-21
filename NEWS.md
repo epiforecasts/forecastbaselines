@@ -45,7 +45,7 @@
   representing seasonality. Values above 1 allow sharper, asymmetric seasonal
   shapes than a single sinusoid, subject to the limits documented on each
   function: ARMA fits with several waves can settle far from the data, and
-  INARCH forecasts do not carry the estimated seasonality, which
+  INARCH forecasts do not reflect the estimated seasonality, which
   `INARCHModel()` warns about (#7).
 * `INARCHModel()` gains `s` (seasonal period) and `nb` (negative binomial
   conditional distribution for overdispersed counts) (#7).

@@ -224,7 +224,7 @@ test_that("INARCHModel warns about harmonics beyond the first", {
 
   expect_warning(
     INARCHModel(p = 1, s = 52, k = 2),
-    "not carried into the forecasts"
+    "do not reflect seasonality estimated"
   )
 })
 
