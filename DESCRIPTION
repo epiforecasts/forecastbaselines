@@ -17,7 +17,7 @@ LazyData: true
 Depends:
     R (>= 3.5.0)
 Imports:
-    juliabridge,
+    juliabridge (>= 0.1.0),
     scoringutils (>= 1.0.0)
 SystemRequirements: Julia (>= 1.9)
 RoxygenNote: 7.3.3
@@ -32,4 +32,4 @@ Suggests:
 VignetteBuilder: knitr
 Remotes:
     hubverse-org/hubVis,
-    epiforecasts/juliabridge
+    epiforecasts/juliabridge@v0.1.0
