@@ -1014,7 +1014,10 @@ seasonal <- 200 * sin(2 * pi * months / 12) # Holiday peaks
 noise <- rnorm(240, sd = 50)
 data <- trend + seasonal + noise
 
-# Try multiple models
+# Hold the final year back to score the forecasts against
+train <- data[1:228]
+test <- data[229:240]
+
 models <- list(
   Naive = ConstantModel(),
   LSD = LSDModel(window_width = 3, s = 12),
@@ -1022,22 +1025,36 @@ models <- list(
   ETS = ETSModel(error_type = "A", trend_type = "A", season_type = "A", s = 12)
 )
 
-# Fit all models
-results <- lapply(names(models), function(name) {
-  fitted <- fit_baseline(data, models[[name]])
-  fc <- forecast(fitted, interval_method = NoInterval(), horizon = 1:12)
-
-  data.frame(
-    Model = name,
-    Forecast_Mean = mean(fc$mean)
+# Fit each model on the training data and forecast the held-out year
+quantiles <- lapply(names(models), function(name) {
+  fitted <- fit_baseline(train, models[[name]])
+  fc <- forecast(
+    fitted,
+    interval_method = EmpiricalInterval(n_trajectories = 1000, seed = 42),
+    horizon = 1:12,
+    levels = c(0.5, 0.9),
+    truth = test,
+    model_name = name
   )
+  as.data.frame(scoringutils::as_forecast_quantile(fc))
 })
 
-comparison <- do.call(rbind, results)
-print(comparison)
+# Scoring the models together puts them in one comparable table
+scores <- scoringutils::score(
+  scoringutils::as_forecast_quantile(do.call(rbind, quantiles))
+)
+comparison <- as.data.frame(
+  scoringutils::summarise_scores(scores, by = "model")
+)
 
-# Recommendation: STL or ETS for trend + seasonality
+comparison[order(comparison$wis), c("model", "wis", "ae_median", "bias")]
 ```
+
+ETS and STL come out ahead on the weighted interval score, because both
+represent the trend and the annual cycle. LSD scores worst by a wide margin,
+and its bias of -1 says why: it repeats the values seen at the same point in
+previous years, so on a series rising by 20 a month every forecast falls short.
+The naive model sits between them, tracking the level but not the season.
 
 ## Example 2: Website Traffic (Count Data)
 
