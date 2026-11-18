@@ -453,9 +453,6 @@ Now that you've learned the basics, explore:
 3. Package documentation - Run `?forecastbaselines` or
    `help(package = "forecastbaselines")`
 
-4. Examples - Check the `examples/` directory in the package
-   for complete workflows
-
 # Quick Reference
 
 ## Basic Workflow
