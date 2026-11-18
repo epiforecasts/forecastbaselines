@@ -1,6 +1,7 @@
 ^CITATION\.cff$
 ^data-raw$
 ^README\.Rmd$
+^Rplots\.pdf$
 ^\.claude$
 ^\.github$
 ^\.lintr$
