@@ -1,3 +1,7 @@
 ^CITATION\.cff$
+^data-raw$
+^examples$
 ^README\.Rmd$
+^\.claude$
 ^\.github$
+^\.lintr$
