@@ -52,6 +52,8 @@
 
 ## Bug fixes
 
+* Quantile levels are rounded to the decimals they stand for, so `scoringutils` can find them. `levels = 0.9` gave 0.049999999999999989 instead of 0.05, and scoringutils dropped `interval_coverage_90` from the scores with a warning.
+
 * `add_temporal_info()` matches the ForecastBaselines.jl method it calls: it
   drops `target_date`, which Julia derives from the reference date, the
   forecast's horizon and `resolution`; takes `resolution` as a keyword

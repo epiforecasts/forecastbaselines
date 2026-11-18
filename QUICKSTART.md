@@ -255,7 +255,7 @@ ensemble <- rowMeans(do.call(cbind, forecasts))
 
 ## Next Steps
 
-- **Full Examples**: Check `examples/basic_usage.R` and `examples/seasonal_forecasting.R`
+- **Full Examples**: [getting started](https://epiforecasts.io/forecastbaselines/articles/forecastbaselines.html) for a first forecast, [the models guide](https://epiforecasts.io/forecastbaselines/articles/forecast-models.html) for every model
 - **Documentation**: See `README.md` for complete API documentation
 - **Installation Help**: See `INSTALL.md` if you encounter setup issues
 

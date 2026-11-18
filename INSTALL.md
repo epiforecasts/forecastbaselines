@@ -187,14 +187,14 @@ effect: setup overwrites it when it activates that project.
 
 ## Testing Installation
 
-Run the example scripts to test functionality:
+Check that the package can reach Julia and return a forecast:
 
 ```r
-# Test basic usage
-source("examples/basic_usage.R")
+library(forecastbaselines)
+setup_ForecastBaselines()
 
-# Test seasonal forecasting
-source("examples/seasonal_forecasting.R")
+fitted <- fit_baseline(rnorm(50, 100, 5), ConstantModel())
+point_forecast(fitted, 1:3)
 ```
 
 ## Getting Help
@@ -210,7 +210,7 @@ If you encounter issues not covered here:
 Once installation is complete:
 
 1. Read the [README](README.md) for an overview of features
-2. Run the examples in the `examples/` directory
+2. Work through the [getting started guide](https://epiforecasts.io/forecastbaselines/articles/forecastbaselines.html) for a complete workflow
 3. Check the function documentation with `?function_name` in R
 4. Start forecasting!
 

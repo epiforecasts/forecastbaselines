@@ -53,6 +53,33 @@ test_that("as_forecast_point requires truth values", {
   )
 })
 
+test_that("quantile levels match the literals scoringutils scores against", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(123)
+  data <- rnorm(60, mean = 100, sd = 10)
+  truth_vals <- rnorm(5, mean = 100, sd = 10)
+
+  fitted <- fit_baseline(data, ConstantModel())
+  fc <- forecast(fitted,
+    interval_method = EmpiricalInterval(n_trajectories = 200, seed = 1),
+    horizon = 1:5,
+    levels = c(0.5, 0.9),
+    truth = truth_vals
+  )
+
+  expect_identical(
+    sort(fc$quantile_levels),
+    c(0.05, 0.25, 0.5, 0.75, 0.95)
+  )
+
+  # scoringutils looks the 0.05 and 0.95 quantiles up by value, so a level that
+  # is merely close to one drops interval_coverage_90 from the scores.
+  scores <- score(as_forecast_quantile(fc))
+  expect_true("interval_coverage_90" %in% names(scores))
+})
+
 # Score Function Tests --------------------------------------------------
 
 test_that("score works with converted forecast", {
@@ -181,7 +208,8 @@ test_that("MAE and RMSE have expected relationship", {
   # RMSE should equal sqrt(MSE)
   expect_equal(rmse_score, sqrt(mse_score), tolerance = 1e-10)
 
-  # By Cauchy-Schwarz, RMSE >= MAE (with equality only when all errors are equal)
+  # By Cauchy-Schwarz, RMSE >= MAE, with equality only when every error
+  # is the same size
   expect_true(rmse_score >= mae_score - 1e-10)
 })
 
