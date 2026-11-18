@@ -210,7 +210,7 @@ If you encounter issues not covered here:
 Once installation is complete:
 
 1. Read the [README](README.md) for an overview of features
-2. Work through `vignette("forecastbaselines")` for a complete workflow
+2. Work through the [getting started guide](https://epiforecasts.io/forecastbaselines/articles/forecastbaselines.html) for a complete workflow
 3. Check the function documentation with `?function_name` in R
 4. Start forecasting!
 
