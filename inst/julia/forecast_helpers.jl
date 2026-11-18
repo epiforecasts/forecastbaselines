@@ -69,8 +69,11 @@ function forecast_to_r(fc)
         for level in levels
             # Convert confidence level to quantile levels
             # e.g., 0.95 confidence → 0.025 and 0.975 quantiles
-            lower_q = (1.0 - level) / 2.0
-            upper_q = 1.0 - lower_q
+            # Round to the nearest representable decimal: (1 - 0.9) / 2 is not
+            # the Float64 nearest 0.05, and scoringutils matches its interval
+            # metrics against the exact literals.
+            lower_q = round((1.0 - level) / 2.0, digits = 10)
+            upper_q = round(1.0 - lower_q, digits = 10)
             push!(quantile_levels, lower_q)
             push!(quantile_levels, upper_q)
         end
