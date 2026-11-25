@@ -1102,11 +1102,11 @@ compare_models(data, list(
 ), h = 12)
 ```
 
-ARMA scores about a third better than Marginal on both the interval score and
-the median forecast, because an AR(1) series is what it is built to fit. Real
-return series usually carry far less autocorrelation than this simulated one,
-and the two models then converge: where ARMA cannot beat Marginal, the data
-may hold no autocorrelation worth modelling.
+ARMA scores about a third better than Marginal on the interval score and about
+a quarter better on the median forecast, because an AR(1) series is what it is
+built to fit. Real return series usually carry far less autocorrelation than
+this simulated one, and the two models then converge: where ARMA cannot beat
+Marginal, the data may hold no autocorrelation worth modelling.
 
 # Performance Considerations
 
