@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# forecastbaselines
+# forecastbaselines <a href="https://epiforecasts.io/forecastbaselines/"><picture><source media="(prefers-color-scheme: dark)" srcset="man/figures/logo-dark.svg"><img src="man/figures/logo.svg" align="right" height="139" alt="forecastbaselines website" /></picture></a>
 
 > R interface to
 > [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
