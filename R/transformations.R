@@ -135,7 +135,9 @@ PowerPlusOneTransform <- function(lambda, constant = 1.0) {
 #' better reliability and flexibility. This function has limitations due to
 #' bugs in ForecastBaselines.jl (e.g., SquareRootTransform fails).
 #'
-#' See `vignette("transformations")` for the recommended R approach.
+#' See the
+#' \url{https://epiforecasts.io/forecastbaselines/articles/transformations.html}
+#' article for the recommended R approach.
 #'
 #' @examples
 #' \dontrun{
@@ -216,7 +218,9 @@ inverse_transform_data <- function(y, transformation) {
 #' fc$mean <- exp(fc$mean)  # Back-transform
 #' ```
 #'
-#' See `vignette("transformations")` for complete examples.
+#' See the
+#' \url{https://epiforecasts.io/forecastbaselines/articles/transformations.html}
+#' article for complete examples.
 #'
 #' @examples
 #' \dontrun{
@@ -238,7 +242,9 @@ transform_model <- function(model, transformation) {
     "  2. Fit model: fitted <- fit_baseline(log_data, model)\n",
     "  3. Forecast: fc <- forecast(fitted, ...)\n",
     "  4. Back-transform: fc$mean <- exp(fc$mean)\n",
-    "See vignette('transformations') for details.",
+    "See ",
+    "https://epiforecasts.io/forecastbaselines/articles/transformations.html",
+    " for details.",
     call. = FALSE
   )
 }

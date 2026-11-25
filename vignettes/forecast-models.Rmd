@@ -1160,8 +1160,8 @@ Don't know where to begin?
 
 ## Further Reading
 
-- See `vignette("forecastbaselines")` for basic workflow
-- See `vignette("transformations")` for data preprocessing
+- See [the getting started vignette](forecastbaselines.html) for the basic workflow
+- See [the transformations vignette](transformations.html) for data preprocessing
 - Check individual function help: `?ARMAModel`, `?forecast`, etc.
 
 # Appendix: Parameter Quick Reference
