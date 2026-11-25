@@ -31,7 +31,9 @@ fc <- forecast(fitted, ...)
 fc$mean <- exp(fc$mean)  # Back-transform
 ```
 
-See the \url{https://epiforecasts.io/forecastbaselines/articles/transformations.html} article for complete examples.
+See the
+\url{https://epiforecasts.io/forecastbaselines/articles/transformations.html}
+article for complete examples.
 }
 \examples{
 \dontrun{
