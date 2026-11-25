@@ -60,3 +60,5 @@
   argument rather than positionally; and converts a `Date` reference date
   into a Julia `Date` rather than letting it reach Julia as a `Float64`.
   Every previous call failed with a `MethodError` (#14).
+
+* The help pages and error message of `transform_data()` and `transform_model()`, and the "Further Reading" list of the models vignette, link to the transformations and getting started articles rather than calling `vignette()`, which finds nothing in an installation made without building vignettes.

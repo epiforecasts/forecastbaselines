@@ -22,7 +22,7 @@ Applies a transformation to data.
 better reliability and flexibility. This function has limitations due to
 bugs in ForecastBaselines.jl (e.g., SquareRootTransform fails).
 
-See `vignette("transformations")` for the recommended R approach.
+See the \url{https://epiforecasts.io/forecastbaselines/articles/transformations.html} article for the recommended R approach.
 }
 \examples{
 \dontrun{
