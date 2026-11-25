@@ -414,7 +414,7 @@ fc$mean <- exp(fc$mean)
 print(fc$mean)
 ```
 
-See `vignette("transformations")` for detailed guidance on transformations.
+See [Transformations](transformations.html) for detailed guidance.
 
 # Utility Functions
 
