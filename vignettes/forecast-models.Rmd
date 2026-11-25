@@ -1003,6 +1003,40 @@ Tips:
 
 # Model Selection Examples
 
+Each example holds the last stretch of a series back, fits the candidate models
+to the rest, and scores their forecasts of the held-out points together. The
+weighted interval score (`wis`) rewards sharp intervals that cover the truth,
+so it ranks models on their whole predictive distribution rather than on their
+point forecasts alone.
+
+```{r selection-helper}
+compare_models <- function(data, models, h) {
+  train <- head(data, -h)
+  test <- tail(data, h)
+
+  quantiles <- lapply(names(models), function(name) {
+    fitted <- fit_baseline(train, models[[name]])
+    fc <- forecast(
+      fitted,
+      interval_method = EmpiricalInterval(n_trajectories = 1000, seed = 42),
+      horizon = seq_len(h),
+      levels = c(0.5, 0.9),
+      truth = test,
+      model_name = name
+    )
+    as.data.frame(scoringutils::as_forecast_quantile(fc))
+  })
+
+  scores <- scoringutils::score(
+    scoringutils::as_forecast_quantile(do.call(rbind, quantiles))
+  )
+  comparison <- as.data.frame(
+    scoringutils::summarise_scores(scores, by = "model")
+  )
+  comparison[order(comparison$wis), c("model", "wis", "ae_median", "bias")]
+}
+```
+
 ## Example 1: Monthly Sales Data
 
 ```{r sales-example}
@@ -1014,40 +1048,12 @@ seasonal <- 200 * sin(2 * pi * months / 12) # Holiday peaks
 noise <- rnorm(240, sd = 50)
 data <- trend + seasonal + noise
 
-# Hold the final year back to score the forecasts against
-train <- data[1:228]
-test <- data[229:240]
-
-models <- list(
+compare_models(data, list(
   Naive = ConstantModel(),
   LSD = LSDModel(window_width = 3, s = 12),
   STL = STLModel(s = 12),
   ETS = ETSModel(error_type = "A", trend_type = "A", season_type = "A", s = 12)
-)
-
-# Fit each model on the training data and forecast the held-out year
-quantiles <- lapply(names(models), function(name) {
-  fitted <- fit_baseline(train, models[[name]])
-  fc <- forecast(
-    fitted,
-    interval_method = EmpiricalInterval(n_trajectories = 1000, seed = 42),
-    horizon = 1:12,
-    levels = c(0.5, 0.9),
-    truth = test,
-    model_name = name
-  )
-  as.data.frame(scoringutils::as_forecast_quantile(fc))
-})
-
-# Scoring the models together puts them in one comparable table
-scores <- scoringutils::score(
-  scoringutils::as_forecast_quantile(do.call(rbind, quantiles))
-)
-comparison <- as.data.frame(
-  scoringutils::summarise_scores(scores, by = "model")
-)
-
-comparison[order(comparison$wis), c("model", "wis", "ae_median", "bias")]
+), h = 12)
 ```
 
 ETS and STL come out ahead on the weighted interval score, because both
@@ -1059,41 +1065,47 @@ The naive model sits between them, tracking the level but not the season.
 ## Example 2: Website Traffic (Count Data)
 
 ```{r traffic-example}
-# Daily page views (count data)
+# Daily page views as a Poisson AR process: each day's expected count depends
+# on the count observed the day before, which is what INARCH represents
 set.seed(456)
-days <- 100
-data <- rpois(days, lambda = 100 + 0.5 * 1:days)
+n <- 150
+data <- numeric(n)
+data[1] <- rpois(1, 100)
+for (i in 2:n) {
+  data[i] <- rpois(1, 20 + 0.8 * data[i - 1])
+}
 
-# Count-specific models
-models <- list(
-  Marginal = MarginalModel(), # Ignore trend
-  INARCH = INARCHModel(p = 1) # Model count dynamics
-)
-
-# Compare
-# INARCH should perform better due to trend
-
-# Recommendation: INARCH for count data with patterns
+compare_models(data, list(
+  Marginal = MarginalModel(), # Ignores the dependence between days
+  INARCH = INARCHModel(p = 1) # Represents it
+), h = 12)
 ```
+
+INARCH wins on the weighted interval score, by about 9%, because it conditions
+each day's expected count on the day before and the series was generated that
+way. The gain sits in the intervals rather than the point forecast: Marginal
+has the better `ae_median` of the two, so ranking these models on absolute
+error alone would have chosen the wrong one.
 
 ## Example 3: Financial Returns
 
 ```{r finance-example}
-# Daily returns (stationary, no trend/season)
+# Daily returns simulated with AR(1) structure, so there is autocorrelation
+# for ARMA to find
 set.seed(789)
-data <- rnorm(200, mean = 0.001, sd = 0.02)
+data <- as.numeric(arima.sim(list(ar = 0.6), n = 200, sd = 0.02)) + 0.001
 
-# Stationary models
-models <- list(
+compare_models(data, list(
   Marginal = MarginalModel(),
   ARMA = ARMAModel(p = 1, q = 1)
-)
-
-# For returns, ARMA captures autocorrelation
-# Marginal is baseline
-
-# Recommendation: ARMA if autocorrelation present, else Marginal
+), h = 12)
 ```
+
+ARMA scores about a third better than Marginal on both the interval score and
+the median forecast, because an AR(1) series is what it is built to fit. Real
+return series usually carry far less autocorrelation than this simulated one,
+and the two models then converge: where ARMA cannot beat Marginal, the data
+may hold no autocorrelation worth modelling.
 
 # Performance Considerations
 
