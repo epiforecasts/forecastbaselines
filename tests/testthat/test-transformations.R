@@ -176,3 +176,13 @@ test_that("inverse_transform_data inverts PowerTransform correctly", {
 
   expect_equal(original, data, tolerance = 1e-10)
 })
+
+# transform_model Tests -------------------------------------------------
+
+test_that("transform_model errors and points to the published article", {
+  expect_error(
+    transform_model(NULL, NULL),
+    "articles/transformations.html",
+    fixed = TRUE
+  )
+})
