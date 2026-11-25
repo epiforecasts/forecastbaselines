@@ -1083,9 +1083,10 @@ compare_models(data, list(
 
 INARCH wins on the weighted interval score, by about 9%, because it conditions
 each day's expected count on the day before and the series was generated that
-way. The gain sits in the intervals rather than the point forecast: Marginal
-has the better `ae_median` of the two, so ranking these models on absolute
-error alone would have chosen the wrong one.
+way. The gain sits in the intervals alone: twelve days ahead both models have
+settled to a near-flat median close to the training mean, while the held-out
+counts range from 74 to 109, so neither point forecast tracks them and
+`ae_median` separates the two by only a few per cent either way.
 
 ## Example 3: Financial Returns
 
