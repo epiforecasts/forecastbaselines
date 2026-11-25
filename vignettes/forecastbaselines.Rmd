@@ -414,7 +414,7 @@ fc$mean <- exp(fc$mean)
 print(fc$mean)
 ```
 
-See `vignette("transformations")` for detailed guidance on transformations.
+See [Transformations](transformations.html) for detailed guidance.
 
 # Utility Functions
 
@@ -444,11 +444,11 @@ fc_selected <- filter_horizons(fc, horizons = c(1, 3, 6, 12))
 
 Now that you've learned the basics, explore:
 
-1. `vignette("forecast-models")` - Detailed guide to all 10 models,
-   when to use each, and their parameters
+1. [Forecasting models guide](forecast-models.html) - Detailed guide to
+   all 10 models, when to use each, and their parameters
 
-2. `vignette("transformations")` - Guide to data transformations with
-   examples
+2. [Transformations](transformations.html) - Guide to data
+   transformations with examples
 
 3. Package documentation - Run `?forecastbaselines` or
    `help(package = "forecastbaselines")`

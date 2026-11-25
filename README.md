@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# forecastbaselines
+# forecastbaselines <a href="https://epiforecasts.io/forecastbaselines/"><picture><source media="(prefers-color-scheme: dark)" srcset="man/figures/logo-dark.svg"><img src="man/figures/logo.svg" align="right" height="139" alt="forecastbaselines website" /></picture></a>
 
 > R interface to
 > [ForecastBaselines.jl](https://github.com/ManuelStapper/ForecastBaselines.jl)
@@ -113,9 +113,14 @@ scores_summary[, c("model", "ae_point", "se_point")]
 
 For detailed guides and examples:
 
-- `vignette("forecastbaselines")` - Complete introduction with examples
-- `vignette("forecast-models")` - Detailed guide to all 10 models
-- `vignette("transformations")` - Working with data transformations
+- [Getting
+  started](https://epiforecasts.io/forecastbaselines/articles/forecastbaselines.html) -
+  Complete introduction with examples
+- [Forecasting models
+  guide](https://epiforecasts.io/forecastbaselines/articles/forecast-models.html) -
+  Detailed guide to all 10 models
+- [Transformations](https://epiforecasts.io/forecastbaselines/articles/transformations.html) -
+  Working with data transformations
 
 ## Related Packages
 
