@@ -26,7 +26,7 @@ seamless integration with the
 
 ### Prerequisites
 
-1.  Julia (\>= 1.9): Download from
+1.  Julia (\>= 1.10): Download from
     [julialang.org](https://julialang.org/downloads/)
 2.  R (\>= 3.5.0)
 3.  remotes R package, to pull in the juliabridge dependency:

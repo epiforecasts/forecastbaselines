@@ -35,7 +35,7 @@ This vignette will walk you through:
 
 You'll need both Julia and R installed:
 
-Julia (>= 1.9)
+Julia (>= 1.10)
 
 - Download from [julialang.org](https://julialang.org/downloads/)
 - Verify installation: `julia --version`

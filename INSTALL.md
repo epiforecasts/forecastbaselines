@@ -6,7 +6,7 @@ This guide will walk you through installing forecastbaselines and its dependenci
 
 ### 1. Install Julia
 
-forecastbaselines requires Julia (version 1.9 or higher) to be installed on your system.
+forecastbaselines requires Julia (version 1.10 or higher) to be installed on your system.
 
 #### On Linux/macOS:
 
@@ -217,7 +217,7 @@ Once installation is complete:
 ## System Requirements
 
 - **R**: >= 3.5.0
-- **Julia**: >= 1.9
+- **Julia**: >= 1.10
 - **Operating Systems**: Linux, macOS, Windows
 - **RAM**: At least 2GB recommended (4GB+ for large datasets)
 - **Disk Space**: ~500MB for Julia and packages
