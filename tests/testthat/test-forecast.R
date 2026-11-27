@@ -2,6 +2,22 @@
 
 # fit_baseline Tests ----------------------------------------------------
 
+test_that("convergence is available and unsuccessful fits warn", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  expect_true(is.na(has_converged(fit_baseline(1:20, ConstantModel()))))
+  set.seed(123)
+  expect_true(has_converged(fit_baseline(rnorm(100), ARMAModel(p = 1))))
+  set.seed(1)
+  y <- 100 + 5 * sin(2 * pi * (1:200) / 12) + rnorm(200)
+  expect_warning(
+    fitted <- fit_baseline(y, ARMAModel(p = 1, q = 0, s = 12, k = 3)),
+    "converg"
+  )
+  expect_false(has_converged(fitted))
+})
+
 test_that("fit_baseline works with ConstantModel", {
   skip_if_no_julia()
   skip_on_cran()

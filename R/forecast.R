@@ -11,6 +11,7 @@
 #'   resolution
 #'
 #' @return A fitted model object that can be used for forecasting
+#' @details Issues a warning if the fit did not converge.
 #' @export
 #'
 #' @examples
@@ -29,7 +30,24 @@ fit_baseline <- function(x, model, temporal_info = NULL) {
   if (!is.null(temporal_info)) {
     args$temporal_info <- as_julia_object(temporal_info)
   }
-  do.call(juliabridge::call_julia, args)
+  fitted <- do.call(juliabridge::call_julia, args)
+  if (identical(has_converged(fitted), FALSE)) {
+    warning("The fit did not converge; use has_converged() to check it.",
+      call. = FALSE
+    )
+  }
+  fitted
+}
+
+#' Check whether a fit converged
+#'
+#' @param fitted A fitted model object from [fit_baseline()].
+#' @return `TRUE` or `FALSE` if convergence was assessed, otherwise `NA`.
+#' @export
+has_converged <- function(fitted) {
+  check_setup()
+  result <- juliabridge::call_julia("ForecastBaselines.has_converged", fitted)
+  if (is.null(result)) NA else as.logical(result)
 }
 
 #' Generate Point Forecasts
