@@ -244,3 +244,69 @@ test_that("score works with multiple horizons and produces correct output", {
   scores_sum <- summarise_scores(scores, by = "model")
   expect_equal(nrow(scores_sum), 1) # One row for the model
 })
+
+# as_hubverse Tests -----------------------------------------------------
+
+test_that("as_hubverse aligns target dates for non-contiguous horizons", {
+  fc <- structure(
+    list(
+      horizon = c(2L, 4L),
+      mean = c(11, 13),
+      median = c(11, 13),
+      truth = NULL,
+      model_name = "TestModel",
+      quantiles = matrix(c(9, 11, 13, 11, 13, 15), nrow = 2, byrow = TRUE),
+      quantile_levels = c(0.025, 0.5, 0.975)
+    ),
+    class = c("ForecastBaselines_Forecast", "list")
+  )
+  obs <- as.numeric(1:10)
+
+  hv <- as_hubverse(
+    fc,
+    start_date = "2024-01-01",
+    horizon_unit = "day",
+    observed_data = obs
+  )
+
+  expect_equal(
+    unique(hv$model_output$target_date),
+    as.Date(c("2024-01-08", "2024-01-10"))
+  )
+  expect_true(all(hv$model_output$target_date <= max(hv$target_data$date)))
+
+  # Same alignment when called directly on a scoringutils forecast_quantile
+  fc_with_truth <- fc
+  fc_with_truth$truth <- c(8, 10)
+  fc_q <- as_forecast_quantile(fc_with_truth)
+  hv_default <- as_hubverse(
+    fc_q,
+    start_date = "2024-01-01",
+    horizon_unit = "day",
+    observed_data = obs
+  )
+  expect_equal(
+    unique(hv_default$model_output$target_date),
+    as.Date(c("2024-01-08", "2024-01-10"))
+  )
+
+  # Reject observed_data shorter than the maximum horizon
+  expect_error(
+    as_hubverse(
+      fc,
+      start_date = "2024-01-01",
+      horizon_unit = "day",
+      observed_data = c(1, 2, 3)
+    ),
+    "observed_data"
+  )
+  expect_error(
+    as_hubverse(
+      fc_q,
+      start_date = "2024-01-01",
+      horizon_unit = "day",
+      observed_data = c(1, 2, 3)
+    ),
+    "observed_data"
+  )
+})
