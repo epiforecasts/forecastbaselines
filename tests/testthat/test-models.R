@@ -111,6 +111,21 @@ test_that("IDSModel rejects unsupported threshold", {
 
 # STLModel Tests --------------------------------------------------------
 
+test_that("STLModel needs more than 13 seasonal cycles", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(3)
+  s <- 12
+
+  # The seasonal loess span is 13, so 13 * s observations is one short.
+  expect_error(
+    fit_baseline(rnorm(13 * s, 100, 5), STLModel(s = s)),
+    "needs at least"
+  )
+  expect_no_error(fit_baseline(rnorm(13 * s + 1, 100, 5), STLModel(s = s)))
+})
+
 test_that("STLModel creates valid model with seasonal period", {
   skip_if_no_julia()
 
@@ -124,6 +139,22 @@ test_that("STLModel rejects unsupported trend and robust options", {
 })
 
 # ARMAModel Tests -------------------------------------------------------
+
+test_that("ARMA seasonal fits sit at the level of the data", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(2)
+  n <- 200
+  z <- 100 + 5 * sin(2 * pi * seq_len(n) / 12) + rnorm(n)
+
+  fitted <- fit_baseline(z, ARMAModel(p = 1, q = 0, s = 12, k = 2))
+
+  # The intercept of the mean function rather than the forecast: an AR
+  # coefficient near one carries the level, so a forecast can look right
+  # while the mean function sits at zero.
+  expect_equal(mean_intercept(fitted), mean(z), tolerance = 0.01)
+})
 
 test_that("ARMAModel creates AR(1) model", {
   skip_if_no_julia()
@@ -219,21 +250,35 @@ test_that("INARCHModel creates valid model with higher order", {
   expect_true(!is.null(model))
 })
 
-test_that("INARCHModel warns about harmonics beyond the first", {
+test_that("INARCHModel accepts harmonics beyond the first without warning", {
   skip_if_no_julia()
 
-  expect_warning(
-    INARCHModel(p = 1, s = 52, k = 2),
-    "do not reflect seasonality estimated"
-  )
+  expect_no_warning(INARCHModel(p = 1, s = 52, k = 2))
+})
+
+test_that("INARCH forecasts carry seasonality estimated with k > 1", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(1)
+  s <- 12
+  n <- 240
+
+  # A second harmonic gives the series a shape the fundamental alone cannot
+  # reproduce, so a forecast evaluating both at one frequency would lose it.
+  shape <- function(i) 6 * sin(2 * pi * i / s) + 5 * cos(4 * pi * i / s)
+  y <- rpois(n, pmax(20 + shape(seq_len(n)), 1))
+
+  fitted <- fit_baseline(y, INARCHModel(p = 1, s = s, k = 2))
+  fc <- point_forecast(fitted, seq_len(s))
+
+  expect_gt(cor(fc, shape(n + seq_len(s))), 0.9)
 })
 
 test_that("INARCHModel passes seasonality and negative binomial through", {
   skip_if_no_julia()
 
-  model <- as_julia_object(
-    suppressWarnings(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
-  )
+  model <- as_julia_object(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
   expect_equal(as.integer(model$s), 52L)
   expect_equal(as.integer(model$k), 4L)
   expect_true(as.logical(model$nb))
@@ -288,8 +333,6 @@ test_that("ETSModel creates Holt-Winters multiplicative (M,M,M)", {
 test_that("ETSModel reaches both of the Julia error types", {
   skip_if_no_julia()
 
-  # Julia's constructor spells its multiplicative error "N", so a wrapper that
-  # passed "M" straight through would return an additive-error model.
   expect_equal(
     julia_error_type(ETSModel(error_type = "A", trend_type = "N")), "AError"
   )

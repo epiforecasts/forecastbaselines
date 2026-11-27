@@ -12,13 +12,7 @@
   through `trend_type = "Ad"` or `"Md"`. These arguments were accepted and
   then discarded, so a model built with them was identical to one built
   without them (#7).
-* `ETSModel(error_type = "M")` now returns a multiplicative-error model, and
-  `error_type = "N"` is rejected: every ETS model has an error term.
-  ForecastBaselines.jl reaches its multiplicative error through the string
-  `"N"` and builds an additive-error model for every other string, so in
-  0.1.0 it was `error_type = "N"` — documented there as "none" — that gave
-  multiplicative errors, while `"M"` gave additive ones. Code written against
-  0.1.0 should read `"N"` as `"M"`, and `"M"` as `"A"`.
+* `ETSModel(error_type = "M")` now returns a multiplicative-error model, and `error_type = "N"` is rejected: every ETS model has an error term. In 0.1.0 the argument reached a ForecastBaselines.jl constructor that read `"N"` as multiplicative and every other string as additive, so `error_type = "N"` — documented there as "none" — gave multiplicative errors while `"M"` gave additive ones. Code written against 0.1.0 should read `"N"` as `"M"`, and `"M"` as `"A"`.
 * `setup_ForecastBaselines()` drops `install_package`, which it accepted and
   then ignored: the package always initialises Julia against the pinned
   project it ships in `inst/julia`.
@@ -41,16 +35,13 @@
 
 * `ARMAModel()` passes `include_drift` through to Julia, which adds a linear
   trend to the mean of the series (#7).
-* `ARMAModel()` and `INARCHModel()` gain `k`, the number of harmonic waves
-  representing seasonality. Values above 1 allow sharper, asymmetric seasonal
-  shapes than a single sinusoid, subject to the limits documented on each
-  function: ARMA fits with several waves can settle far from the data, and
-  INARCH forecasts do not reflect the estimated seasonality, which
-  `INARCHModel()` warns about (#7).
+* `ARMAModel()` and `INARCHModel()` gain `k`, the number of harmonic waves representing seasonality. Values above 1 allow sharper, asymmetric seasonal shapes than a single sinusoid (#7).
 * `INARCHModel()` gains `s` (seasonal period) and `nb` (negative binomial
   conditional distribution for overdispersed counts) (#7).
 
 ## Bug fixes
+
+* The pinned ForecastBaselines.jl moves from a build of August 2025 to one that fixes four problems this package used to work around or document. ETS error types are chosen by `"A"` and `"M"` rather than through `"N"`; ARMA starts its mean parameters at the level of the data, so seasonal fits no longer settle far from it; INARCH evaluates each seasonal harmonic at its own frequency when forecasting, so forecasts reflect the seasonality that was estimated; and STL reports the minimum length it enforces, which its own documentation used to contradict. The wrappers drop the workaround and the warnings those problems needed, so `INARCHModel(k > 1)` no longer warns.
 
 * Quantile levels are rounded to the decimals they stand for, so `scoringutils` can find them. `levels = 0.9` gave 0.049999999999999989 instead of 0.05, and scoringutils dropped `interval_coverage_90` from the scores with a warning.
 

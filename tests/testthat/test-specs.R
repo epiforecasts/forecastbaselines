@@ -15,7 +15,7 @@ test_that("arguments reach Julia under their Julia names", {
   expect_identical(LSDModel(s = 12, window_width = 2)$kwargs$w, 2L)
   expect_identical(OLSModel(degree = 2)$kwargs$p, 2L)
   expect_true(ARMAModel(p = 1, include_drift = TRUE)$kwargs$trend)
-  expect_identical(ETSModel(error_type = "M")$kwargs$error, "N")
+  expect_identical(ETSModel(error_type = "M")$kwargs$error, "M")
 })
 
 test_that("roles keep models and interval methods apart", {

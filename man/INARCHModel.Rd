@@ -12,13 +12,8 @@ INARCHModel(p = 1L, s = 0L, k = 1L, nb = FALSE)
 \item{s}{Seasonal period (default: 0 for no seasonality)}
 
 \item{k}{Number of harmonic waves used to represent seasonality
-(default: 1). Only meaningful when `s > 0`. Values above 1 are fitted
-correctly but not forecast correctly: `point_forecast()` and
-`interval_forecast()` in ForecastBaselines.jl evaluate every harmonic
-coefficient at the fundamental frequency, so forecasts do not reflect
-the seasonality that was estimated. Constructing such a model warns.
-Reported upstream at
-<https://github.com/ManuelStapper/ForecastBaselines.jl/issues/2>.}
+(default: 1). Only meaningful when `s > 0`. Higher values allow sharper,
+asymmetric seasonal shapes.}
 
 \item{nb}{Whether to use a negative binomial conditional distribution
 instead of Poisson, allowing for overdispersion (default: FALSE)}

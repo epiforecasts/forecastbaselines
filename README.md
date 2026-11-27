@@ -26,7 +26,7 @@ seamless integration with the
 
 ### Prerequisites
 
-1.  Julia (\>= 1.9): Download from
+1.  Julia (\>= 1.10): Download from
     [julialang.org](https://julialang.org/downloads/)
 2.  R (\>= 3.5.0)
 3.  remotes R package, to pull in the juliabridge dependency:
@@ -83,9 +83,9 @@ scores <- score(fc_point)
 scores_summary <- summarise_scores(scores, by = "model")
 
 scores_summary[, c("model", "ae_point", "se_point")]
-#>        model  ae_point   se_point
-#>       <char>     <num>      <num>
-#> 1: ARMA(1,1) 0.2368795 0.07611188
+#>        model  ae_point  se_point
+#>       <char>     <num>     <num>
+#> 1: ARMA(1,1) 0.3979735 0.1783829
 ```
 
 ## Available Models
