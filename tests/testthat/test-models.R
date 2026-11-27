@@ -125,6 +125,21 @@ test_that("STLModel rejects unsupported trend and robust options", {
 
 # ARMAModel Tests -------------------------------------------------------
 
+test_that("STLModel needs more than 13 seasonal cycles", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(3)
+  s <- 12
+
+  # The seasonal loess span is 13, so 13 * s observations is one short.
+  expect_error(
+    fit_baseline(rnorm(13 * s, 100, 5), STLModel(s = s)),
+    "needs at least"
+  )
+  expect_no_error(fit_baseline(rnorm(13 * s + 1, 100, 5), STLModel(s = s)))
+})
+
 test_that("ARMAModel creates AR(1) model", {
   skip_if_no_julia()
 
@@ -205,6 +220,19 @@ test_that("ARMAModel rejects a non-logical include_drift", {
 
 # INARCHModel Tests -----------------------------------------------------
 
+test_that("ARMA seasonal fits sit at the level of the data", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(2)
+  n <- 200
+  z <- 100 + 5 * sin(2 * pi * seq_len(n) / 12) + rnorm(n)
+
+  fitted <- fit_baseline(z, ARMAModel(p = 1, q = 0, s = 12, k = 2))
+
+  expect_equal(mean(point_forecast(fitted, 1:12)), mean(z), tolerance = 0.05)
+})
+
 test_that("INARCHModel creates valid model", {
   skip_if_no_julia()
 
@@ -223,6 +251,25 @@ test_that("INARCHModel accepts harmonics beyond the first without warning", {
   skip_if_no_julia()
 
   expect_no_warning(INARCHModel(p = 1, s = 52, k = 2))
+})
+
+test_that("INARCH forecasts carry seasonality estimated with k > 1", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(1)
+  s <- 12
+  n <- 240
+
+  # A second harmonic gives the series a shape the fundamental alone cannot
+  # reproduce, so a forecast evaluating both at one frequency would lose it.
+  shape <- function(i) 6 * sin(2 * pi * i / s) + 5 * cos(4 * pi * i / s)
+  y <- rpois(n, pmax(20 + shape(seq_len(n)), 1))
+
+  fitted <- fit_baseline(y, INARCHModel(p = 1, s = s, k = 2))
+  fc <- point_forecast(fitted, seq_len(s))
+
+  expect_gt(cor(fc, shape(n + seq_len(s))), 0.9)
 })
 
 test_that("INARCHModel passes seasonality and negative binomial through", {
