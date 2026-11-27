@@ -145,11 +145,9 @@ IDSModel <- function(window_size = 3L) {
 #' settings in ForecastBaselines.jl, which `fit_baseline()` does not expose.
 #' The seasonal period is therefore the only argument.
 #'
-#' @param s Seasonal period. Fitting needs more than 13 cycles of data, i.e.
-#'   more than `13 * s` observations, because the loess smoothing span that
-#'   ForecastBaselines.jl fixes at 13 cannot be reached with fewer. Reported
-#'   upstream at
-#'   <https://github.com/ManuelStapper/ForecastBaselines.jl/issues/5>.
+#' @param s Seasonal period. Fitting needs at least as many seasonal cycles as
+#'   the seasonal loess span, which ForecastBaselines.jl fixes at 13, so a
+#'   shorter series is rejected with an error naming the requirement.
 #'
 #' @return A spec for a Julia `STLModel`, built when it is fitted
 #'   (see [juliabridge::julia_spec()])
@@ -180,14 +178,7 @@ STLModel <- function(s) {
 #' @param s Seasonal period (default: 0 for no seasonality)
 #' @param k Number of harmonic waves used to represent seasonality
 #'   (default: 1). Higher values allow sharper, asymmetric seasonal shapes.
-#'   Only meaningful when `s > 0`. The mean parameters are estimated by a
-#'   derivative-free search started from zero, which can settle on a solution
-#'   far from the data. The risk grows with the number of waves and with the
-#'   distance of the series from zero: at a mean of 100 two waves fail,
-#'   while on low-count series they usually, though not always, succeed.
-#'   Compare the fitted mean with the data before trusting a seasonal fit.
-#'   Reported upstream at
-#'   <https://github.com/ManuelStapper/ForecastBaselines.jl/issues/4>.
+#'   Only meaningful when `s > 0`.
 #' @param include_drift Whether to include a linear trend in the mean
 #'   (default: FALSE)
 #'
@@ -232,13 +223,8 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
 #' @param p Order of the INARCH model (default: 1)
 #' @param s Seasonal period (default: 0 for no seasonality)
 #' @param k Number of harmonic waves used to represent seasonality
-#'   (default: 1). Only meaningful when `s > 0`. Values above 1 are fitted
-#'   correctly but not forecast correctly: `point_forecast()` and
-#'   `interval_forecast()` in ForecastBaselines.jl evaluate every harmonic
-#'   coefficient at the fundamental frequency, so forecasts do not reflect
-#'   the seasonality that was estimated. Constructing such a model warns.
-#'   Reported upstream at
-#'   <https://github.com/ManuelStapper/ForecastBaselines.jl/issues/2>.
+#'   (default: 1). Only meaningful when `s > 0`. Higher values allow sharper,
+#'   asymmetric seasonal shapes.
 #' @param nb Whether to use a negative binomial conditional distribution
 #'   instead of Poisson, allowing for overdispersion (default: FALSE)
 #'
@@ -255,13 +241,6 @@ ARMAModel <- function(p = 0L, q = 0L, s = 0L, k = 1L,
 #' }
 INARCHModel <- function(p = 1L, s = 0L, k = 1L, nb = FALSE) {
   check_harmonics(s, k)
-  if (as.integer(k) > 1L) {
-    warning(
-      "INARCH forecasts evaluate every harmonic at the fundamental ",
-      "frequency, so they do not reflect seasonality estimated with k > 1.",
-      call. = FALSE
-    )
-  }
   check_flag(nb)
   baseline_spec(
     "INARCHModel", "model",
@@ -317,15 +296,9 @@ ETSModel <- function(error_type = "A", trend_type = "N", season_type = "N",
     )
   }
 
-  # The Julia constructor reaches its multiplicative error type through the
-  # string "N" and builds an additive one for every other string, so "M" has
-  # to be sent as "N" to get the model the caller asked for. The tests assert
-  # the resulting error type, so this stops working loudly if Julia's mapping
-  # is corrected. Reported upstream at
-  # https://github.com/ManuelStapper/ForecastBaselines.jl/issues/3
   baseline_spec(
     "ETSModel", "model",
-    error = if (error_type == "M") "N" else "A",
+    error = error_type,
     trend = trend_type,
     season = season_type,
     s = if (!is.null(s)) as.integer(s)

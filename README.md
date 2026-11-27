@@ -83,9 +83,9 @@ scores <- score(fc_point)
 scores_summary <- summarise_scores(scores, by = "model")
 
 scores_summary[, c("model", "ae_point", "se_point")]
-#>        model  ae_point   se_point
-#>       <char>     <num>      <num>
-#> 1: ARMA(1,1) 0.2368795 0.07611188
+#>        model  ae_point  se_point
+#>       <char>     <num>     <num>
+#> 1: ARMA(1,1) 0.3979735 0.1783829
 ```
 
 ## Available Models

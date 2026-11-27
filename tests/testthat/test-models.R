@@ -219,21 +219,16 @@ test_that("INARCHModel creates valid model with higher order", {
   expect_true(!is.null(model))
 })
 
-test_that("INARCHModel warns about harmonics beyond the first", {
+test_that("INARCHModel accepts harmonics beyond the first without warning", {
   skip_if_no_julia()
 
-  expect_warning(
-    INARCHModel(p = 1, s = 52, k = 2),
-    "do not reflect seasonality estimated"
-  )
+  expect_no_warning(INARCHModel(p = 1, s = 52, k = 2))
 })
 
 test_that("INARCHModel passes seasonality and negative binomial through", {
   skip_if_no_julia()
 
-  model <- as_julia_object(
-    suppressWarnings(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
-  )
+  model <- as_julia_object(INARCHModel(p = 1, s = 52, k = 4, nb = TRUE))
   expect_equal(as.integer(model$s), 52L)
   expect_equal(as.integer(model$k), 4L)
   expect_true(as.logical(model$nb))
@@ -288,8 +283,6 @@ test_that("ETSModel creates Holt-Winters multiplicative (M,M,M)", {
 test_that("ETSModel reaches both of the Julia error types", {
   skip_if_no_julia()
 
-  # Julia's constructor spells its multiplicative error "N", so a wrapper that
-  # passed "M" straight through would return an additive-error model.
   expect_equal(
     julia_error_type(ETSModel(error_type = "A", trend_type = "N")), "AError"
   )
