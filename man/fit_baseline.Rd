@@ -22,8 +22,7 @@ A fitted model object that can be used for forecasting
 Fits a baseline forecasting model to observed data.
 }
 \details{
-A warning is issued if the fit did not converge. Use
-  [has_converged()] to check the fitted model.
+A warning is issued if the fit did not converge.
 }
 \examples{
 \dontrun{

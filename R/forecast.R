@@ -11,8 +11,7 @@
 #'   resolution
 #'
 #' @return A fitted model object that can be used for forecasting
-#' @details A warning is issued if the fit did not converge. Use
-#'   [has_converged()] to check the fitted model.
+#' @details A warning is issued if the fit did not converge.
 #' @export
 #'
 #' @examples
