@@ -41,7 +41,7 @@
 
 ## Bug fixes
 
-* The pinned ForecastBaselines.jl moves from a build of August 2025 to one that fixes four problems this package used to work around or document. ETS error types are chosen by `"A"` and `"M"` rather than through `"N"`; ARMA starts its mean parameters at the level of the data, so seasonal fits no longer settle far from it; INARCH evaluates each seasonal harmonic at its own frequency when forecasting, so forecasts reflect the seasonality that was estimated; and STL rejects a series shorter than its seasonal span with an error naming the requirement. The wrappers drop the workaround and the warnings those problems needed, so `INARCHModel(k > 1)` no longer warns.
+* The pinned ForecastBaselines.jl moves from a build of August 2025 to one that fixes four problems this package used to work around or document. ETS error types are chosen by `"A"` and `"M"` rather than through `"N"`; ARMA starts its mean parameters at the level of the data, so seasonal fits no longer settle far from it; INARCH evaluates each seasonal harmonic at its own frequency when forecasting, so forecasts reflect the seasonality that was estimated; and STL reports the minimum length it enforces, which its own documentation used to contradict. The wrappers drop the workaround and the warnings those problems needed, so `INARCHModel(k > 1)` no longer warns.
 
 * Quantile levels are rounded to the decimals they stand for, so `scoringutils` can find them. `levels = 0.9` gave 0.049999999999999989 instead of 0.05, and scoringutils dropped `interval_coverage_90` from the scores with a warning.
 
