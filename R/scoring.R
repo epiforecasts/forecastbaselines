@@ -16,14 +16,16 @@ NULL
 #'   If NULL (default), uses horizon numbers as target_date values.
 #'   Can be a Date object or character string in "YYYY-MM-DD" format.
 #' @param horizon_unit Character string specifying the time unit for horizons.
-#'   One of "day" (default), "week", or "month". Used when start_date is provided.
-#' @param observed_data Optional numeric vector of all observed values (training + test).
-#'   If provided, will be used to populate target_data with complete historical context.
+#'   One of "day" (default), "week", or "month". Used when start_date is
+#'   provided.
+#' @param observed_data Optional numeric vector of all observed values
+#'   (training + test). If provided, will be used to populate target_data with
+#'   complete historical context.
 #'
 #' @return A list with two elements:
 #'   \describe{
-#'     \item{model_output}{Data frame (model_out_tbl) with columns: target_date, value,
-#'       model_id, output_type, output_type_id}
+#'     \item{model_output}{Data frame (model_out_tbl) with columns:
+#'       target_date, value, model_id, output_type, output_type_id}
 #'     \item{target_data}{Data frame with columns: date, observation}
 #'   }
 #'
@@ -62,10 +64,12 @@ as_hubverse <- function(data,
 }
 
 #' @export
-as_hubverse.ForecastBaselines_Forecast <- function(data,
-                                                    start_date = NULL,
-                                                    horizon_unit = c("day", "week", "month"),
-                                                    observed_data = NULL) {
+as_hubverse.ForecastBaselines_Forecast <- function(
+  data,
+  start_date = NULL,
+  horizon_unit = c("day", "week", "month"),
+  observed_data = NULL
+) {
   # Check for quantiles
   if (is.null(data$quantiles) || length(data$quantiles) == 0) {
     stop(
@@ -76,28 +80,30 @@ as_hubverse.ForecastBaselines_Forecast <- function(data,
 
   # If observed_data provided, we can work without truth in the forecast
   if (!is.null(observed_data)) {
-    # Extract just the test/forecast period from observed_data to use as "truth"
-    n_horizons <- length(data$horizon)
+    # Extract the forecast period from observed_data to use as "truth"
+    max_horizon <- max(data$horizon)
     n_obs <- length(observed_data)
 
-    if (n_obs < n_horizons) {
-      stop("observed_data has fewer observations than forecast horizons")
+    if (n_obs < max_horizon) {
+      stop("observed_data has fewer observations than maximum forecast horizon")
     }
 
-    # Use the last n_horizons observations as truth for conversion
-    temp_truth <- observed_data[(n_obs - n_horizons + 1):n_obs]
+    # Align truth with each horizon relative to the end of observed_data
+    temp_truth <- observed_data[n_obs - max_horizon + data$horizon]
 
     # Temporarily add truth for conversion
     data_with_truth <- data
     data_with_truth$truth <- temp_truth
 
-    fc_quantile <- as_forecast_quantile.ForecastBaselines_Forecast(data_with_truth)
+    fc_quantile <- as_forecast_quantile.ForecastBaselines_Forecast(
+      data_with_truth
+    )
   } else {
     # Fall back to requiring truth in the forecast
     if (is.null(data$truth) || all(is.na(data$truth))) {
       stop(
-        "Forecast must contain truth values or observed_data must be provided. ",
-        "Use add_truth() or provide observed_data parameter."
+        "Forecast must contain truth values or observed_data must be ",
+        "provided. Use add_truth() or provide observed_data parameter."
       )
     }
 
@@ -108,14 +114,18 @@ as_hubverse.ForecastBaselines_Forecast <- function(data,
 }
 
 #' @export
-as_hubverse.default <- function(data,
-                                 start_date = NULL,
-                                 horizon_unit = c("day", "week", "month"),
-                                 observed_data = NULL) {
+as_hubverse.default <- function(
+  data,
+  start_date = NULL,
+  horizon_unit = c("day", "week", "month"),
+  observed_data = NULL
+) {
   horizon_unit <- match.arg(horizon_unit)
 
   # Check for required columns
-  required_cols <- c("observed", "predicted", "quantile_level", "horizon", "model")
+  required_cols <- c(
+    "observed", "predicted", "quantile_level", "horizon", "model"
+  )
   missing_cols <- setdiff(required_cols, names(data))
   if (length(missing_cols) > 0) {
     stop(
@@ -141,11 +151,17 @@ as_hubverse.default <- function(data,
       "month" = 30 # Approximate
     )
 
-    # If observed_data provided, calculate where forecast starts in the full series
+    # If observed_data provided, place horizons at the end of the full series
     if (!is.null(observed_data)) {
-      # Forecast starts after training data
-      forecast_start_index <- length(observed_data) - length(unique(data$horizon)) + 1
-      target_dates <- start_date + ((forecast_start_index - 1 + data$horizon - 1) * multiplier)
+      max_horizon <- max(data$horizon)
+      if (length(observed_data) < max_horizon) {
+        stop(
+          "observed_data has fewer observations than maximum forecast horizon"
+        )
+      }
+      forecast_start_index <- length(observed_data) - max_horizon + 1
+      target_dates <- start_date +
+        ((forecast_start_index - 1 + data$horizon - 1) * multiplier)
     } else {
       # Legacy behavior: horizons relative to start_date
       target_dates <- start_date + ((data$horizon - 1) * multiplier)
