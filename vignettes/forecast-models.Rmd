@@ -646,7 +646,7 @@ Strengths:
 Limitations:
 
 - Fixed seasonal period
-- Needs at least 13 seasonal cycles
+- Needs more than 13 seasonal cycles
 - More complex than LSD
 
 Use Case:

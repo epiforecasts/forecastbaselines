@@ -7,9 +7,10 @@
 STLModel(s)
 }
 \arguments{
-\item{s}{Seasonal period. Fitting needs at least as many seasonal cycles as
-the seasonal loess span, which ForecastBaselines.jl fixes at 13, so a
-shorter series is rejected with an error naming the requirement.}
+\item{s}{Seasonal period. Fitting needs more than 13 seasonal cycles, that
+is more than `13 * s` observations, because the seasonal loess span that
+ForecastBaselines.jl fixes at 13 cannot be reached with fewer. A shorter
+series is rejected with an error naming the number of observations needed.}
 }
 \value{
 A spec for a Julia `STLModel`, built when it is fitted
