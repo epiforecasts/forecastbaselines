@@ -21,6 +21,10 @@ A fitted model object that can be used for forecasting
 \description{
 Fits a baseline forecasting model to observed data.
 }
+\details{
+A warning is issued if the fit did not converge. Use
+  [has_converged()] to check the fitted model.
+}
 \examples{
 \dontrun{
 data <- c(1.2, 2.3, 3.1, 2.8, 3.5, 4.2, 3.9)

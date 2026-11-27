@@ -33,6 +33,8 @@
 
 ## New features
 
+* `has_converged()` reports whether a fit converged, and `fit_baseline()` issues an R warning when it did not.
+
 * `ARMAModel()` passes `include_drift` through to Julia, which adds a linear
   trend to the mean of the series (#7).
 * `ARMAModel()` and `INARCHModel()` gain `k`, the number of harmonic waves representing seasonality. Values above 1 allow sharper, asymmetric seasonal shapes than a single sinusoid (#7).
