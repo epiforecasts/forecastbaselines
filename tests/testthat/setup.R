@@ -50,6 +50,12 @@ mean_dim <- function(model) {
   as.integer(as_julia_object(model)[["\u03bcDim"]])
 }
 
+# Intercept of the mean function of a fitted ARMA model. The field is named
+# "\u03bc" (mu) in Julia; it is written as an escape to keep this file ASCII.
+mean_intercept <- function(fitted) {
+  as.numeric(fitted[["par"]][["\u03bc"]])[1]
+}
+
 # Name of the Julia error type a fitted ETS model carries.
 julia_error_type <- function(model) {
   juliabridge::eval_julia(

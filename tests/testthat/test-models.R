@@ -111,6 +111,21 @@ test_that("IDSModel rejects unsupported threshold", {
 
 # STLModel Tests --------------------------------------------------------
 
+test_that("STLModel needs more than 13 seasonal cycles", {
+  skip_if_no_julia()
+  skip_on_cran()
+
+  set.seed(3)
+  s <- 12
+
+  # The seasonal loess span is 13, so 13 * s observations is one short.
+  expect_error(
+    fit_baseline(rnorm(13 * s, 100, 5), STLModel(s = s)),
+    "needs at least"
+  )
+  expect_no_error(fit_baseline(rnorm(13 * s + 1, 100, 5), STLModel(s = s)))
+})
+
 test_that("STLModel creates valid model with seasonal period", {
   skip_if_no_julia()
 
@@ -125,19 +140,20 @@ test_that("STLModel rejects unsupported trend and robust options", {
 
 # ARMAModel Tests -------------------------------------------------------
 
-test_that("STLModel needs more than 13 seasonal cycles", {
+test_that("ARMA seasonal fits sit at the level of the data", {
   skip_if_no_julia()
   skip_on_cran()
 
-  set.seed(3)
-  s <- 12
+  set.seed(2)
+  n <- 200
+  z <- 100 + 5 * sin(2 * pi * seq_len(n) / 12) + rnorm(n)
 
-  # The seasonal loess span is 13, so 13 * s observations is one short.
-  expect_error(
-    fit_baseline(rnorm(13 * s, 100, 5), STLModel(s = s)),
-    "needs at least"
-  )
-  expect_no_error(fit_baseline(rnorm(13 * s + 1, 100, 5), STLModel(s = s)))
+  fitted <- fit_baseline(z, ARMAModel(p = 1, q = 0, s = 12, k = 2))
+
+  # The intercept of the mean function rather than the forecast: an AR
+  # coefficient near one carries the level, so a forecast can look right
+  # while the mean function sits at zero.
+  expect_equal(mean_intercept(fitted), mean(z), tolerance = 0.01)
 })
 
 test_that("ARMAModel creates AR(1) model", {
@@ -219,19 +235,6 @@ test_that("ARMAModel rejects a non-logical include_drift", {
 })
 
 # INARCHModel Tests -----------------------------------------------------
-
-test_that("ARMA seasonal fits sit at the level of the data", {
-  skip_if_no_julia()
-  skip_on_cran()
-
-  set.seed(2)
-  n <- 200
-  z <- 100 + 5 * sin(2 * pi * seq_len(n) / 12) + rnorm(n)
-
-  fitted <- fit_baseline(z, ARMAModel(p = 1, q = 0, s = 12, k = 2))
-
-  expect_equal(mean(point_forecast(fitted, 1:12)), mean(z), tolerance = 0.05)
-})
 
 test_that("INARCHModel creates valid model", {
   skip_if_no_julia()
