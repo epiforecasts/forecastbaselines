@@ -11,7 +11,7 @@
 #'   resolution
 #'
 #' @return A fitted model object that can be used for forecasting
-#' @details A warning is issued if the fit did not converge.
+#' @details Issues a warning if the fit did not converge.
 #' @export
 #'
 #' @examples

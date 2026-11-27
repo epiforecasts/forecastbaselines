@@ -33,7 +33,7 @@
 
 ## New features
 
-* `has_converged()` reports whether a fit converged, and `fit_baseline()` issues an R warning when it did not.
+* `has_converged()` reports whether a fit converged. `fit_baseline()` issues an R warning if the fit did not converge.
 
 * `ARMAModel()` passes `include_drift` through to Julia, which adds a linear
   trend to the mean of the series (#7).
